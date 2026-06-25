@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#0b4b2f"/>
+<title>Asha Mini Shallow Elite</title>
+<style>
+:root{
+  --bg:#eef4f0;--card:#fff;--ink:#101828;--muted:#667085;--line:#d0d5dd;
+  --brand:#0b4b2f;--brand2:#168456;--soft:#e8f6ee;--ok:#067647;--okbg:#dcfae6;
+  --bad:#b42318;--badbg:#fee4e2;--warn:#b54708;--warnbg:#fef0c7;
+  --shadow:0 14px 36px rgba(16,24,40,.09);--r:22px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at top left,#dff4e8,transparent 40%),var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans Bengali","Noto Sans",Arial,sans-serif}
+button,input,select,textarea{font:inherit}
+.appbar{position:sticky;top:0;z-index:20;background:linear-gradient(135deg,#073b25,#168456);color:#fff;padding:16px 14px 18px;border-bottom-left-radius:26px;border-bottom-right-radius:26px;box-shadow:0 14px 28px rgba(11,75,47,.22)}
+.top{display:flex;align-items:center;gap:12px}.logo{width:45px;height:45px;border-radius:16px;background:#ffffff20;border:1px solid #ffffff35;display:grid;place-items:center;font-weight:950}
+h1{font-size:19px;margin:0}.appbar p{font-size:12px;margin:3px 0 0;opacity:.9}.right{margin-left:auto}
+.status{margin-top:10px;background:#ffffff16;border:1px solid #ffffff24;border-radius:14px;padding:8px 10px;font-size:12px}
+.wrap{max-width:1180px;margin:0 auto;padding:14px 12px 94px}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
+.span-12{grid-column:span 12}.span-8{grid-column:span 8}.span-7{grid-column:span 7}.span-6{grid-column:span 6}.span-5{grid-column:span 5}.span-4{grid-column:span 4}.span-3{grid-column:span 3}
+.card,.stat{background:rgba(255,255,255,.92);border:1px solid #e4e7ec;border-radius:var(--r);box-shadow:var(--shadow);padding:14px;backdrop-filter:blur(10px)}
+h2{font-size:18px;margin:0 0 10px}h3{font-size:15px;margin:0 0 10px}.muted,.tiny{color:var(--muted);font-size:12px}.tiny{font-size:11px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+label{display:block;margin:9px 0 5px;font-size:12px;font-weight:900;color:#344054}
+input,select,textarea{width:100%;border:1px solid var(--line);border-radius:14px;padding:10px 11px;background:#fff;color:var(--ink);outline:none}
+textarea{min-height:70px;resize:vertical}
+input:focus,select:focus,textarea:focus{border-color:var(--brand2);box-shadow:0 0 0 4px rgba(22,132,86,.12)}
+button{cursor:pointer}.primary{border:0;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;padding:10px 13px;border-radius:14px;font-weight:950}
+.secondary{border:0;background:#344054;color:#fff;padding:10px 13px;border-radius:14px;font-weight:950}
+.light{background:#f2f4f7;color:#172033;border:1px solid var(--line);padding:9px 11px;border-radius:14px;font-weight:900}
+.danger{border:0;background:var(--bad);color:#fff;padding:9px 11px;border-radius:14px;font-weight:900}
+.nav{position:fixed;left:8px;right:8px;bottom:8px;z-index:40;background:#fff;border:1px solid #e4e7ec;border-radius:24px;box-shadow:var(--shadow);display:flex;gap:5px;padding:6px;overflow:auto}
+.nav button{min-width:70px;border:0;background:transparent;border-radius:18px;padding:7px 5px;font-size:10px;font-weight:900;color:#344054}
+.nav span{display:grid;place-items:center;width:32px;height:32px;margin:0 auto 3px;border-radius:12px;background:#f2f4f7;border:1px solid #e4e7ec;font-size:16px}
+.nav button.active{background:#eaf7ef;color:var(--brand)}.nav button.active span{background:linear-gradient(135deg,var(--brand),var(--brand2));color:white;border-color:transparent}
+.page{display:none}.page.active{display:block}
+.stat .label{font-size:12px;color:var(--muted);font-weight:900}.stat b{font-size:22px;display:block;margin-top:5px}.ok{color:var(--ok)}.bad{color:var(--bad)}.warn{color:var(--warn)}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border-radius:999px;background:#f2f4f7;font-size:12px;font-weight:900}.chip.ok{background:var(--okbg);color:var(--ok)}.chip.bad{background:var(--badbg);color:var(--bad)}.chip.warn{background:var(--warnbg);color:var(--warn)}
+.listItem{border:1px solid #e4e7ec;border-radius:18px;background:#fff;padding:12px;margin:8px 0}
+.searchBox{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:8px}.searchBox input{border:0;padding:5px}.searchBox input:focus{box-shadow:none}
+.quickActions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.quickAction{border:1px solid #e4e7ec;background:linear-gradient(180deg,#fff,#f7fbf8);border-radius:18px;padding:12px;text-align:left}.quickAction span{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:var(--soft);color:var(--brand);font-size:17px}.quickAction b{display:block;margin-top:5px}
+.resultBox,.notice{background:#fff8e8;border:1px solid #fedf89;border-radius:16px;padding:11px;color:#7a2e0e;font-size:13px}.resultBox{background:linear-gradient(180deg,#f7fbf8,#edf7f1);border-color:#d7ebdf;color:#172033}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px dashed #e4e7ec}.kv:last-child{border-bottom:0}
+.calcGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.hidden{display:none!important}
+.invoiceWrap{display:grid;place-items:start center;background:#f9fafb;border-radius:18px;padding:12px;overflow:auto}
+.invoice{background:#fff;color:#111;border:1px solid #ddd;padding:8px;font-size:12px;line-height:1.28;font-family:"Noto Sans Bengali","Noto Sans",Arial,sans-serif;overflow:visible}
+.invoice.thermal{width:80mm}.invoice.a4half{width:100%;max-width:680px;padding:14px;font-size:12px}.invoice.a4quarter{width:100%;max-width:360px;padding:12px;font-size:11.5px}
+.invoice h1{font-size:18px;text-align:center;margin:0 0 2px}.invoice .sub{text-align:center;font-size:11px;margin:1px 0}.dashline{border-top:1px dashed #333;margin:6px 0}.billrow{display:flex;justify-content:space-between;gap:8px;margin:2px 0}.billrow span:first-child{font-weight:800}.total{font-size:15px;font-weight:950}.center{text-align:center}.sign{text-align:right;margin-top:10px}.qr{display:block;max-width:78px;max-height:78px;margin:5px auto;border:1px solid #ddd;padding:2px}
+.lock{position:fixed;inset:0;z-index:100;background:linear-gradient(135deg,#073b25,#168456);display:none;align-items:center;justify-content:center;padding:16px}.lock.show{display:flex}.lockbox{width:100%;max-width:380px;background:#fff;border-radius:26px;padding:18px;box-shadow:0 24px 80px rgba(0,0,0,.25)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:90;display:none;align-items:center;justify-content:center;padding:14px}.modal.show{display:flex}.modalBox{background:#fff;border-radius:24px;max-width:520px;width:100%;padding:16px}
+@media(max-width:850px){.span-8,.span-7,.span-6,.span-5,.span-4,.span-3{grid-column:span 12}.quickActions,.calcGrid{grid-template-columns:repeat(2,1fr)}.wrap{padding-left:10px;padding-right:10px}.appbar{border-radius:0 0 22px 22px}}
+@media print{
+  .appbar,.nav,.noPrint{display:none!important}body{background:white}.wrap{padding:0;margin:0}.card{border:0;box-shadow:none;padding:0}.invoiceWrap{display:block;background:white;padding:0}
+  body.print-thermal .invoice{border:0;width:80mm;margin:0;padding:4mm;font-size:12px}
+  body.print-a4half .invoice{border:1px dashed #ddd;width:148mm;height:105mm;margin:0;padding:7mm;font-size:11px}
+  body.print-a4quarter .invoice{border:1px dashed #ddd;width:105mm;height:148mm;margin:0;padding:6mm;font-size:10.5px}
+  body.print-a4quarter .invoice .qr{max-width:54px;max-height:54px}body.print-a4half .invoice .qr{max-width:72px;max-height:72px}
+}
+
+body.dark{
+  --bg:#0b1110;--card:#101c18;--ink:#f2f4f7;--muted:#98a2b3;--line:#2e3b36;
+  --soft:#10291d;--shadow:0 14px 36px rgba(0,0,0,.34);
+  background:radial-gradient(circle at top left,#123d2b,transparent 42%),#0b1110;
+}
+body.dark .card,body.dark .stat,body.dark .listItem,body.dark .invoiceWrap{background:rgba(16,28,24,.94);border-color:#2e3b36}
+body.dark input,body.dark select,body.dark textarea{background:#0f1a17;color:#f2f4f7;border-color:#2e3b36}
+body.dark .light{background:#17231f;color:#f2f4f7;border-color:#2e3b36}
+body.dark .searchBox{background:#0f1a17;border-color:#2e3b36}
+body.dark .nav{background:#101c18;border-color:#2e3b36}
+body.dark .quickAction{background:linear-gradient(180deg,#14221d,#0f1a17);border-color:#2e3b36;color:#f2f4f7}
+body.dark .resultBox{background:#102019;border-color:#244233;color:#f2f4f7}
+body.dark .notice{background:#251a0b;border-color:#6b430b;color:#ffd599}
+.templateModern.invoice{border-radius:14px;border:2px solid #0b4b2f}
+.templateModern.invoice h1{background:linear-gradient(135deg,#0b4b2f,#168456);color:#fff;border-radius:10px;padding:7px;margin-bottom:5px}
+.templateModern .dashline{border-color:#0b4b2f}
+.miniTable{width:100%;border-collapse:separate;border-spacing:0 7px}
+.miniTable td,.miniTable th{font-size:12px;padding:8px;background:#fff;border-top:1px solid #e4e7ec;border-bottom:1px solid #e4e7ec}
+.miniTable td:first-child,.miniTable th:first-child{border-left:1px solid #e4e7ec;border-radius:12px 0 0 12px}
+.miniTable td:last-child,.miniTable th:last-child{border-right:1px solid #e4e7ec;border-radius:0 12px 12px 0}
+body.dark .miniTable td,body.dark .miniTable th{background:#0f1a17;border-color:#2e3b36}
+
+
+/* V10 final premium updates */
+:root{--gold:#f4c430}
+.premiumRibbon{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#fff7d6,#e8f6ee);color:#0b4b2f;border:1px solid #e8d27a;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:950}
+body.dark .premiumRibbon{background:#231f12;color:#ffe58f;border-color:#5c4b17}
+.actionGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.actionGrid button{width:100%}
+@media(max-width:700px){.actionGrid{grid-template-columns:repeat(2,1fr)}}
+@media print{
+  .templateModern.invoice{border:2px solid #0b4b2f!important;border-radius:0!important}
+  .templateModern.invoice h1{background:#0b4b2f!important;color:#fff!important;border-radius:0!important;padding:5px!important;margin:0 0 4px!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .templateModern .dashline{border-top:1px solid #0b4b2f!important}
+  .templateModern .total{background:#e8f6ee!important;padding:2px 4px!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+.invoice.templateModern .billrow{border-bottom:1px dotted #d0d5dd;padding:1px 0}
+.invoice.templateModern .qr{border:2px solid #0b4b2f;border-radius:8px}
+
+
+/* V11 clean dashboard + side-half print */
+.cleanMini{font-size:11px;color:var(--muted)}
+body .status{font-size:11px}
+body .premiumRibbon{background:#eef7f2;border-color:#bfe6ce;color:#0b4b2f}
+body.dark .premiumRibbon{background:#13251d;color:#bff0cf;border-color:#315b42}
+.invoice.a4side{width:96mm;min-height:270mm;padding:9mm;font-size:12px}
+.invoice.a4landscape{width:140mm;min-height:190mm;padding:9mm;font-size:12px}
+@media screen{
+  .invoiceWrap.sidePreview{place-items:start}
+  .invoice.a4side{width:100%;max-width:390px;min-height:auto}
+  .invoice.a4landscape{width:100%;max-width:680px;min-height:auto}
+}
+@media print{
+  @page{size:A4 portrait;margin:8mm}
+  body.print-a4side .invoiceWrap{display:block!important;padding:0!important;margin:0!important}
+  body.print-a4side .invoice{width:96mm!important;min-height:270mm!important;height:auto!important;margin:0 auto 0 0!important;padding:6mm!important;font-size:11px!important}
+  body.print-a4side .invoice h1{font-size:15px!important}
+  body.print-a4side .invoice .qr{max-width:58px!important;max-height:58px!important}
+  body.print-a4landscape .invoiceWrap{display:block!important;padding:0!important;margin:0!important}
+  body.print-a4landscape .invoice{width:140mm!important;min-height:190mm!important;height:auto!important;margin:0 auto 0 0!important;padding:7mm!important;font-size:11px!important}
+  body.print-a4landscape .invoice h1{font-size:16px!important}
+  body.print-a4landscape .invoice .qr{max-width:70px!important;max-height:70px!important}
+}
+
+
+/* Elite V13 additions */
+.cloudBox{background:linear-gradient(180deg,#f7fbf8,#edf7f1);border:1px solid #d7ebdf;border-radius:16px;padding:12px;margin-top:12px}
+body.dark .cloudBox{background:#102019;border-color:#244233}
+.pageMock{background:#fff;border:1px solid #d0d5dd;position:relative;width:100%;max-width:720px;aspect-ratio:210/297;box-shadow:0 10px 24px rgba(0,0,0,.06)}
+.pageMock.two:before{content:"";position:absolute;left:0;right:0;top:50%;border-top:2px dashed #d0d5dd}
+.pageMock.four:before{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:2px dashed #d0d5dd}
+.pageMock.four:after{content:"";position:absolute;left:0;right:0;top:50%;border-top:2px dashed #d0d5dd}
+.pageMock .slot{position:absolute;left:0;top:0;overflow:hidden}
+.pageMock .slot.a5{width:100%;height:50%}
+.pageMock .slot.a6{width:50%;height:50%}
+.invoice.a5slot{width:210mm;min-height:148.5mm;padding:4.2mm;font-size:9.6px;line-height:1.18}
+.invoice.a6slot{width:105mm;min-height:148.5mm;padding:3.0mm;font-size:7.5px;line-height:1.12}
+.invoice.a5slot h1{font-size:17px}.invoice.a6slot h1{font-size:12px}
+.invoice.a5slot .sub{font-size:10px}.invoice.a6slot .sub{font-size:7px}
+.invoice.a5slot .qr{max-width:58px;max-height:58px}.invoice.a6slot .qr{max-width:42px;max-height:42px}
+.invoice.a6slot .center,.invoice.a6slot .sign,.invoice.a6slot .tiny{font-size:6.7px}
+.invoice.a6slot .total{font-size:8.2px}
+.quickAction span{font-size:18px}
+@media screen{.invoiceWrap.slotPreview{padding:18px;background:#f3f4f6;border:1px solid #e4e7ec}.invoiceWrap.slotPreview .slot .invoice{width:100%;height:100%;max-width:none;border:0}}
+@media print{
+  body.print-a5slot .invoiceWrap,body.print-a6slot .invoiceWrap{display:block!important;padding:0!important;background:#fff!important}
+  body.print-a5slot .pageMock,body.print-a6slot .pageMock{width:210mm!important;height:297mm!important;position:relative!important;border:0!important;box-shadow:none!important}
+  body.print-a5slot .pageMock.two:before{content:"";position:absolute;left:0;right:0;top:148.5mm;border-top:1px dashed #ccc}
+  body.print-a6slot .pageMock.four:before{content:"";position:absolute;left:105mm;top:0;bottom:0;border-left:1px dashed #ccc}
+  body.print-a6slot .pageMock.four:after{content:"";position:absolute;left:0;right:0;top:148.5mm;border-top:1px dashed #ccc}
+  body.print-a5slot .slot.a5{position:absolute;left:0;top:0;width:210mm;height:148.5mm;overflow:hidden}
+  body.print-a6slot .slot.a6{position:absolute;left:0;top:0;width:105mm;height:148.5mm;overflow:hidden}
+  body.print-a5slot .slot .invoice{width:210mm!important;min-height:148.5mm!important;height:148.5mm!important;margin:0!important;border:0!important;padding:4.2mm!important;font-size:9.6px!important}
+  body.print-a6slot .slot .invoice{width:105mm!important;min-height:148.5mm!important;height:148.5mm!important;margin:0!important;border:0!important;padding:3.0mm!important;font-size:7.5px!important}
+  body.print-a5slot .invoice h1{font-size:17px!important} body.print-a6slot .invoice h1{font-size:12px!important}
+  body.print-a5slot .invoice .sub{font-size:10px!important} body.print-a6slot .invoice .sub{font-size:7px!important}
+  body.print-a6slot .invoice .center, body.print-a6slot .invoice .sign{font-size:6.7px!important}
+  body.print-a6slot .invoice .qr{max-width:42px!important;max-height:42px!important} body.print-a5slot .invoice .qr{max-width:58px!important;max-height:58px!important}
+}
+
+
+/* Elite V14: custom photo background, WhatsApp, Call, clean preview */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:linear-gradient(rgba(238,244,240,.88),rgba(238,244,240,.93)), url("./app-bg.jpg") center/cover no-repeat;
+  z-index:-2;
+}
+body.dark::before{
+  background:linear-gradient(rgba(5,16,12,.86),rgba(5,16,12,.92)), url("./app-bg.jpg") center/cover no-repeat;
+}
+.logo{
+  background-image:linear-gradient(rgba(11,75,47,.25),rgba(11,75,47,.25)), url("./icon-192.png") !important;
+  background-size:cover !important;
+  background-position:center !important;
+  color:transparent !important;
+}
+.actionIcon{
+  display:inline-grid;
+  place-items:center;
+  min-width:22px;
+  height:22px;
+  border-radius:999px;
+  font-size:13px;
+  margin-right:5px;
+  font-weight:950;
+}
+.whatsappIcon{background:#25D366;color:#fff}
+.callIcon{background:#0b84ff;color:#fff}
+.userIcon{background:#e8f6ee;color:#0b4b2f}
+.ledgerIcon{background:#fff4d8;color:#b54708}
+.previewNote{font-size:11px;color:var(--muted);margin-top:5px}
+.customerActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
+.customerActions .light,.customerActions .danger{padding:8px 10px}
+
+</style>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body class="print-thermal">
+<div id="lockScreen" class="lock">
+  <div class="lockbox">
+    <h2>🔐 Asha Billing Lock</h2>
+    <p class="muted">PIN দিন। PIN set না থাকলে Settings থেকে set করতে পারবেন।</p>
+    <label>PIN</label><input id="unlockPin" type="password" inputmode="numeric" placeholder="Enter PIN">
+    <div class="row" style="margin-top:12px"><button class="primary" onclick="unlockApp()">Unlock</button></div>
+    <div id="lockMsg" class="bad tiny" style="margin-top:8px"></div>
+  </div>
+</div>
+
+<header class="appbar noPrint">
+  <div class="top">
+    <div class="logo">AS</div>
+    <div><h1 id="headCompany">আশা মিনি শ্যালো</h1><p>Smart Billing • Cloud • Print • Call • WhatsApp</p></div>
+    <button class="light right" onclick="exportData()">Backup</button><button class="light" onclick="installInfo()">Install</button>
+  </div>
+  <div class="status" id="appStatus"><span class="premiumRibbon">Auto-save enabled</span> Data locally saved. <span id="backupStatus"></span></div>
+</header>
+
+<main class="wrap">
+<section id="dashboard" class="page active">
+  <div class="grid">
+    <div class="span-12 card">
+      <div class="row"><div><h2>Dashboard</h2><div class="muted">Today collection, due, village and bank overview</div></div><select id="dashSeason" class="right" style="max-width:160px"></select><select id="dashMonth" style="max-width:160px"></select></div>
+    </div>
+    <div class="span-12 card noPrint"><div class="quickActions">
+      <button class="quickAction" onclick="navTo('bill')"><span>▣</span><b>New Bill</b><div class="tiny">Create bill</div></button>
+      <button class="quickAction" onclick="navTo('customers')"><span>◉</span><b>Customer</b><div class="tiny">Add/search</div></button>
+      <button class="quickAction" onclick="navTo('calculator')"><span>∑</span><b>Calculator</b><div class="tiny">Normal + land</div></button>
+      <button class="quickAction" onclick="navTo('reports')"><span>◷</span><b>Reports</b><div class="tiny">Export data</div></button>
+      <button class="quickAction" onclick="navTo('ledger')"><span>☷</span><b>Ledger</b><div class="tiny">Customer account</div></button>
+    </div></div>
+    <div class="span-3 stat"><div class="label">Total Bill</div><b id="stTotal">₹0</b></div>
+    <div class="span-3 stat"><div class="label">Collected</div><b id="stPaid" class="ok">₹0</b></div>
+    <div class="span-3 stat"><div class="label">Due</div><b id="stDue" class="bad">₹0</b></div>
+    <div class="span-3 stat"><div class="label">Bills</div><b id="stBills">0</b></div>
+    <div class="span-4 card"><h3>Bank-wise Collection</h3><div id="bankSummary"></div></div>
+    <div class="span-4 card"><h3>Village-wise Due</h3><div id="villageSummary"></div></div>
+    <div class="span-4 card"><h3>Top Due Customers</h3><div id="dueSummary"></div></div>
+  </div>
+</section>
+
+<section id="customers" class="page">
+  <div class="grid">
+    <div class="span-5 card">
+      <h2 id="custTitle">Add Customer</h2><input id="custId" type="hidden">
+      <label>Name</label><input id="custName" placeholder="Customer name">
+      <label>Phone</label><input id="custPhone" placeholder="10 digit mobile">
+      <label>Village</label><input id="custVillage" placeholder="Village">
+      <label>Address</label><textarea id="custAddress"></textarea>
+      <label>Opening Due ₹</label><input id="custOpeningDue" type="number" step="0.01" value="0">
+      <label>Note</label><textarea id="custNote"></textarea>
+      <div class="row" style="margin-top:12px"><button class="primary" onclick="saveCustomer()">Save Customer</button><button class="light" onclick="clearCustomerForm()">Clear</button></div>
+    </div>
+    <div class="span-7 card">
+      <div class="row"><h2>Customer List</h2><button class="light right" onclick="exportCustomersCSV()">Export</button></div>
+      <div class="searchBox"><span>🔎</span><input id="customerSearch" oninput="renderCustomers()" placeholder="Search name / phone / village"></div>
+      <div id="customerList"></div>
+    </div>
+  </div>
+</section>
+
+<section id="bill" class="page">
+  <div class="grid">
+    <div class="span-5 card noPrint">
+      <h2>New Bill</h2>
+      <label>Print Size</label><select id="printMode" onchange="setPrintMode(this.value);renderInvoice()">
+        <option value="thermal">Bluetooth Thermal 80mm</option>
+        <option value="a5slot">2 Bills on A4 (A5 = 210 × 148.5 mm)</option>
+        <option value="a6slot">4 Bills on A4 (A6 = 105 × 148.5 mm)</option>
+        <option value="a4side">A4 Side Half — Left Side Full Bill</option>
+        <option value="a4landscape">A4 Landscape Half — Left Side</option>
+        <option value="a4half">A4 Half Page</option>
+        <option value="a4quarter">A4 Quarter Page</option>
+        <option value="thermalText">Thermal Text for Printer App</option>
+      </select>
+      <div class="cleanMini" style="margin-top:4px">A5/A6 mode standard A4 slot size follow করবে। A4 Side mode-এ bill left side-এ থাকবে।</div>
+      <label>Customer</label><select id="billCustomer" onchange="fillCustomerBill()"></select>
+      <div class="row" style="margin-top:8px"><button class="light" onclick="navTo('customers')">+ New Customer</button></div>
+      <label>Season</label><select id="billSeason" onchange="applySeasonRate();calcBill()"></select>
+      <div class="calcGrid"><div><label>Land Amount</label><input id="landAmount" type="number" step="0.01" value="0" oninput="calcBill()"></div><div><label>Unit</label><select id="landUnit" onchange="calcBill()"><option value="bigha">বিঘা</option><option value="katha">কাঠা</option><option value="decimal">ডেসিমেল</option></select></div></div>
+      <label>Rate per Bigha ₹</label><input id="ratePerBigha" type="number" step="0.01" oninput="calcBill()">
+      <div class="calcGrid"><div><label>Previous Due ₹</label><input id="prevDue" type="number" step="0.01" value="0" oninput="calcBill()"></div><div><label>Paid Now ₹</label><input id="paidAmount" type="number" step="0.01" value="0" oninput="calcBill()"></div></div>
+      <label>Payment Mode</label><select id="payMode"><option>Cash</option><option>Online</option><option>Cash + Online</option><option>Not Paid</option></select>
+      <label>Received In / Bank / UPI</label><input id="receivedIn" placeholder="Cash / SBI / UPI / PhonePe">
+      <label>Note</label><textarea id="billNote"></textarea>
+      <div class="notice" id="calcBox">Calculation...</div>
+      <div class="row" style="margin-top:12px"><button class="primary" onclick="saveBill()">Save Bill</button><button class="secondary" onclick="smartPrint()">Print Modern</button><button class="light" onclick="downloadBillPDF()">PDF</button><button class="light" onclick="downloadBillImage()">Image</button><button class="light" onclick="shareBillImage()">WhatsApp Image</button><button class="light" onclick="resetBillForm()">Normal Preview</button></div>
+    </div>
+    <div class="span-7 card">
+      <div class="row noPrint"><h2>Bill Preview</h2><button class="light right" onclick="downloadBillImage()">Image</button><button class="secondary" onclick="smartPrint()">Print</button></div><div class="previewNote noPrint">Form edit করলে preview normal/current bill দেখাবে; History থেকে View করলে saved bill দেখাবে।</div>
+      <div class="invoiceWrap" id="invoicePreview"></div>
+    </div>
+  </div>
+</section>
+
+<section id="payments" class="page">
+  <div class="card">
+    <div class="row"><h2>Partial Payments / Due Payment</h2><input id="paymentSearch" class="right" oninput="renderPayments()" placeholder="Search due bills" style="max-width:320px"></div>
+    <div id="paymentList"></div>
+  </div>
+</section>
+
+<section id="history" class="page">
+  <div class="card">
+    <div class="row"><h2>Bill History</h2><button class="light right" onclick="exportBillsCSV()">Export CSV</button></div>
+    <div class="searchBox"><span>🔎</span><input id="historySearch" oninput="renderHistory()" placeholder="Search bill no / name / phone / village"></div>
+    <div id="historyList"></div>
+  </div>
+</section>
+
+
+<section id="ledger" class="page">
+  <div class="grid">
+    <div class="span-12 card">
+      <div class="row"><div><h2>Customer Ledger</h2><div class="muted">একজন customer-এর সব bill, payment, due এক জায়গায়</div></div><select id="ledgerCustomer" class="right" style="max-width:360px" onchange="renderLedger()"></select><button class="light" onclick="exportLedgerCSV()">Export Ledger</button></div>
+      <div id="ledgerBox"></div>
+    </div>
+  </div>
+</section>
+
+<section id="reports" class="page">
+  <div class="grid">
+    <div class="span-6 card"><h2>Reports</h2><div class="row"><select id="reportMonth"></select><button class="primary" onclick="exportMonthlyCSV()">Monthly CSV</button><button class="light" onclick="exportBillsCSV()">All Bills CSV</button></div><div class="actionGrid" style="margin-top:10px"><button class="light" onclick="dataHealthCheck()">Data Check</button><button class="light" onclick="printReport()">Print Report</button><button class="light" onclick="exportData()">Backup Now</button></div><div class="resultBox" id="reportBox" style="margin-top:12px"></div></div>
+    <div class="span-6 card"><h2>Village Report</h2><div id="villageReport"></div></div>
+    <div class="span-6 card"><h2>Bank-wise Report</h2><div id="bankReport"></div></div>
+    <div class="span-6 card"><h2>Due List</h2><div id="dueReport"></div></div>
+  </div>
+</section>
+
+<section id="calculator" class="page">
+  <div class="grid">
+    <div class="span-6 card">
+      <h2>Land Calculator</h2><div class="muted">1 বিঘা = 20 কাঠা = 40 ডেসিমেল</div>
+      <div class="calcGrid"><div><label>Land</label><input id="calcLand" type="number" step="0.01" value="0" oninput="runLandCalc()"></div><div><label>Unit</label><select id="calcUnit" onchange="runLandCalc()"><option value="bigha">বিঘা</option><option value="katha">কাঠা</option><option value="decimal">ডেসিমেল</option></select></div><div><label>Rate ₹/Bigha</label><input id="calcRate" type="number" step="0.01" value="2200" oninput="runLandCalc()"></div><div><label>Paid ₹</label><input id="calcPaid" type="number" step="0.01" value="0" oninput="runLandCalc()"></div></div>
+      <div class="resultBox" id="landCalcOut" style="margin-top:12px"></div>
+    </div>
+    <div class="span-6 card">
+      <h2>Normal Calculator</h2>
+      <label>Expression</label><input id="normalExpr" placeholder="Example: (2200/20)*10 + 500 - 1000">
+      <div class="row" style="margin-top:10px"><button class="primary" onclick="runNormalCalc()">Calculate</button><button class="light" onclick="normalExpr.value='';normalCalcOut.innerHTML='Result: ₹0'">Clear</button></div>
+      <div class="resultBox" id="normalCalcOut" style="margin-top:12px">Result: ₹0</div>
+    </div>
+  </div>
+</section>
+
+<section id="settings" class="page">
+  <div class="grid">
+    <div class="span-6 card">
+      <h2>Business Settings</h2>
+      <label>Company</label><input id="setCompany"><label>Proprietor</label><input id="setOwner"><label>Contact</label><input id="setContact"><label>Address</label><textarea id="setAddress"></textarea>
+      <label>Default Rate ₹/Bigha</label><input id="setRate" type="number">
+      <div class="calcGrid"><div><label>খরা Rate</label><input id="rateKhora" type="number"></div><div><label>বর্ষা Rate</label><input id="rateBorsha" type="number"></div><div><label>বোরো Rate</label><input id="rateBoro" type="number"></div><div><label>আমন Rate</label><input id="rateAman" type="number"></div></div>
+      <label>UPI ID</label><input id="setUpi"><label>Default Note</label><textarea id="setNote"></textarea>
+      <div class="row" style="margin-top:12px"><button class="primary" onclick="saveSettings()">Save Settings</button></div>
+    </div>
+    <div class="span-6 card">
+      <h2>QR / Security / Backup</h2>
+      <label>Upload UPI QR</label><input id="qrFile" type="file" accept="image/*" onchange="uploadQR(event)"><div id="qrPreviewBox" style="margin:12px 0"></div>
+      <label>Set / Change PIN</label><input id="setPin" type="password" inputmode="numeric" placeholder="New PIN">
+      <div class="row" style="margin-top:10px"><button class="secondary" onclick="savePin()">Save PIN</button><button class="light" onclick="removePin()">Remove PIN</button><button class="light" onclick="lockNow()">Lock Now</button></div>
+      <label>Theme</label><select id="setTheme" onchange="saveThemeNow()"><option value="light">Light Premium</option><option value="dark">Dark Premium</option></select>
+      <label>Bill Template</label><select id="setTemplate" onchange="saveThemeNow()"><option value="classic">Classic Clean</option><option value="modern">Modern Premium</option></select>
+      <label>Auto Backup Reminder</label><select id="setBackupReminder" onchange="saveThemeNow()"><option value="on">On</option><option value="off">Off</option></select>
+      <hr style="border:0;border-top:1px solid #e4e7ec;margin:14px 0">
+      <div class="row"><button class="secondary" onclick="exportData()">Export Backup</button><button class="light" onclick="importFile.click()">Import Backup</button><input id="importFile" class="hidden" type="file" accept="application/json" onchange="importData(event)"></div>
+      <div class="cloudBox">
+        <h3>Cloud Sync (Firebase)</h3>
+        <label>Firebase Config JSON</label><textarea id="setFirebaseConfig" placeholder='{"apiKey":"...","authDomain":"...","projectId":"..."}'></textarea>
+        <label>Cloud Doc ID</label><input id="setCloudDocId" placeholder="owner-main">
+        <label>Auto Cloud Sync</label><select id="setCloudAuto"><option value="off">Off</option><option value="on">On</option></select>
+        <div class="row" style="margin-top:10px"><button class="primary" onclick="saveCloudSettings()">Save Cloud Settings</button><button class="light" onclick="testCloud()">Test</button><button class="light" onclick="cloudPush(true)">Push</button><button class="light" onclick="cloudPull()">Pull</button></div>
+        <div id="cloudStatus" class="tiny" style="margin-top:8px">Cloud not configured.</div>
+      </div>
+      <div class="notice" style="margin-top:12px">QR add না হলে browser storage full হতে পারে। ছোট QR image ব্যবহার করুন।</div>
+    </div>
+  </div>
+</section>
+</main>
+
+<nav class="nav noPrint">
+  <button class="active" data-page="dashboard" onclick="navTo('dashboard')"><span>⌂</span>Home</button>
+  <button data-page="customers" onclick="navTo('customers')"><span>◉</span>Users</button>
+  <button data-page="bill" onclick="navTo('bill')"><span>▣</span>Bill</button>
+  <button data-page="payments" onclick="navTo('payments')"><span>₹</span>Pay</button>
+  <button data-page="history" onclick="navTo('history')"><span>◷</span>History</button>
+  <button data-page="reports" onclick="navTo('reports')"><span>▤</span>Reports</button>
+  <button data-page="ledger" onclick="navTo('ledger')"><span>☷</span>Ledger</button>
+  <button data-page="calculator" onclick="navTo('calculator')"><span>∑</span>Calc</button>
+  <button data-page="settings" onclick="navTo('settings')"><span>⚙</span>Set</button>
+</nav>
+
+<div id="paymentModal" class="modal">
+  <div class="modalBox">
+    <h2>Add Due Payment</h2><input id="payBillId" type="hidden">
+    <div id="payBillInfo" class="resultBox"></div>
+    <label>Payment Amount ₹</label><input id="modalPayAmount" type="number" step="0.01">
+    <label>Payment Mode</label><select id="modalPayMode"><option>Cash</option><option>Online</option><option>Cash + Online</option></select>
+    <label>Received In / Bank / UPI</label><input id="modalReceivedIn" placeholder="Cash / SBI / UPI">
+    <label>Note</label><textarea id="modalPayNote"></textarea>
+    <div class="row" style="margin-top:12px"><button class="primary" onclick="confirmPayment()">Save Payment</button><button class="light" onclick="closePaymentModal()">Cancel</button></div>
+  </div>
+</div>
+
+<script>
+const KEY="ashaMiniShallowEliteV13";
+const $=id=>document.getElementById(id);
+const money=n=>"₹"+(Number(n||0).toLocaleString("en-IN",{maximumFractionDigits:2}));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const today=()=>new Date().toISOString().slice(0,10);
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+let fbApp=null, fbDb=null, cloudTimer=null;
+function defaultState(){return{settings:{company:"আশা মিনি শ্যালো",owner:"SK EKRAMUL Haque",contact:"9564061920",address:"Raghunathpur, Chaklachipur, Ghatal, Paschim Medinipur, 721232",defaultRate:2200,upi:"8710065540@axl",note:"ধন্যবাদ। সময়মতো বিল পরিশোধ করার জন্য অনুরোধ করা হচ্ছে।",qrImage:"",pin:"",theme:"light",template:"classic",backupReminder:"on",lastBackup:"",firebaseConfig:"",cloudDocId:"owner-main",cloudAutoSync:"off",seasonRates:{"খরা":2200,"বর্ষা":0,"বোরো":0,"আমন":0}},seasons:["খরা","বর্ষা","বোরো","আমন"],customers:[],bills:[]}}
+let state=loadState();let currentBillForPreview=null;
+function loadState(){
+  try{
+    let data=JSON.parse(localStorage.getItem(KEY));
+    if(data) return normalizeState(data);
+    const oldKeys=["ashaMiniShallowEliteV13","ashaMiniShallowProV12","ashaMiniShallowProV11","ashaMiniShallowProV10","ashaMiniShallowProV8","ashaMiniShallowProV7","ashaMiniShallowCloudV3","ashaMiniShallowV1"];
+    for(const k of oldKeys){ const old=JSON.parse(localStorage.getItem(k)||"null"); if(old) return normalizeState(old);}    
+    return defaultState();
+  }catch(e){return defaultState()}
+}
+function normalizeState(s){
+  const d=defaultState();
+  s=s||d; s.settings=Object.assign({},d.settings,s.settings||{});
+  s.settings.seasonRates=Object.assign({},d.settings.seasonRates,s.settings.seasonRates||{});
+  s.seasons=s.seasons||d.seasons; s.customers=s.customers||[]; s.bills=s.bills||[];
+  s.bills.forEach(b=>{if(!b.payments){b.payments=[]; if(b.paid>0)b.payments.push({id:uid(),date:b.date||today(),amount:+b.paid||0,mode:b.payMode||"Cash",receivedIn:b.receivedIn||"",note:"Migrated payment"});}});
+  return s;
+}
+function saveState(){localStorage.setItem(KEY,JSON.stringify(state));applyTheme();refreshAll();if(state.settings.cloudAutoSync==="on") scheduleCloudPush();}
+function navTo(page){document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));$(page).classList.add("active");document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));refreshAll(false); if(page==="ledger")renderLedger()}
+function refreshAll(recalc=true){$("headCompany").textContent=state.settings.company;fillSelects();loadSettings();renderDashboard();renderCustomers();renderHistory();renderPayments();renderReports();if(recalc)calcBill()}
+function fillSelects(){
+  $("dashSeason").innerHTML='<option>All</option>'+state.seasons.map(s=>`<option>${s}</option>`).join("");
+  const months=[...new Set(state.bills.map(b=>(b.date||"").slice(0,7)).filter(Boolean))].sort().reverse();
+  $("dashMonth").innerHTML='<option>All Months</option>'+months.map(m=>`<option>${m}</option>`).join("");
+  $("reportMonth").innerHTML='<option>All Months</option>'+months.map(m=>`<option>${m}</option>`).join("");
+  const old=$("billCustomer").value;
+  $("billCustomer").innerHTML='<option value="">-- Select Customer --</option>'+state.customers.map(c=>`<option value="${c.id}">${esc(c.name)} — ${esc(c.phone||"")}</option>`).join("");
+  if(old)$("billCustomer").value=old;
+  const ledOld=$("ledgerCustomer")?.value||"";
+  if($("ledgerCustomer")){$("ledgerCustomer").innerHTML='<option value="">-- Select Customer --</option>'+state.customers.map(c=>`<option value="${c.id}">${esc(c.name)} — ${esc(c.phone||"")}</option>`).join(""); if(ledOld)$("ledgerCustomer").value=ledOld;}
+  $("billSeason").innerHTML=state.seasons.map(s=>`<option>${s}</option>`).join("");
+  if(!$("ratePerBigha").value)$("ratePerBigha").value=state.settings.defaultRate||0;
+  if(!$("receivedIn").value)$("receivedIn").value="Cash";
+}
+$("dashSeason").addEventListener("change",renderDashboard);$("dashMonth").addEventListener("change",renderDashboard);
+function filteredBills(){const s=$("dashSeason").value||"All",m=$("dashMonth").value||"All Months";return state.bills.filter(b=>(s==="All"||b.season===s)&&(m==="All Months"||(b.date||"").startsWith(m)))}
+function sum(arr,key){return arr.reduce((a,b)=>a+(+b[key]||0),0)}
+function paymentsOf(b){return b.payments||[]}
+function billPaid(b){return paymentsOf(b).reduce((a,p)=>a+(+p.amount||0),0)}
+function billDue(b){return Math.max((+b.allTotal||0)-billPaid(b),0)}
+function billStatus(b){const due=billDue(b), paid=billPaid(b);return due<=0&&b.allTotal>0?"Paid":paid>0?"Partial":"Due"}
+function renderDashboard(){
+  const bs=filteredBills(),total=sum(bs,"allTotal"),paid=bs.reduce((a,b)=>a+billPaid(b),0),due=bs.reduce((a,b)=>a+billDue(b),0);
+  $("stTotal").textContent=money(total);$("stPaid").textContent=money(paid);$("stDue").textContent=money(due);$("stBills").textContent=bs.length;
+  $("bankSummary").innerHTML=listSummary(groupPayments("bank",bs),"No collection.");
+  $("villageSummary").innerHTML=listSummary(groupDue("village",bs),"No due.");
+  $("dueSummary").innerHTML=listSummary(groupDue("customerName",bs),"No due.");
+}
+function groupDue(field,bs){const o={};bs.forEach(b=>{const d=billDue(b);if(d>0)o[b[field]||"Unknown"]=(o[b[field]||"Unknown"]||0)+d});return o}
+function groupPayments(type,bs){const o={};bs.forEach(b=>paymentsOf(b).forEach(p=>{const k=p.receivedIn||p.mode||"Unknown";o[k]=(o[k]||0)+(+p.amount||0)}));return o}
+function listSummary(o,empty){const rows=Object.entries(o).sort((a,b)=>b[1]-a[1]);return rows.length?rows.slice(0,8).map(([k,v])=>`<div class="kv"><span>${esc(k)}</span><b>${money(v)}</b></div>`).join(""):`<p class="muted">${empty}</p>`}
+function saveCustomer(){
+  const c={id:$("custId").value||uid(),name:$("custName").value.trim(),phone:$("custPhone").value.trim(),village:$("custVillage").value.trim(),address:$("custAddress").value.trim(),openingDue:+$("custOpeningDue").value||0,note:$("custNote").value.trim()};
+  if(!c.name){alert("Customer name দিন");return}
+  const i=state.customers.findIndex(x=>x.id===c.id); if(i>=0)state.customers[i]=c; else state.customers.push(c);
+  clearCustomerForm(); saveState(); alert("Customer saved");
+}
+
+function resetBillForm(){
+  currentBillForPreview=null;
+  $("billCustomer").value="";
+  $("landAmount").value=0;
+  $("landUnit").value="bigha";
+  $("ratePerBigha").value=state.settings.defaultRate||0;
+  $("prevDue").value=0;
+  $("paidAmount").value=0;
+  $("payMode").value="Cash";
+  $("receivedIn").value="Cash";
+  $("billNote").value="";
+  calcBill();
+}
+function callCustomer(id){
+  const c=state.customers.find(x=>x.id===id);
+  if(!c || !c.phone){alert("এই customer-এর phone number নেই");return;}
+  const p=sanitizePhone(c.phone);
+  window.location.href="tel:+"+p;
+}
+function whatsappCustomer(id){
+  const c=state.customers.find(x=>x.id===id);
+  if(!c || !c.phone){alert("এই customer-এর phone number নেই");return;}
+  const due=customerDue(id);
+  const txt=`আসসালামু আলাইকুম ${c.name},\nআপনার আশা মিনি শ্যালো এর Due: ${money(due)}\nUPI: ${state.settings.upi}\n- ${state.settings.company}`;
+  window.open("https://wa.me/"+sanitizePhone(c.phone)+"?text="+encodeURIComponent(txt),"_blank");
+}
+
+function clearCustomerForm(){["custId","custName","custPhone","custVillage","custAddress","custNote"].forEach(id=>$(id).value="");$("custOpeningDue").value=0;$("custTitle").textContent="Add Customer"}
+function editCustomer(id){const c=state.customers.find(x=>x.id===id);if(!c)return;navTo("customers");$("custId").value=c.id;$("custName").value=c.name;$("custPhone").value=c.phone||"";$("custVillage").value=c.village||"";$("custAddress").value=c.address||"";$("custOpeningDue").value=c.openingDue||0;$("custNote").value=c.note||"";$("custTitle").textContent="Edit Customer"}
+function customerDue(id){const c=state.customers.find(x=>x.id===id);return (+c?.openingDue||0)+state.bills.filter(b=>b.customerId===id).reduce((a,b)=>a+billDue(b),0)}
+function renderCustomers(){
+  const q=($("customerSearch").value||"").toLowerCase();
+  const rows=state.customers.filter(c=>(c.name+c.phone+c.village+c.address).toLowerCase().includes(q));
+  $("customerList").innerHTML=rows.length?rows.map(c=>{
+    const due=customerDue(c.id);
+    return `<div class="listItem">
+      <div class="row">
+        <div><b>${esc(c.name)}</b><div class="muted">${esc(c.phone||"")} • ${esc(c.village||"")}</div></div>
+        <span class="chip ${due>0?'bad':'ok'} right">Due ${money(due)}</span>
+      </div>
+      <div class="muted" style="margin-top:6px">${esc(c.address||"")}</div>
+      <div class="customerActions">
+        <button class="light" onclick="editCustomer('${c.id}')"><span class="actionIcon userIcon">✎</span>Edit</button>
+        <button class="light" onclick="quickBill('${c.id}')"><span class="actionIcon userIcon">🧾</span>Bill</button>
+        <button class="light" onclick="whatsappCustomer('${c.id}')"><span class="actionIcon whatsappIcon">☘</span>WhatsApp</button>
+        <button class="light" onclick="callCustomer('${c.id}')"><span class="actionIcon callIcon">☎</span>Call</button>
+        <button class="light" onclick="openLedger('${c.id}')"><span class="actionIcon ledgerIcon">▤</span>Ledger</button>
+        <button class="danger" onclick="deleteCustomer('${c.id}')">Delete</button>
+      </div>
+    </div>`;
+  }).join(""):`<p class="muted">No customer yet.</p>`;
+}
+function deleteCustomer(id){if(confirm("Delete customer?")){state.customers=state.customers.filter(c=>c.id!==id);saveState()}}
+function quickBill(id){navTo("bill");$("billCustomer").value=id;fillCustomerBill()}
+function fillCustomerBill(){currentBillForPreview=null;const c=state.customers.find(x=>x.id===$("billCustomer").value);if(!c)return;$("prevDue").value=customerDue(c.id);calcBill()}
+function applySeasonRate(){const r=+(state.settings.seasonRates||{})[$("billSeason").value]||0;if(r>0)$("ratePerBigha").value=r}
+function unitLabel(u){return u==="bigha"?"বিঘা":u==="katha"?"কাঠা":"ডেসিমেল"}
+function calcValues(){const amt=+$("landAmount").value||0,rate=+$("ratePerBigha").value||0,prev=+$("prevDue").value||0,paid=+$("paidAmount").value||0;let bigha=amt;if($("landUnit").value==="katha")bigha=amt/20;if($("landUnit").value==="decimal")bigha=amt/40;const current=round(bigha*rate),allTotal=round(current+prev),due=round(Math.max(allTotal-paid,0));return{amt,rate,prev,paid,bigha:round(bigha),current,allTotal,due,status:due<=0&&allTotal>0?"Paid":paid>0?"Partial":"Due"}}
+function round(n){return Math.round((+n||0)*100)/100}
+function calcBill(){currentBillForPreview=null;$("calcBox").innerHTML="";const v=calcValues();$("calcBox").innerHTML=`Converted: <b>${v.bigha} বিঘা</b><br>Current: <b>${money(v.current)}</b> • Previous: <b>${money(v.prev)}</b><br>Total: <b>${money(v.allTotal)}</b> • Paid: <b>${money(v.paid)}</b> • Due: <b class="${v.due?'bad':'ok'}">${money(v.due)}</b>`;renderInvoice()}
+function nextBillNo(){return "ASHA-"+new Date().getFullYear()+"-"+String(state.bills.length+1).padStart(4,"0")}
+function makePreviewBill(realNo=false){const c=state.customers.find(x=>x.id===$("billCustomer").value)||{};const v=calcValues();return{id:uid(),billNo:realNo?nextBillNo():"Preview",date:today(),customerId:c.id||"",customerName:c.name||"Customer Name",phone:c.phone||"",address:c.address||"",village:c.village||"",season:$("billSeason").value,landAmount:v.amt,unit:$("landUnit").value,rate:v.rate,bigha:v.bigha,current:v.current,previousDue:v.prev,allTotal:v.allTotal,payMode:$("payMode").value,receivedIn:$("receivedIn").value.trim(),note:$("billNote").value.trim(),payments:v.paid>0?[{id:uid(),date:today(),amount:v.paid,mode:$("payMode").value,receivedIn:$("receivedIn").value.trim(),note:"Initial payment"}]:[],printMode:$("printMode").value}}
+function saveBill(){const c=state.customers.find(x=>x.id===$("billCustomer").value);if(!c){alert("Customer select করুন");return}const b=makePreviewBill(true);if(b.current<=0&&b.previousDue<=0){alert("Amount/rate ঠিক করুন");return}state.bills.push(b);currentBillForPreview=b;saveState();$("invoicePreview").innerHTML=invoiceHTML(b);alert("Bill saved: "+b.billNo)}
+function renderInvoice(b){b=b||makePreviewBill(false);$("invoicePreview").innerHTML=invoiceHTML(b)}
+function invoiceHTML(b){
+  const s=state.settings;const pm=$("printMode").value;
+  const cls=pm==="a5slot"?"a5slot":pm==="a6slot"?"a6slot":pm==="a4half"?"a4half":pm==="a4quarter"?"a4quarter":pm==="a4side"?"a4side":pm==="a4landscape"?"a4landscape":"thermal";
+  const paid=billPaid(b),due=Math.max(b.allTotal-paid,0),status=due<=0?"Paid":paid>0?"Partial":"Due";
+  const tmpl=(state.settings.template||"classic")==="modern"?"templateModern":"";
+  const core=`<div class="invoice ${cls} ${tmpl}" id="billInvoice"><h1>${esc(s.company)}</h1><div class="sub">Pro: ${esc(s.owner)}</div><div class="sub">📞/WhatsApp: ${esc(s.contact)}</div><div class="sub">${esc(s.address)}</div><div class="dashline"></div><div class="billrow"><span>Bill No</span><b>${esc(b.billNo)}</b></div><div class="billrow"><span>Date</span><b>${esc(b.date)}</b></div><div class="dashline"></div><div><b>Name:</b> ${esc(b.customerName)}</div><div><b>Phone:</b> ${esc(b.phone||"")}</div><div><b>Address:</b> ${esc(b.address||"")}</div><div class="dashline"></div><div class="billrow"><span>Season</span><b>${esc(b.season)}</b></div><div class="billrow"><span>জমির পরিমাণ</span><b>${b.landAmount} ${unitLabel(b.unit)}</b></div><div class="billrow"><span>Converted</span><b>${b.bigha} বিঘা</b></div><div class="billrow"><span>Rate</span><b>${money(b.rate)}/বিঘা</b></div><div class="billrow"><span>Current Bill</span><b>${money(b.current)}</b></div><div class="billrow"><span>Previous Due</span><b>${money(b.previousDue)}</b></div><div class="billrow total"><span>All Total</span><b>${money(b.allTotal)}</b></div><div class="billrow"><span>Paid</span><b>${money(paid)}</b></div><div class="billrow total"><span>Due</span><b>${money(due)}</b></div><div class="billrow"><span>Status</span><b>${status}</b></div><div class="billrow"><span>Payment</span><b>${esc(b.payMode||"")}</b></div><div class="billrow"><span>Received</span><b>${esc(b.receivedIn||"")}</b></div><div class="dashline"></div><div class="center"><b>UPI:</b> ${esc(s.upi)}</div>${s.qrImage?`<img class="qr" src="${s.qrImage}">`:`<div class="center tiny">Add QR from Settings</div>`}<div class="dashline"></div><div class="tiny">${esc(b.note||s.note||"")}</div><div class="sign">Sign: ${esc(s.owner)}</div><div class="center tiny">Thank you</div></div>`;
+  if(pm==="a5slot") return `<div class="pageMock two"><div class="slot a5">${core}</div></div>`;
+  if(pm==="a6slot") return `<div class="pageMock four"><div class="slot a6">${core}</div></div>`;
+  return core;
+}
+function setPrintMode(m){
+  document.body.classList.toggle("print-thermal",m==="thermal"||m==="thermalText");
+  document.body.classList.toggle("print-a4half",m==="a4half");
+  document.body.classList.toggle("print-a4quarter",m==="a4quarter");
+  document.body.classList.toggle("print-a4side",m==="a4side");
+  document.body.classList.toggle("print-a4landscape",m==="a4landscape");
+  document.body.classList.toggle("print-a5slot",m==="a5slot");
+  document.body.classList.toggle("print-a6slot",m==="a6slot");
+  const wrap=$("invoicePreview");
+  if(wrap){wrap.classList.toggle("sidePreview",m==="a4side"||m==="a4landscape");wrap.classList.toggle("slotPreview",m==="a5slot"||m==="a6slot");}
+}
+function smartPrint(){if($("printMode").value==="thermalText"){copyThermalText();return}window.print()}
+function renderHistory(){const q=($("historySearch").value||"").toLowerCase();const rows=state.bills.slice().reverse().filter(b=>(b.billNo+b.customerName+b.phone+b.village).toLowerCase().includes(q));$("historyList").innerHTML=rows.length?rows.map(b=>`<div class="listItem"><div class="row"><div><b>${b.billNo}</b><div class="muted">${b.date} • ${esc(b.customerName)} • ${esc(b.village||"")}</div></div><span class="chip ${billStatus(b)==='Paid'?'ok':billStatus(b)==='Partial'?'warn':'bad'} right">${billStatus(b)}</span></div><div class="row" style="margin-top:8px"><span>Total: <b>${money(b.allTotal)}</b></span><span>Paid: <b class="ok">${money(billPaid(b))}</b></span><span>Due: <b class="bad">${money(billDue(b))}</b></span></div><div class="row" style="margin-top:9px"><button class="light" onclick="viewBill('${b.id}')">View</button><button class="light" onclick="openPayment('${b.id}')">Add Payment</button><button class="light" onclick="receiptPDF('${b.id}')">Due Receipt</button><button class="danger" onclick="deleteBill('${b.id}')">Delete</button></div></div>`).join(""):`<p class="muted">No bills.</p>`}
+function viewBill(id){const b=state.bills.find(x=>x.id===id);if(!b)return;currentBillForPreview=b;navTo("bill");$("printMode").value=b.printMode||"thermal";setPrintMode($("printMode").value);$("invoicePreview").innerHTML=invoiceHTML(b)}
+function deleteBill(id){if(confirm("Delete bill?")){state.bills=state.bills.filter(b=>b.id!==id);saveState()}}
+function renderPayments(){const q=($("paymentSearch").value||"").toLowerCase();const rows=state.bills.filter(b=>billDue(b)>0).filter(b=>(b.billNo+b.customerName+b.phone).toLowerCase().includes(q));$("paymentList").innerHTML=rows.length?rows.map(b=>`<div class="listItem"><div class="row"><div><b>${b.billNo}</b><div class="muted">${esc(b.customerName)} • Due ${money(billDue(b))}</div></div><button class="light" onclick="callCustomer('${b.customerId}')"><span class="actionIcon callIcon">☎</span>Call</button><button class="primary right" onclick="openPayment('${b.id}')">Add Payment</button></div></div>`).join(""):`<p class="muted">No due bills.</p>`}
+function openPayment(id){const b=state.bills.find(x=>x.id===id);if(!b)return;$("payBillId").value=id;$("payBillInfo").innerHTML=`${b.billNo} — ${esc(b.customerName)}<br>Due: <b>${money(billDue(b))}</b>`;$("modalPayAmount").value=billDue(b);$("modalReceivedIn").value="Cash";$("paymentModal").classList.add("show")}
+function closePaymentModal(){$("paymentModal").classList.remove("show")}
+function confirmPayment(){const b=state.bills.find(x=>x.id===$("payBillId").value);if(!b)return;const amt=+$("modalPayAmount").value||0;if(amt<=0){alert("Amount দিন");return}(b.payments=b.payments||[]).push({id:uid(),date:today(),amount:amt,mode:$("modalPayMode").value,receivedIn:$("modalReceivedIn").value.trim(),note:$("modalPayNote").value.trim()});closePaymentModal();saveState();alert("Payment saved")}
+function renderReports(){const bs=state.bills;$("reportBox").innerHTML=`<div class="kv"><span>Total Bills</span><b>${bs.length}</b></div><div class="kv"><span>Total Amount</span><b>${money(sum(bs,"allTotal"))}</b></div><div class="kv"><span>Collected</span><b>${money(bs.reduce((a,b)=>a+billPaid(b),0))}</b></div><div class="kv"><span>Due</span><b>${money(bs.reduce((a,b)=>a+billDue(b),0))}</b></div>`;$("villageReport").innerHTML=listSummary(groupDue("village",bs),"No village due");$("bankReport").innerHTML=listSummary(groupPayments("bank",bs),"No collection");$("dueReport").innerHTML=listSummary(groupDue("customerName",bs),"No due")}
+function loadSettings(){const s=state.settings;s.seasonRates=s.seasonRates||{};$("setCompany").value=s.company;$("setOwner").value=s.owner;$("setContact").value=s.contact;$("setAddress").value=s.address;$("setRate").value=s.defaultRate;$("setUpi").value=s.upi;$("setNote").value=s.note;$("rateKhora").value=s.seasonRates["খরা"]||0;$("rateBorsha").value=s.seasonRates["বর্ষা"]||0;$("rateBoro").value=s.seasonRates["বোরো"]||0;$("rateAman").value=s.seasonRates["আমন"]||0;if($("setTheme"))$("setTheme").value=s.theme||"light";if($("setTemplate"))$("setTemplate").value=s.template||"classic";if($("setBackupReminder"))$("setBackupReminder").value=s.backupReminder||"on";if($("setFirebaseConfig"))$("setFirebaseConfig").value=s.firebaseConfig||"";if($("setCloudDocId"))$("setCloudDocId").value=s.cloudDocId||"owner-main";if($("setCloudAuto"))$("setCloudAuto").value=s.cloudAutoSync||"off";$("qrPreviewBox").innerHTML=s.qrImage?`<img class="qr" src="${s.qrImage}">`:`<span class="tiny">No QR uploaded</span>`;updateCloudStatus(s.firebaseConfig?"Cloud config saved locally.":"Cloud not configured.")}
+function saveSettings(){Object.assign(state.settings,{company:$("setCompany").value.trim(),owner:$("setOwner").value.trim(),contact:$("setContact").value.trim(),address:$("setAddress").value.trim(),defaultRate:+$("setRate").value||0,upi:$("setUpi").value.trim(),note:$("setNote").value.trim(),theme:$("setTheme")?.value||state.settings.theme||"light",template:$("setTemplate")?.value||state.settings.template||"classic",backupReminder:$("setBackupReminder")?.value||"on",firebaseConfig:$("setFirebaseConfig")?.value.trim()||state.settings.firebaseConfig||"",cloudDocId:$("setCloudDocId")?.value.trim()||"owner-main",cloudAutoSync:$("setCloudAuto")?.value||"off",seasonRates:{"খরা":+$("rateKhora").value||0,"বর্ষা":+$("rateBorsha").value||0,"বোরো":+$("rateBoro").value||0,"আমন":+$("rateAman").value||0}});saveState();alert("Settings saved")}
+function saveCloudSettings(){state.settings.firebaseConfig=$("setFirebaseConfig").value.trim();state.settings.cloudDocId=$("setCloudDocId").value.trim()||"owner-main";state.settings.cloudAutoSync=$("setCloudAuto").value;localStorage.setItem(KEY,JSON.stringify(state));updateCloudStatus("Cloud settings saved locally.")}
+function uploadQR(e){const f=e.target.files[0];if(!f)return;if(f.size>700000){alert("QR image ছোট করুন, 700KB-এর নিচে দিন");return}const r=new FileReader();r.onload=()=>{state.settings.qrImage=r.result;saveState();alert("QR saved")};r.readAsDataURL(f)}
+function savePin(){const p=$("setPin").value.trim();if(p.length<4){alert("Minimum 4 digit PIN দিন");return}state.settings.pin=p;saveState();$("setPin").value="";alert("PIN saved")}
+function removePin(){state.settings.pin="";saveState();alert("PIN removed")}
+function lockNow(){if(!state.settings.pin){alert("PIN set করা নেই");return}$("lockScreen").classList.add("show")}
+function unlockApp(){if($("unlockPin").value===state.settings.pin){$("lockScreen").classList.remove("show");$("unlockPin").value="";$("lockMsg").textContent=""}else $("lockMsg").textContent="Wrong PIN"}
+function checkLock(){if(state.settings.pin)$("lockScreen").classList.add("show")}
+function sanitizePhone(p){p=String(p||"").replace(/\D/g,"");return p.length===10?"91"+p:p}
+function sendDueReminder(id){whatsappCustomer(id)}
+async function invoiceBlob(){const el=$("billInvoice");if(!el){alert("Bill preview নেই");return null}if(typeof html2canvas==="undefined"){alert("Internet অন করে reload করুন");return null}const canvas=await html2canvas(el,{backgroundColor:"#fff",scale:2,useCORS:true});return new Promise(res=>canvas.toBlob(res,"image/png",.98))}
+async function downloadBillImage(){const blob=await invoiceBlob();if(!blob)return;downloadBlob(blob,"asha_bill.png")}
+function downloadBlob(blob,name){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;a.click()}
+async function downloadBillPDF(){const blob=await invoiceBlob();if(!blob)return;if(!window.jspdf){alert("PDF library load হয়নি। Print > Save as PDF ব্যবহার করুন");return}const img=URL.createObjectURL(blob);const jsPDF=window.jspdf.jsPDF;const doc=new jsPDF("p","mm","a4");const w=80,h=140;doc.addImage(img,"PNG",10,10,w,h);doc.save("asha_bill.pdf")}
+async function shareBillImage(){const b=currentBillForPreview||makePreviewBill(false);const blob=await invoiceBlob();if(!blob)return;const file=new File([blob],"asha_bill.png",{type:"image/png"});const txt=`Asha Mini Shallow Bill\nName: ${b.customerName}\nTotal: ${money(b.allTotal)}\nPaid: ${money(billPaid(b))}\nDue: ${money(billDue(b))}`;if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],text:txt});return}catch(e){}}downloadBlob(blob,"asha_bill.png");window.open("https://wa.me/"+sanitizePhone(b.phone)+"?text="+encodeURIComponent(txt+"\nBill image downloaded, please attach it."),"_blank")}
+function thermalText(b){return`${state.settings.company}\nBill: ${b.billNo}\nName: ${b.customerName}\nTotal: ${money(b.allTotal)}\nPaid: ${money(billPaid(b))}\nDue: ${money(billDue(b))}\nUPI: ${state.settings.upi}`}
+function copyThermalText(){navigator.clipboard?.writeText(thermalText(currentBillForPreview||makePreviewBill(false)));alert("Thermal text copied")}
+function receiptPDF(id){const b=state.bills.find(x=>x.id===id);if(!b)return;const txt=`Due Payment Receipt\n${state.settings.company}\nBill: ${b.billNo}\nName: ${b.customerName}\nPaid: ${money(billPaid(b))}\nDue: ${money(billDue(b))}\nDate: ${today()}`;const blob=new Blob([txt],{type:"text/plain"});downloadBlob(blob,`receipt_${b.billNo}.txt`)}
+function csv(rows){return rows.map(r=>r.map(x=>`"${String(x??"").replace(/"/g,'""')}"`).join(",")).join("\n")}
+function exportBillsCSV(){const rows=[["Bill No","Date","Name","Phone","Village","Season","Total","Paid","Due","Status"]].concat(state.bills.map(b=>[b.billNo,b.date,b.customerName,b.phone,b.village,b.season,b.allTotal,billPaid(b),billDue(b),billStatus(b)]));downloadBlob(new Blob([csv(rows)],{type:"text/csv"}),"bills.csv")}
+function exportMonthlyCSV(){const m=$("reportMonth").value;const rows=state.bills.filter(b=>m==="All Months"||(b.date||"").startsWith(m));downloadBlob(new Blob([csv([["Bill No","Date","Name","Total","Paid","Due"]].concat(rows.map(b=>[b.billNo,b.date,b.customerName,b.allTotal,billPaid(b),billDue(b)])))],{type:"text/csv"}),`monthly_${m}.csv`)}
+function exportCustomersCSV(){downloadBlob(new Blob([csv([["Name","Phone","Village","Address","Due"]].concat(state.customers.map(c=>[c.name,c.phone,c.village,c.address,customerDue(c.id)])))],{type:"text/csv"}),"customers.csv")}
+function exportData(){state.settings.lastBackup=today();localStorage.setItem(KEY,JSON.stringify(state));downloadBlob(new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),`asha_backup_${today()}.json`);refreshAll(false)}
+function importData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{state=JSON.parse(r.result);saveState();alert("Backup imported")}catch(err){alert("Invalid backup")}};r.readAsText(f)}
+function runLandCalc(){let amt=+$("calcLand").value||0,rate=+$("calcRate").value||0,paid=+$("calcPaid").value||0,b=amt;if($("calcUnit").value==="katha")b=amt/20;if($("calcUnit").value==="decimal")b=amt/40;const total=round(b*rate),due=Math.max(total-paid,0);$("landCalcOut").innerHTML=`<div class="kv"><span>Bigha</span><b>${round(b)}</b></div><div class="kv"><span>Total</span><b>${money(total)}</b></div><div class="kv"><span>Due</span><b>${money(due)}</b></div>`}
+function runNormalCalc(){const ex=$("normalExpr").value.trim();if(!/^[0-9+\-*/().%\s]+$/.test(ex)){$("normalCalcOut").innerHTML='<span class="bad">Invalid</span>';return}try{$("normalCalcOut").innerHTML="Result: <b>"+money(Function("return ("+ex+")")())+"</b>"}catch(e){$("normalCalcOut").innerHTML='<span class="bad">Invalid</span>'}}
+
+
+function updateCloudStatus(msg){const el=$("cloudStatus"); if(el) el.textContent=msg;}
+function initFirebase(){
+  try{
+    const raw=state.settings.firebaseConfig||$("setFirebaseConfig")?.value||"";
+    if(!raw) throw new Error("Firebase config JSON দিন");
+    const cfg=JSON.parse(raw);
+    if(!cfg.apiKey || !cfg.projectId) throw new Error("apiKey/projectId missing");
+    if(!window.firebase) throw new Error("Firebase SDK load হয়নি");
+    if(!firebase.apps.length) fbApp=firebase.initializeApp(cfg); else fbApp=firebase.app();
+    fbDb=firebase.firestore();
+    updateCloudStatus("Firebase connected.");
+    return true;
+  }catch(e){updateCloudStatus("Cloud error: "+e.message);return false;}
+}
+async function testCloud(){ if(!initFirebase()) return; try{ await fbDb.collection("ashaMiniShallow").limit(1).get(); updateCloudStatus("Cloud test success."); }catch(e){ updateCloudStatus("Test failed: "+e.message);} }
+async function cloudPush(manual){ if(!initFirebase()) return; try{ const docId=(state.settings.cloudDocId||"owner-main"); const payload={updatedAt:new Date().toISOString(), data:state}; await fbDb.collection("ashaMiniShallow").doc(docId).set(payload); updateCloudStatus((manual?"Manual":"Auto")+" cloud backup saved."); }catch(e){ updateCloudStatus("Push failed: "+e.message);} }
+async function cloudPull(){ if(!initFirebase()) return; try{ const docId=(state.settings.cloudDocId||"owner-main"); const snap=await fbDb.collection("ashaMiniShallow").doc(docId).get(); if(!snap.exists){ updateCloudStatus("No cloud data found."); return;} state=normalizeState((snap.data()||{}).data||{}); localStorage.setItem(KEY,JSON.stringify(state)); refreshAll(); updateCloudStatus("Cloud data loaded."); }catch(e){ updateCloudStatus("Pull failed: "+e.message);} }
+function scheduleCloudPush(){ clearTimeout(cloudTimer); cloudTimer=setTimeout(()=>cloudPush(false),1200); }
+
+function installInfo(){alert("Mobile Chrome: menu ⋮ > Add to Home screen. Hosting করলে app-এর মতো install হবে। Firebase config দিলে cloud sync-ও হবে।")}
+function applyTheme(){
+  document.body.classList.toggle("dark",(state.settings.theme||"light")==="dark");
+  const last=state.settings.lastBackup||"Never";
+  const dueBackup=state.settings.backupReminder!=="off" && state.settings.lastBackup!==today();
+  if($("backupStatus")) $("backupStatus").innerHTML = dueBackup ? ` • <b style="color:#ffd599">Backup suggested</b>` : ` • Backup: ${last}`;
+}
+function saveThemeNow(){
+  state.settings.theme=$("setTheme")?.value||"light";
+  state.settings.template=$("setTemplate")?.value||"classic";
+  state.settings.backupReminder=$("setBackupReminder")?.value||"on";
+  saveState();
+}
+function openLedger(id){navTo("ledger");$("ledgerCustomer").value=id;renderLedger();}
+function renderLedger(){
+  const id=$("ledgerCustomer")?.value;
+  if(!id){$("ledgerBox").innerHTML='<p class="muted">Customer select করুন।</p>';return;}
+  const c=state.customers.find(x=>x.id===id);
+  if(!c){$("ledgerBox").innerHTML='<p class="muted">Customer not found.</p>';return;}
+  const bills=state.bills.filter(b=>b.customerId===id).sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+  const total=bills.reduce((a,b)=>a+(+b.allTotal||0),0);
+  const paid=bills.reduce((a,b)=>a+billPaid(b),0);
+  const due=(+c.openingDue||0)+bills.reduce((a,b)=>a+billDue(b),0);
+  let rows=bills.map(b=>`<tr><td><b>${esc(b.billNo)}</b><br><span class="tiny">${esc(b.date)}</span></td><td>${esc(b.season||"")}</td><td>${money(b.allTotal)}</td><td class="ok">${money(billPaid(b))}</td><td class="bad">${money(billDue(b))}</td><td>${billStatus(b)}</td><td><button class="light" onclick="viewBill('${b.id}')">View</button> <button class="light" onclick="openPayment('${b.id}')">Pay</button></td></tr>`).join("");
+  const payRows=bills.flatMap(b=>paymentsOf(b).map(p=>`<tr><td>${esc(b.billNo)}</td><td>${esc(p.date)}</td><td>${esc(p.mode)}</td><td>${esc(p.receivedIn||"")}</td><td class="ok">${money(p.amount)}</td><td><button class="danger" onclick="deletePayment('${b.id}','${p.id}')">Delete</button></td></tr>`)).join("");
+  $("ledgerBox").innerHTML=`<div class="resultBox"><div class="kv"><span>Name</span><b>${esc(c.name)}</b></div><div class="kv"><span>Phone</span><b>${esc(c.phone||"")}</b></div><div class="kv"><span>Total Bill</span><b>${money(total)}</b></div><div class="kv"><span>Total Paid</span><b>${money(paid)}</b></div><div class="kv"><span>Current Due</span><b class="bad">${money(due)}</b></div></div>
+  <h3 style="margin-top:14px">Bills</h3><div style="overflow:auto"><table class="miniTable"><tr><th>Bill</th><th>Season</th><th>Total</th><th>Paid</th><th>Due</th><th>Status</th><th>Action</th></tr>${rows||'<tr><td colspan="7">No bills</td></tr>'}</table></div>
+  <h3 style="margin-top:14px">Payment History</h3><div style="overflow:auto"><table class="miniTable"><tr><th>Bill</th><th>Date</th><th>Mode</th><th>Bank/UPI</th><th>Amount</th><th>Action</th></tr>${payRows||'<tr><td colspan="6">No payments</td></tr>'}</table></div>`;
+}
+function deletePayment(billId,payId){
+  if(!confirm("Payment delete করবেন?"))return;
+  const b=state.bills.find(x=>x.id===billId); if(!b)return;
+  b.payments=(b.payments||[]).filter(p=>p.id!==payId);
+  saveState(); renderLedger();
+}
+function exportLedgerCSV(){
+  const id=$("ledgerCustomer")?.value; if(!id){alert("Customer select করুন");return;}
+  const c=state.customers.find(x=>x.id===id); const bills=state.bills.filter(b=>b.customerId===id);
+  const rows=[["Customer",c?.name||""],[],["Bill No","Date","Season","Total","Paid","Due","Status"]].concat(bills.map(b=>[b.billNo,b.date,b.season,b.allTotal,billPaid(b),billDue(b),billStatus(b)]));
+  downloadBlob(new Blob([csv(rows)],{type:"text/csv"}),`ledger_${(c?.name||"customer").replace(/\s+/g,'_')}.csv`);
+}
+
+function dataHealthCheck(){
+  const missingPhone=state.customers.filter(c=>!c.phone).length;
+  const missingVillage=state.customers.filter(c=>!c.village).length;
+  const dueBills=state.bills.filter(b=>billDue(b)>0).length;
+  alert(`Data Health\nCustomers: ${state.customers.length}\nBills: ${state.bills.length}\nMissing phone: ${missingPhone}\nMissing village: ${missingVillage}\nDue bills: ${dueBills}`);
+}
+function printReport(){navTo("reports");setTimeout(()=>window.print(),100)}
+
+function registerSW(){if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}}
+
+function init(){setPrintMode("thermal");applyTheme();refreshAll();runLandCalc();checkLock();registerSW();updateCloudStatus(state.settings.firebaseConfig?"Cloud config available.":"Cloud not configured.");}
+init();
+</script>
+</body>
+</html>
