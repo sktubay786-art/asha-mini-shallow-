@@ -214,6 +214,37 @@ body.dark .iconBtn{background:#111e1a;border-color:#2e3b36;color:#f2f4f7}
 .customerNamePremium{font-size:18px;font-weight:950;letter-spacing:.1px}.customerMetaPremium{font-size:12px;color:var(--muted);font-weight:750}.dueBadgePremium{background:linear-gradient(135deg,#fee4e2,#fff2f1);color:#b42318;border:1px solid #fecdca;border-radius:999px;padding:8px 12px;font-weight:950}.paidBadgePremium{background:linear-gradient(135deg,#dcfae6,#f0fff4);color:#067647;border:1px solid #abefc6;border-radius:999px;padding:8px 12px;font-weight:950}
 .invoice .upiLine{font-size:10px;text-align:center;margin-top:3px}.dynamicQrLabel{font-size:10px;text-align:center;color:#0b4b2f;font-weight:900;margin-top:2px}.qrModeNote{font-size:11px;color:var(--muted);margin-top:6px}
 
+
+/* Elite V17 Lockdown Security */
+body.secureLocked main,
+body.secureLocked .nav,
+body.secureLocked .page,
+body.secureLocked .appbar .top button,
+body.secureLocked .status{
+  filter:blur(3px);
+  pointer-events:none;
+  user-select:none;
+}
+body.secureLocked #secureGate{display:flex}
+.secureGate{
+  position:fixed;inset:0;z-index:160;display:none;align-items:center;justify-content:center;
+  padding:18px;background:linear-gradient(145deg,rgba(4,33,22,.94),rgba(9,93,57,.9));
+}
+.secureGateBox{
+  width:100%;max-width:430px;background:#fff;border-radius:28px;padding:20px;
+  box-shadow:0 30px 90px rgba(0,0,0,.34);border:1px solid rgba(255,255,255,.35);
+}
+body.dark .secureGateBox{background:#101c18;border-color:#2e3b36}
+.secureGateBox h2{margin-bottom:6px}
+.secureGateBox .dangerNote{
+  background:#fff4e5;border:1px solid #fedf89;color:#93370d;padding:10px;border-radius:16px;
+  font-size:12px;margin:10px 0;
+}
+.secureBadge{
+  display:inline-flex;align-items:center;gap:6px;border-radius:999px;background:#dcfae6;color:#067647;
+  padding:6px 10px;font-size:12px;font-weight:950;margin-bottom:8px;
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -226,6 +257,23 @@ body.dark .iconBtn{background:#111e1a;border-color:#2e3b36;color:#f2f4f7}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 </head>
 <body class="print-thermal">
+
+<div id="secureGate" class="secureGate noPrint">
+  <div class="secureGateBox">
+    <div class="secureBadge">🔐 Secure Login Required</div>
+    <h2>Asha Billing Lockdown</h2>
+    <div class="muted">Owner/staff login ছাড়া app data দেখা যাবে না।</div>
+    <div class="dangerNote">Firebase Rules-এ Owner UID lock করলেই আসল database security হবে।</div>
+    <label>Email</label><input id="gateEmail" type="email" placeholder="your@email.com">
+    <label>Password</label><input id="gatePass" type="password" placeholder="Password">
+    <div class="row" style="margin-top:12px">
+      <button class="primary" onclick="gateLogin()">Login</button>
+      <button class="light" onclick="gateCreate()">Create Owner Login</button>
+    </div>
+    <div id="gateMsg" class="tiny" style="margin-top:8px"></div>
+  </div>
+</div>
+
 <div id="lockScreen" class="lock">
   <div class="lockbox">
     <h2>🔐 Asha Billing Lock</h2>
@@ -722,6 +770,55 @@ async function authLogout(){
   catch(e){ updateCloudStatus("Logout failed: "+e.message); }
 }
 
+
+function setSecureLocked(isLocked){
+  document.body.classList.toggle("secureLocked", !!isLocked);
+}
+function secureAuthAllowed(){
+  if(!state.settings || !state.settings.firebaseConfig) return false;
+  if(!window.firebase || !firebase.auth) return false;
+  const u=firebase.auth().currentUser;
+  if(!u) return false;
+  if(state.settings.ownerUid && u.uid !== state.settings.ownerUid) return false;
+  return true;
+}
+function updateSecureGate(){
+  if(secureAuthAllowed()){
+    setSecureLocked(false);
+    const g=$("secureGate"); if(g) g.style.display="none";
+  }else{
+    setSecureLocked(true);
+  }
+}
+async function gateLogin(){
+  try{
+    if(!initFirebase()) return;
+    const email=$("gateEmail").value.trim();
+    const pass=$("gatePass").value;
+    await firebase.auth().signInWithEmailAndPassword(email,pass);
+    if(state.settings.ownerUid && firebase.auth().currentUser.uid !== state.settings.ownerUid){
+      await firebase.auth().signOut();
+      $("gateMsg").textContent="এই email owner UID-এর সাথে match করছে না।";
+      updateSecureGate();
+      return;
+    }
+    state.settings.ownerUid=state.settings.ownerUid||firebase.auth().currentUser.uid;
+    localStorage.setItem(KEY,JSON.stringify(state));
+    updateSecureGate(); updateAuthStatus(); updateCloudStatus("Secure login success.");
+  }catch(e){ $("gateMsg").textContent=e.message; updateSecureGate(); }
+}
+async function gateCreate(){
+  try{
+    if(!initFirebase()) return;
+    const email=$("gateEmail").value.trim();
+    const pass=$("gatePass").value;
+    await firebase.auth().createUserWithEmailAndPassword(email,pass);
+    state.settings.ownerUid=firebase.auth().currentUser.uid;
+    localStorage.setItem(KEY,JSON.stringify(state));
+    updateSecureGate(); updateAuthStatus(); updateCloudStatus("Owner login created.");
+  }catch(e){ $("gateMsg").textContent=e.message; updateSecureGate(); }
+}
+
 function updateCloudStatus(msg){const el=$("cloudStatus"); if(el) el.textContent=msg;}
 function initFirebase(){
   try{
@@ -732,7 +829,7 @@ function initFirebase(){
     if(!window.firebase) throw new Error("Firebase SDK load হয়নি");
     if(!firebase.apps.length) fbApp=firebase.initializeApp(cfg); else fbApp=firebase.app();
     fbDb=firebase.firestore();
-    if(firebase.auth){firebase.auth().onAuthStateChanged(u=>{if(u){state.settings.ownerUid=state.settings.ownerUid||u.uid;if($("setOwnerUid"))$("setOwnerUid").value=state.settings.ownerUid;localStorage.setItem(KEY,JSON.stringify(state));}updateAuthStatus();});}
+    if(firebase.auth){firebase.auth().onAuthStateChanged(u=>{if(u){state.settings.ownerUid=state.settings.ownerUid||u.uid;if($("setOwnerUid"))$("setOwnerUid").value=state.settings.ownerUid;localStorage.setItem(KEY,JSON.stringify(state));}updateAuthStatus();updateSecureGate();});}
     updateCloudStatus("Firebase connected.");
     return true;
   }catch(e){updateCloudStatus("Cloud error: "+e.message);return false;}
@@ -794,7 +891,7 @@ function printReport(){navTo("reports");setTimeout(()=>window.print(),100)}
 
 function registerSW(){if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}}
 
-function init(){setPrintMode("thermal");applyTheme();refreshAll();runLandCalc();checkLock();registerSW();if(state.settings.firebaseConfig){initFirebase();updateCloudStatus("Cloud config available. Login করুন।")}else updateCloudStatus("Cloud not configured.");updateAuthStatus();}
+function init(){setPrintMode("thermal");applyTheme();refreshAll();runLandCalc();checkLock();registerSW();if(state.settings.firebaseConfig){initFirebase();updateCloudStatus("Cloud config available. Login করুন।");setTimeout(updateSecureGate,700)}else updateCloudStatus("Cloud not configured.");updateAuthStatus();}
 init();
 </script>
 </body>

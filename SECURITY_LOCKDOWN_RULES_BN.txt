@@ -1,0 +1,28 @@
+Asha Mini Shallow Elite V17 Lockdown Rules
+
+Owner UID:
+FZIhTAr0JEMoHCeQd3kr2t8cJKk2
+
+Firestore Database > Rules এ গিয়ে এই rules paste করে Publish করুন:
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /ashaMiniShallow/{docId} {
+      allow read, write: if request.auth != null
+        && request.auth.uid == "FZIhTAr0JEMoHCeQd3kr2t8cJKk2";
+    }
+  }
+}
+
+
+এর ফলে:
+- App link public থাকলেও Firebase data locked থাকবে।
+- শুধু এই UID দিয়ে login করলে read/write হবে।
+- অন্য কেউ login করলেও data access পাবে না।
+
+Steps:
+1. V17 files GitHub-এ upload/replace করে Commit করুন।
+2. Live app খুলে owner login করুন।
+3. Test/Pull করুন।
+4. তারপর Firestore Rules publish করুন।
