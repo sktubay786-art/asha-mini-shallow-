@@ -1,14 +1,12 @@
-Asha Mini Shallow Elite V14
+Asha Mini Shallow Elite V16
 
-New fixes:
-- Bill preview no longer sticks to the previous saved bill.
-- Normal Preview button added.
-- Customer WhatsApp reminder button added with WhatsApp-style icon.
-- Customer Call button added; it opens the phone dialer using the saved phone number.
-- Due payment list also has Call button.
-- Uploaded picture is used as app icon and soft app background.
-- All previous cloud sync, print modes, report, ledger, QR, payment, PIN features are retained.
+New:
+- Dynamic UPI QR in bill: QR amount = current due/bill amount.
+- Customer can scan and pay from PhonePe, Google Pay, Paytm, Navi, Slice or any UPI app.
+- QR Mode setting: dynamic amount-wise QR or uploaded static QR.
+- Premium clean customer cards and icons.
+- Edit Due quick button.
+- Reminder text keeps owner/business details.
 
-GitHub update:
-Upload/replace these files in your GitHub repository:
-index.html, manifest.json, sw.js, icon-192.png, icon-512.png, app-bg.jpg, README.txt
+Important:
+For Dynamic QR, set Settings > UPI ID, Payee Name, QR Mode = Dynamic UPI QR with due amount.

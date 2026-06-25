@@ -1,0 +1,16 @@
+Dynamic UPI QR Guide
+
+Dynamic QR কী করে?
+- Bill/due amount যত টাকা, QR scan করলে UPI app-এ সেই amount auto fill হবে।
+- PhonePe / Google Pay / Paytm / Navi / Slice / any UPI app দিয়ে pay করা যাবে।
+
+Setup:
+1. Settings > UPI ID দিন
+2. Payee Name দিন
+3. QR Mode = Dynamic UPI QR with due amount
+4. Save Settings
+5. Bill তৈরি করলে QR auto amount-wise হবে
+
+Static QR:
+- QR Mode = Uploaded static QR image দিলে upload করা QR show হবে।
+- Static QR amount auto-fill করে না।

@@ -1,0 +1,30 @@
+Firebase Security/Auth Setup
+
+1. Firebase Console > Build/Security > Authentication
+2. Get started
+3. Sign-in method
+4. Email/Password provider Enable করুন
+5. Save
+
+তারপর app-এ:
+1. Settings > Cloud Sync
+2. Firebase Config আগের মতো রাখুন
+3. Login চাপুন
+4. আপনার email/password দিয়ে Create Login করুন
+5. Test করুন
+6. Push/Pull করুন
+
+Firestore Rules:
+Rules tab-এ গিয়ে এই rules দিন:
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /ashaMiniShallow/{docId} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
+
+তারপর Publish চাপুন।
+এতে login ছাড়া database read/write হবে না।

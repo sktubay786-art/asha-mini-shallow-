@@ -197,14 +197,33 @@ body.dark::before{
 .customerActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
 .customerActions .light,.customerActions .danger{padding:8px 10px}
 
+
+/* Elite V15: Firebase Auth + secure reminders */
+.authOverlay{position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:120;display:none;align-items:center;justify-content:center;padding:16px}
+.authOverlay.show{display:flex}
+.authBox{width:100%;max-width:420px;background:#fff;border-radius:26px;padding:18px;box-shadow:0 28px 80px rgba(0,0,0,.25);border:1px solid #e4e7ec}
+body.dark .authBox{background:#101c18;border-color:#2e3b36}
+.ownerStamp{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.35}
+.secureChip{display:inline-flex;align-items:center;gap:5px;background:#e8f6ee;color:#0b4b2f;border:1px solid #bfe6ce;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:950}
+
+
+/* Elite V16: Dynamic UPI QR + premium customer UI */
+.iconBtn{display:inline-flex;align-items:center;gap:7px;border:1px solid #d8e6de;background:linear-gradient(180deg,#fff,#f6faf8);color:#182230;border-radius:14px;padding:8px 10px;font-weight:900;box-shadow:0 6px 14px rgba(16,24,40,.04)}
+body.dark .iconBtn{background:#111e1a;border-color:#2e3b36;color:#f2f4f7}
+.pIcon{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:10px;font-size:12px;font-weight:950}.pUser{background:#e7f0ff;color:#175cd3}.pBill{background:#e8f6ee;color:#0b4b2f}.pWA{background:#dcfae6;color:#079455}.pCall{background:#e0f2fe;color:#026aa2}.pSMS{background:#fff7d6;color:#b54708}.pLedger{background:#f4ebff;color:#6941c6}.pDue{background:#ffe5e5;color:#b42318}
+.customerNamePremium{font-size:18px;font-weight:950;letter-spacing:.1px}.customerMetaPremium{font-size:12px;color:var(--muted);font-weight:750}.dueBadgePremium{background:linear-gradient(135deg,#fee4e2,#fff2f1);color:#b42318;border:1px solid #fecdca;border-radius:999px;padding:8px 12px;font-weight:950}.paidBadgePremium{background:linear-gradient(135deg,#dcfae6,#f0fff4);color:#067647;border:1px solid #abefc6;border-radius:999px;padding:8px 12px;font-weight:950}
+.invoice .upiLine{font-size:10px;text-align:center;margin-top:3px}.dynamicQrLabel{font-size:10px;text-align:center;color:#0b4b2f;font-weight:900;margin-top:2px}.qrModeNote{font-size:11px;color:var(--muted);margin-top:6px}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <link rel="manifest" href="./manifest.json">
 <link rel="icon" href="./icon-192.png">
 <link rel="apple-touch-icon" href="./icon-192.png">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 </head>
 <body class="print-thermal">
 <div id="lockScreen" class="lock">
@@ -217,13 +236,28 @@ body.dark::before{
   </div>
 </div>
 
+
+<div id="authScreen" class="authOverlay noPrint">
+  <div class="authBox">
+    <div class="row"><div class="logo">AS</div><div><h2>Secure Cloud Login</h2><div class="muted">Owner/staff email দিয়ে login করুন।</div></div></div>
+    <label>Email</label><input id="authEmail" type="email" placeholder="owner@example.com">
+    <label>Password</label><input id="authPass" type="password" placeholder="Password">
+    <div class="row" style="margin-top:12px">
+      <button class="primary" onclick="authLogin()">Login</button>
+      <button class="light" onclick="authSignup()">Create Login</button>
+      <button class="light" onclick="hideAuth()">Later</button>
+    </div>
+    <div id="authMsg" class="tiny" style="margin-top:8px"></div>
+  </div>
+</div>
+
 <header class="appbar noPrint">
   <div class="top">
     <div class="logo">AS</div>
     <div><h1 id="headCompany">আশা মিনি শ্যালো</h1><p>Smart Billing • Cloud • Print • Call • WhatsApp</p></div>
     <button class="light right" onclick="exportData()">Backup</button><button class="light" onclick="installInfo()">Install</button>
   </div>
-  <div class="status" id="appStatus"><span class="premiumRibbon">Auto-save enabled</span> Data locally saved. <span id="backupStatus"></span></div>
+  <div class="status" id="appStatus"><span id="authStatus" class="secureChip">Cloud Auth: checking</span> <span class="premiumRibbon">Auto-save enabled</span> Data locally saved. <span id="backupStatus"></span></div>
 </header>
 
 <main class="wrap">
@@ -360,7 +394,7 @@ body.dark::before{
       <label>Company</label><input id="setCompany"><label>Proprietor</label><input id="setOwner"><label>Contact</label><input id="setContact"><label>Address</label><textarea id="setAddress"></textarea>
       <label>Default Rate ₹/Bigha</label><input id="setRate" type="number">
       <div class="calcGrid"><div><label>খরা Rate</label><input id="rateKhora" type="number"></div><div><label>বর্ষা Rate</label><input id="rateBorsha" type="number"></div><div><label>বোরো Rate</label><input id="rateBoro" type="number"></div><div><label>আমন Rate</label><input id="rateAman" type="number"></div></div>
-      <label>UPI ID</label><input id="setUpi"><label>Default Note</label><textarea id="setNote"></textarea>
+      <label>UPI ID</label><input id="setUpi"><label>Payee Name for UPI QR</label><input id="setPayeeName" placeholder="SK ENAMUL HAQUE"><label>QR Mode in Bill</label><select id="setQrMode"><option value="dynamic">Dynamic UPI QR with due amount</option><option value="static">Uploaded static QR image</option></select><div class="qrModeNote">Dynamic mode-এ bill/due amount অনুযায়ী QR তৈরি হবে। Static mode-এ upload করা QR ব্যবহার হবে।</div><label>Default Note</label><textarea id="setNote"></textarea>
       <div class="row" style="margin-top:12px"><button class="primary" onclick="saveSettings()">Save Settings</button></div>
     </div>
     <div class="span-6 card">
@@ -378,7 +412,8 @@ body.dark::before{
         <label>Firebase Config JSON</label><textarea id="setFirebaseConfig" placeholder='{"apiKey":"...","authDomain":"...","projectId":"..."}'></textarea>
         <label>Cloud Doc ID</label><input id="setCloudDocId" placeholder="owner-main">
         <label>Auto Cloud Sync</label><select id="setCloudAuto"><option value="off">Off</option><option value="on">On</option></select>
-        <div class="row" style="margin-top:10px"><button class="primary" onclick="saveCloudSettings()">Save Cloud Settings</button><button class="light" onclick="testCloud()">Test</button><button class="light" onclick="cloudPush(true)">Push</button><button class="light" onclick="cloudPull()">Pull</button></div>
+        <label>Owner Auth UID</label><input id="setOwnerUid" placeholder="Login করলে auto fill হবে">
+        <div class="row" style="margin-top:10px"><button class="primary" onclick="saveCloudSettings()">Save Cloud Settings</button><button class="light" onclick="showAuth()">Login</button><button class="light" onclick="authLogout()">Logout</button><button class="light" onclick="testCloud()">Test</button><button class="light" onclick="cloudPush(true)">Push</button><button class="light" onclick="cloudPull()">Pull</button></div>
         <div id="cloudStatus" class="tiny" style="margin-top:8px">Cloud not configured.</div>
       </div>
       <div class="notice" style="margin-top:12px">QR add না হলে browser storage full হতে পারে। ছোট QR image ব্যবহার করুন।</div>
@@ -419,7 +454,7 @@ const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 const today=()=>new Date().toISOString().slice(0,10);
 const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 let fbApp=null, fbDb=null, cloudTimer=null;
-function defaultState(){return{settings:{company:"আশা মিনি শ্যালো",owner:"SK EKRAMUL Haque",contact:"9564061920",address:"Raghunathpur, Chaklachipur, Ghatal, Paschim Medinipur, 721232",defaultRate:2200,upi:"8710065540@axl",note:"ধন্যবাদ। সময়মতো বিল পরিশোধ করার জন্য অনুরোধ করা হচ্ছে।",qrImage:"",pin:"",theme:"light",template:"classic",backupReminder:"on",lastBackup:"",firebaseConfig:"",cloudDocId:"owner-main",cloudAutoSync:"off",seasonRates:{"খরা":2200,"বর্ষা":0,"বোরো":0,"আমন":0}},seasons:["খরা","বর্ষা","বোরো","আমন"],customers:[],bills:[]}}
+function defaultState(){return{settings:{company:"আশা মিনি শ্যালো",owner:"SK EKRAMUL Haque",contact:"9564061920",address:"Raghunathpur, Chaklachipur, Ghatal, Paschim Medinipur, 721232",defaultRate:2200,upi:"8710065540@axl",payeeName:"SK ENAMUL HAQUE",qrMode:"dynamic",note:"ধন্যবাদ। সময়মতো বিল পরিশোধ করার জন্য অনুরোধ করা হচ্ছে।",qrImage:"",pin:"",theme:"light",template:"classic",backupReminder:"on",lastBackup:"",firebaseConfig:"",cloudDocId:"owner-main",cloudAutoSync:"off",ownerUid:"",seasonRates:{"খরা":2200,"বর্ষা":0,"বোরো":0,"আমন":0}},seasons:["খরা","বর্ষা","বোরো","আমন"],customers:[],bills:[]}}
 let state=loadState();let currentBillForPreview=null;
 function loadState(){
   try{
@@ -498,12 +533,40 @@ function callCustomer(id){
   const p=sanitizePhone(c.phone);
   window.location.href="tel:+"+p;
 }
+function ownerDetailsText(){
+  const s=state.settings;
+  return `\n\n--\n${s.company}\nPro: ${s.owner}\nContact/WhatsApp: ${s.contact}\nAddress: ${s.address}\nUPI: ${s.upi}`;
+}
+function reminderText(c,due){
+  return `আসসালামু আলাইকুম ${c.name},\nআপনার ${state.settings.company} এর বর্তমান বাকি/Due: ${money(due)}\nঅনুগ্রহ করে সুবিধামতো পরিশোধ করুন।${ownerDetailsText()}`;
+}
 function whatsappCustomer(id){
   const c=state.customers.find(x=>x.id===id);
   if(!c || !c.phone){alert("এই customer-এর phone number নেই");return;}
-  const due=customerDue(id);
-  const txt=`আসসালামু আলাইকুম ${c.name},\nআপনার আশা মিনি শ্যালো এর Due: ${money(due)}\nUPI: ${state.settings.upi}\n- ${state.settings.company}`;
+  const txt=reminderText(c,customerDue(id));
   window.open("https://wa.me/"+sanitizePhone(c.phone)+"?text="+encodeURIComponent(txt),"_blank");
+}
+function smsCustomer(id){
+  const c=state.customers.find(x=>x.id===id);
+  if(!c || !c.phone){alert("এই customer-এর phone number নেই");return;}
+  const txt=reminderText(c,customerDue(id));
+  window.location.href="sms:+"+sanitizePhone(c.phone)+"?body="+encodeURIComponent(txt);
+}
+async function whatsappReminderImage(id){
+  const c=state.customers.find(x=>x.id===id);
+  if(!c || !c.phone){alert("এই customer-এর phone number নেই");return;}
+  quickBill(id);
+  await new Promise(r=>setTimeout(r,350));
+  const blob=await invoiceBlob();
+  const txt=reminderText(c,customerDue(id));
+  if(blob && navigator.canShare){
+    const file=new File([blob],"asha_due_bill.png",{type:"image/png"});
+    if(navigator.canShare({files:[file]})){
+      try{await navigator.share({files:[file],text:txt,title:"Asha Mini Shallow Bill"});return;}catch(e){}
+    }
+  }
+  if(blob) downloadBlob(blob,"asha_due_bill.png");
+  window.open("https://wa.me/"+sanitizePhone(c.phone)+"?text="+encodeURIComponent(txt+"\n\nBill image downloaded. Please attach/send the image."),"_blank");
 }
 
 function clearCustomerForm(){["custId","custName","custPhone","custVillage","custAddress","custNote"].forEach(id=>$(id).value="");$("custOpeningDue").value=0;$("custTitle").textContent="Add Customer"}
@@ -514,23 +577,18 @@ function renderCustomers(){
   const rows=state.customers.filter(c=>(c.name+c.phone+c.village+c.address).toLowerCase().includes(q));
   $("customerList").innerHTML=rows.length?rows.map(c=>{
     const due=customerDue(c.id);
-    return `<div class="listItem">
-      <div class="row">
-        <div><b>${esc(c.name)}</b><div class="muted">${esc(c.phone||"")} • ${esc(c.village||"")}</div></div>
-        <span class="chip ${due>0?'bad':'ok'} right">Due ${money(due)}</span>
-      </div>
-      <div class="muted" style="margin-top:6px">${esc(c.address||"")}</div>
-      <div class="customerActions">
-        <button class="light" onclick="editCustomer('${c.id}')"><span class="actionIcon userIcon">✎</span>Edit</button>
-        <button class="light" onclick="quickBill('${c.id}')"><span class="actionIcon userIcon">🧾</span>Bill</button>
-        <button class="light" onclick="whatsappCustomer('${c.id}')"><span class="actionIcon whatsappIcon">☘</span>WhatsApp</button>
-        <button class="light" onclick="callCustomer('${c.id}')"><span class="actionIcon callIcon">☎</span>Call</button>
-        <button class="light" onclick="openLedger('${c.id}')"><span class="actionIcon ledgerIcon">▤</span>Ledger</button>
-        <button class="danger" onclick="deleteCustomer('${c.id}')">Delete</button>
-      </div>
-    </div>`;
+    return `<div class="listItem"><div class="row"><div><div class="customerNamePremium">${esc(c.name)}</div><div class="customerMetaPremium">📞 ${esc(c.phone||"No phone")} • 📍 ${esc(c.village||"No village")}</div></div><span class="${due>0?'dueBadgePremium':'paidBadgePremium'} right">${due>0?'Due '+money(due):'Paid'}</span></div><div class="muted" style="margin-top:7px">${esc(c.address||"")}</div><div class="customerActions"><button class="iconBtn" onclick="editCustomer('${c.id}')"><span class="pIcon pUser">✎</span>Edit</button><button class="iconBtn" onclick="quickBill('${c.id}')"><span class="pIcon pBill">🧾</span>Bill</button><button class="iconBtn" onclick="whatsappCustomer('${c.id}')"><span class="pIcon pWA">WA</span>Text</button><button class="iconBtn" onclick="whatsappReminderImage('${c.id}')"><span class="pIcon pWA">▣</span>Bill+WA</button><button class="iconBtn" onclick="smsCustomer('${c.id}')"><span class="pIcon pSMS">✉</span>SMS</button><button class="iconBtn" onclick="callCustomer('${c.id}')"><span class="pIcon pCall">☎</span>Call</button><button class="iconBtn" onclick="openLedger('${c.id}')"><span class="pIcon pLedger">▤</span>Ledger</button><button class="iconBtn" onclick="editCustomerDue('${c.id}')"><span class="pIcon pDue">₹</span>Edit Due</button><button class="danger" onclick="deleteCustomer('${c.id}')">Delete</button></div></div>`;
   }).join(""):`<p class="muted">No customer yet.</p>`;
 }
+
+function editCustomerDue(id){
+  const c=state.customers.find(x=>x.id===id); if(!c)return;
+  const val=prompt("Opening/adjustment due amount দিন", c.openingDue||0);
+  if(val===null) return;
+  c.openingDue=+val||0;
+  saveState();
+}
+
 function deleteCustomer(id){if(confirm("Delete customer?")){state.customers=state.customers.filter(c=>c.id!==id);saveState()}}
 function quickBill(id){navTo("bill");$("billCustomer").value=id;fillCustomerBill()}
 function fillCustomerBill(){currentBillForPreview=null;const c=state.customers.find(x=>x.id===$("billCustomer").value);if(!c)return;$("prevDue").value=customerDue(c.id);calcBill()}
@@ -543,12 +601,34 @@ function nextBillNo(){return "ASHA-"+new Date().getFullYear()+"-"+String(state.b
 function makePreviewBill(realNo=false){const c=state.customers.find(x=>x.id===$("billCustomer").value)||{};const v=calcValues();return{id:uid(),billNo:realNo?nextBillNo():"Preview",date:today(),customerId:c.id||"",customerName:c.name||"Customer Name",phone:c.phone||"",address:c.address||"",village:c.village||"",season:$("billSeason").value,landAmount:v.amt,unit:$("landUnit").value,rate:v.rate,bigha:v.bigha,current:v.current,previousDue:v.prev,allTotal:v.allTotal,payMode:$("payMode").value,receivedIn:$("receivedIn").value.trim(),note:$("billNote").value.trim(),payments:v.paid>0?[{id:uid(),date:today(),amount:v.paid,mode:$("payMode").value,receivedIn:$("receivedIn").value.trim(),note:"Initial payment"}]:[],printMode:$("printMode").value}}
 function saveBill(){const c=state.customers.find(x=>x.id===$("billCustomer").value);if(!c){alert("Customer select করুন");return}const b=makePreviewBill(true);if(b.current<=0&&b.previousDue<=0){alert("Amount/rate ঠিক করুন");return}state.bills.push(b);currentBillForPreview=b;saveState();$("invoicePreview").innerHTML=invoiceHTML(b);alert("Bill saved: "+b.billNo)}
 function renderInvoice(b){b=b||makePreviewBill(false);$("invoicePreview").innerHTML=invoiceHTML(b)}
+
+function upiLink(amount, note){
+  const s=state.settings;
+  const pa=encodeURIComponent(s.upi||"");
+  const pn=encodeURIComponent(s.payeeName||s.owner||s.company||"");
+  const am=Number(amount||0).toFixed(2);
+  const tn=encodeURIComponent(note||"Asha Mini Shallow Bill Payment");
+  return `upi://pay?pa=${pa}&pn=${pn}&am=${am}&cu=INR&tn=${tn}`;
+}
+function qrImgSrcFor(amount, billNo){
+  const data=upiLink(amount, billNo?`Bill ${billNo}`:"Due Payment");
+  return `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(data)}`;
+}
+function dynamicQrBlock(amount,billNo){
+  const mode=state.settings.qrMode||"dynamic";
+  if(mode==="static"){
+    return state.settings.qrImage?`<img class="qr" src="${state.settings.qrImage}"><div class="dynamicQrLabel">Scan & Pay</div>`:`<div class="center tiny">Static QR not uploaded</div>`;
+  }
+  const src=qrImgSrcFor(amount,billNo);
+  return `<img class="qr" src="${src}" crossorigin="anonymous"><div class="dynamicQrLabel">Scan & Pay ${money(amount)}</div><div class="upiLine">${esc(state.settings.upi||"")}</div>`;
+}
+
 function invoiceHTML(b){
   const s=state.settings;const pm=$("printMode").value;
   const cls=pm==="a5slot"?"a5slot":pm==="a6slot"?"a6slot":pm==="a4half"?"a4half":pm==="a4quarter"?"a4quarter":pm==="a4side"?"a4side":pm==="a4landscape"?"a4landscape":"thermal";
   const paid=billPaid(b),due=Math.max(b.allTotal-paid,0),status=due<=0?"Paid":paid>0?"Partial":"Due";
   const tmpl=(state.settings.template||"classic")==="modern"?"templateModern":"";
-  const core=`<div class="invoice ${cls} ${tmpl}" id="billInvoice"><h1>${esc(s.company)}</h1><div class="sub">Pro: ${esc(s.owner)}</div><div class="sub">📞/WhatsApp: ${esc(s.contact)}</div><div class="sub">${esc(s.address)}</div><div class="dashline"></div><div class="billrow"><span>Bill No</span><b>${esc(b.billNo)}</b></div><div class="billrow"><span>Date</span><b>${esc(b.date)}</b></div><div class="dashline"></div><div><b>Name:</b> ${esc(b.customerName)}</div><div><b>Phone:</b> ${esc(b.phone||"")}</div><div><b>Address:</b> ${esc(b.address||"")}</div><div class="dashline"></div><div class="billrow"><span>Season</span><b>${esc(b.season)}</b></div><div class="billrow"><span>জমির পরিমাণ</span><b>${b.landAmount} ${unitLabel(b.unit)}</b></div><div class="billrow"><span>Converted</span><b>${b.bigha} বিঘা</b></div><div class="billrow"><span>Rate</span><b>${money(b.rate)}/বিঘা</b></div><div class="billrow"><span>Current Bill</span><b>${money(b.current)}</b></div><div class="billrow"><span>Previous Due</span><b>${money(b.previousDue)}</b></div><div class="billrow total"><span>All Total</span><b>${money(b.allTotal)}</b></div><div class="billrow"><span>Paid</span><b>${money(paid)}</b></div><div class="billrow total"><span>Due</span><b>${money(due)}</b></div><div class="billrow"><span>Status</span><b>${status}</b></div><div class="billrow"><span>Payment</span><b>${esc(b.payMode||"")}</b></div><div class="billrow"><span>Received</span><b>${esc(b.receivedIn||"")}</b></div><div class="dashline"></div><div class="center"><b>UPI:</b> ${esc(s.upi)}</div>${s.qrImage?`<img class="qr" src="${s.qrImage}">`:`<div class="center tiny">Add QR from Settings</div>`}<div class="dashline"></div><div class="tiny">${esc(b.note||s.note||"")}</div><div class="sign">Sign: ${esc(s.owner)}</div><div class="center tiny">Thank you</div></div>`;
+  const core=`<div class="invoice ${cls} ${tmpl}" id="billInvoice"><h1>${esc(s.company)}</h1><div class="sub">Pro: ${esc(s.owner)}</div><div class="sub">📞/WhatsApp: ${esc(s.contact)}</div><div class="sub">${esc(s.address)}</div><div class="dashline"></div><div class="billrow"><span>Bill No</span><b>${esc(b.billNo)}</b></div><div class="billrow"><span>Date</span><b>${esc(b.date)}</b></div><div class="dashline"></div><div><b>Name:</b> ${esc(b.customerName)}</div><div><b>Phone:</b> ${esc(b.phone||"")}</div><div><b>Address:</b> ${esc(b.address||"")}</div><div class="dashline"></div><div class="billrow"><span>Season</span><b>${esc(b.season)}</b></div><div class="billrow"><span>জমির পরিমাণ</span><b>${b.landAmount} ${unitLabel(b.unit)}</b></div><div class="billrow"><span>Converted</span><b>${b.bigha} বিঘা</b></div><div class="billrow"><span>Rate</span><b>${money(b.rate)}/বিঘা</b></div><div class="billrow"><span>Current Bill</span><b>${money(b.current)}</b></div><div class="billrow"><span>Previous Due</span><b>${money(b.previousDue)}</b></div><div class="billrow total"><span>All Total</span><b>${money(b.allTotal)}</b></div><div class="billrow"><span>Paid</span><b>${money(paid)}</b></div><div class="billrow total"><span>Due</span><b>${money(due)}</b></div><div class="billrow"><span>Status</span><b>${status}</b></div><div class="billrow"><span>Payment</span><b>${esc(b.payMode||"")}</b></div><div class="billrow"><span>Received</span><b>${esc(b.receivedIn||"")}</b></div><div class="dashline"></div><div class="center"><b>UPI:</b> ${esc(s.upi)}</div>${dynamicQrBlock(due>0?due:b.allTotal,b.billNo)}<div class="dashline"></div><div class="tiny">${esc(b.note||s.note||"")}</div><div class="sign">Sign: ${esc(s.owner)}</div><div class="center tiny">Thank you</div></div>`;
   if(pm==="a5slot") return `<div class="pageMock two"><div class="slot a5">${core}</div></div>`;
   if(pm==="a6slot") return `<div class="pageMock four"><div class="slot a6">${core}</div></div>`;
   return core;
@@ -573,9 +653,9 @@ function openPayment(id){const b=state.bills.find(x=>x.id===id);if(!b)return;$("
 function closePaymentModal(){$("paymentModal").classList.remove("show")}
 function confirmPayment(){const b=state.bills.find(x=>x.id===$("payBillId").value);if(!b)return;const amt=+$("modalPayAmount").value||0;if(amt<=0){alert("Amount দিন");return}(b.payments=b.payments||[]).push({id:uid(),date:today(),amount:amt,mode:$("modalPayMode").value,receivedIn:$("modalReceivedIn").value.trim(),note:$("modalPayNote").value.trim()});closePaymentModal();saveState();alert("Payment saved")}
 function renderReports(){const bs=state.bills;$("reportBox").innerHTML=`<div class="kv"><span>Total Bills</span><b>${bs.length}</b></div><div class="kv"><span>Total Amount</span><b>${money(sum(bs,"allTotal"))}</b></div><div class="kv"><span>Collected</span><b>${money(bs.reduce((a,b)=>a+billPaid(b),0))}</b></div><div class="kv"><span>Due</span><b>${money(bs.reduce((a,b)=>a+billDue(b),0))}</b></div>`;$("villageReport").innerHTML=listSummary(groupDue("village",bs),"No village due");$("bankReport").innerHTML=listSummary(groupPayments("bank",bs),"No collection");$("dueReport").innerHTML=listSummary(groupDue("customerName",bs),"No due")}
-function loadSettings(){const s=state.settings;s.seasonRates=s.seasonRates||{};$("setCompany").value=s.company;$("setOwner").value=s.owner;$("setContact").value=s.contact;$("setAddress").value=s.address;$("setRate").value=s.defaultRate;$("setUpi").value=s.upi;$("setNote").value=s.note;$("rateKhora").value=s.seasonRates["খরা"]||0;$("rateBorsha").value=s.seasonRates["বর্ষা"]||0;$("rateBoro").value=s.seasonRates["বোরো"]||0;$("rateAman").value=s.seasonRates["আমন"]||0;if($("setTheme"))$("setTheme").value=s.theme||"light";if($("setTemplate"))$("setTemplate").value=s.template||"classic";if($("setBackupReminder"))$("setBackupReminder").value=s.backupReminder||"on";if($("setFirebaseConfig"))$("setFirebaseConfig").value=s.firebaseConfig||"";if($("setCloudDocId"))$("setCloudDocId").value=s.cloudDocId||"owner-main";if($("setCloudAuto"))$("setCloudAuto").value=s.cloudAutoSync||"off";$("qrPreviewBox").innerHTML=s.qrImage?`<img class="qr" src="${s.qrImage}">`:`<span class="tiny">No QR uploaded</span>`;updateCloudStatus(s.firebaseConfig?"Cloud config saved locally.":"Cloud not configured.")}
-function saveSettings(){Object.assign(state.settings,{company:$("setCompany").value.trim(),owner:$("setOwner").value.trim(),contact:$("setContact").value.trim(),address:$("setAddress").value.trim(),defaultRate:+$("setRate").value||0,upi:$("setUpi").value.trim(),note:$("setNote").value.trim(),theme:$("setTheme")?.value||state.settings.theme||"light",template:$("setTemplate")?.value||state.settings.template||"classic",backupReminder:$("setBackupReminder")?.value||"on",firebaseConfig:$("setFirebaseConfig")?.value.trim()||state.settings.firebaseConfig||"",cloudDocId:$("setCloudDocId")?.value.trim()||"owner-main",cloudAutoSync:$("setCloudAuto")?.value||"off",seasonRates:{"খরা":+$("rateKhora").value||0,"বর্ষা":+$("rateBorsha").value||0,"বোরো":+$("rateBoro").value||0,"আমন":+$("rateAman").value||0}});saveState();alert("Settings saved")}
-function saveCloudSettings(){state.settings.firebaseConfig=$("setFirebaseConfig").value.trim();state.settings.cloudDocId=$("setCloudDocId").value.trim()||"owner-main";state.settings.cloudAutoSync=$("setCloudAuto").value;localStorage.setItem(KEY,JSON.stringify(state));updateCloudStatus("Cloud settings saved locally.")}
+function loadSettings(){const s=state.settings;s.seasonRates=s.seasonRates||{};$("setCompany").value=s.company;$("setOwner").value=s.owner;$("setContact").value=s.contact;$("setAddress").value=s.address;$("setRate").value=s.defaultRate;$("setUpi").value=s.upi;if($("setPayeeName"))$("setPayeeName").value=s.payeeName||s.owner||"";if($("setQrMode"))$("setQrMode").value=s.qrMode||"dynamic";$("setNote").value=s.note;$("rateKhora").value=s.seasonRates["খরা"]||0;$("rateBorsha").value=s.seasonRates["বর্ষা"]||0;$("rateBoro").value=s.seasonRates["বোরো"]||0;$("rateAman").value=s.seasonRates["আমন"]||0;if($("setTheme"))$("setTheme").value=s.theme||"light";if($("setTemplate"))$("setTemplate").value=s.template||"classic";if($("setBackupReminder"))$("setBackupReminder").value=s.backupReminder||"on";if($("setFirebaseConfig"))$("setFirebaseConfig").value=s.firebaseConfig||"";if($("setCloudDocId"))$("setCloudDocId").value=s.cloudDocId||"owner-main";if($("setCloudAuto"))$("setCloudAuto").value=s.cloudAutoSync||"off";if($("setOwnerUid"))$("setOwnerUid").value=s.ownerUid||"";$("qrPreviewBox").innerHTML=s.qrImage?`<img class="qr" src="${s.qrImage}">`:`<span class="tiny">No QR uploaded</span>`;updateCloudStatus(s.firebaseConfig?"Cloud config saved locally.":"Cloud not configured.")}
+function saveSettings(){Object.assign(state.settings,{company:$("setCompany").value.trim(),owner:$("setOwner").value.trim(),contact:$("setContact").value.trim(),address:$("setAddress").value.trim(),defaultRate:+$("setRate").value||0,upi:$("setUpi").value.trim(),payeeName:$("setPayeeName")?.value.trim()||state.settings.owner||"",qrMode:$("setQrMode")?.value||"dynamic",note:$("setNote").value.trim(),theme:$("setTheme")?.value||state.settings.theme||"light",template:$("setTemplate")?.value||state.settings.template||"classic",backupReminder:$("setBackupReminder")?.value||"on",firebaseConfig:$("setFirebaseConfig")?.value.trim()||state.settings.firebaseConfig||"",cloudDocId:$("setCloudDocId")?.value.trim()||"owner-main",cloudAutoSync:$("setCloudAuto")?.value||"off",ownerUid:$("setOwnerUid")?.value.trim()||state.settings.ownerUid||"",seasonRates:{"খরা":+$("rateKhora").value||0,"বর্ষা":+$("rateBorsha").value||0,"বোরো":+$("rateBoro").value||0,"আমন":+$("rateAman").value||0}});saveState();alert("Settings saved")}
+function saveCloudSettings(){state.settings.firebaseConfig=$("setFirebaseConfig").value.trim();state.settings.cloudDocId=$("setCloudDocId").value.trim()||"owner-main";state.settings.cloudAutoSync=$("setCloudAuto").value;state.settings.ownerUid=$("setOwnerUid")?.value.trim()||state.settings.ownerUid||"";localStorage.setItem(KEY,JSON.stringify(state));updateCloudStatus("Cloud settings saved locally.")}
 function uploadQR(e){const f=e.target.files[0];if(!f)return;if(f.size>700000){alert("QR image ছোট করুন, 700KB-এর নিচে দিন");return}const r=new FileReader();r.onload=()=>{state.settings.qrImage=r.result;saveState();alert("QR saved")};r.readAsDataURL(f)}
 function savePin(){const p=$("setPin").value.trim();if(p.length<4){alert("Minimum 4 digit PIN দিন");return}state.settings.pin=p;saveState();$("setPin").value="";alert("PIN saved")}
 function removePin(){state.settings.pin="";saveState();alert("PIN removed")}
@@ -602,6 +682,46 @@ function runLandCalc(){let amt=+$("calcLand").value||0,rate=+$("calcRate").value
 function runNormalCalc(){const ex=$("normalExpr").value.trim();if(!/^[0-9+\-*/().%\s]+$/.test(ex)){$("normalCalcOut").innerHTML='<span class="bad">Invalid</span>';return}try{$("normalCalcOut").innerHTML="Result: <b>"+money(Function("return ("+ex+")")())+"</b>"}catch(e){$("normalCalcOut").innerHTML='<span class="bad">Invalid</span>'}}
 
 
+
+function showAuth(){ $("authScreen").classList.add("show"); }
+function hideAuth(){ $("authScreen").classList.remove("show"); }
+function updateAuthStatus(){
+  const el=$("authStatus"); if(!el) return;
+  const u=(window.firebase && firebase.auth)?firebase.auth().currentUser:null;
+  el.textContent = u ? "Cloud Auth: logged in" : "Cloud Auth: not logged in";
+}
+function ensureAuth(){
+  if(!window.firebase || !firebase.auth){ updateCloudStatus("Firebase Auth SDK load হয়নি"); return false; }
+  if(!firebase.auth().currentUser){ showAuth(); updateCloudStatus("Cloud use করার আগে login করুন"); return false; }
+  return true;
+}
+async function authLogin(){
+  try{
+    if(!initFirebase()) return;
+    const email=$("authEmail").value.trim(), pass=$("authPass").value;
+    await firebase.auth().signInWithEmailAndPassword(email,pass);
+    state.settings.ownerUid=firebase.auth().currentUser.uid;
+    if($("setOwnerUid")) $("setOwnerUid").value=state.settings.ownerUid;
+    localStorage.setItem(KEY,JSON.stringify(state));
+    hideAuth(); updateAuthStatus(); updateCloudStatus("Login success.");
+  }catch(e){ $("authMsg").textContent=e.message; updateCloudStatus("Login failed: "+e.message); }
+}
+async function authSignup(){
+  try{
+    if(!initFirebase()) return;
+    const email=$("authEmail").value.trim(), pass=$("authPass").value;
+    await firebase.auth().createUserWithEmailAndPassword(email,pass);
+    state.settings.ownerUid=firebase.auth().currentUser.uid;
+    if($("setOwnerUid")) $("setOwnerUid").value=state.settings.ownerUid;
+    localStorage.setItem(KEY,JSON.stringify(state));
+    hideAuth(); updateAuthStatus(); updateCloudStatus("Login created.");
+  }catch(e){ $("authMsg").textContent=e.message; updateCloudStatus("Create login failed: "+e.message); }
+}
+async function authLogout(){
+  try{ if(window.firebase && firebase.auth) await firebase.auth().signOut(); updateAuthStatus(); updateCloudStatus("Logged out."); }
+  catch(e){ updateCloudStatus("Logout failed: "+e.message); }
+}
+
 function updateCloudStatus(msg){const el=$("cloudStatus"); if(el) el.textContent=msg;}
 function initFirebase(){
   try{
@@ -612,13 +732,14 @@ function initFirebase(){
     if(!window.firebase) throw new Error("Firebase SDK load হয়নি");
     if(!firebase.apps.length) fbApp=firebase.initializeApp(cfg); else fbApp=firebase.app();
     fbDb=firebase.firestore();
+    if(firebase.auth){firebase.auth().onAuthStateChanged(u=>{if(u){state.settings.ownerUid=state.settings.ownerUid||u.uid;if($("setOwnerUid"))$("setOwnerUid").value=state.settings.ownerUid;localStorage.setItem(KEY,JSON.stringify(state));}updateAuthStatus();});}
     updateCloudStatus("Firebase connected.");
     return true;
   }catch(e){updateCloudStatus("Cloud error: "+e.message);return false;}
 }
-async function testCloud(){ if(!initFirebase()) return; try{ await fbDb.collection("ashaMiniShallow").limit(1).get(); updateCloudStatus("Cloud test success."); }catch(e){ updateCloudStatus("Test failed: "+e.message);} }
-async function cloudPush(manual){ if(!initFirebase()) return; try{ const docId=(state.settings.cloudDocId||"owner-main"); const payload={updatedAt:new Date().toISOString(), data:state}; await fbDb.collection("ashaMiniShallow").doc(docId).set(payload); updateCloudStatus((manual?"Manual":"Auto")+" cloud backup saved."); }catch(e){ updateCloudStatus("Push failed: "+e.message);} }
-async function cloudPull(){ if(!initFirebase()) return; try{ const docId=(state.settings.cloudDocId||"owner-main"); const snap=await fbDb.collection("ashaMiniShallow").doc(docId).get(); if(!snap.exists){ updateCloudStatus("No cloud data found."); return;} state=normalizeState((snap.data()||{}).data||{}); localStorage.setItem(KEY,JSON.stringify(state)); refreshAll(); updateCloudStatus("Cloud data loaded."); }catch(e){ updateCloudStatus("Pull failed: "+e.message);} }
+async function testCloud(){ if(!initFirebase()) return; if(!ensureAuth()) return; try{ await fbDb.collection("ashaMiniShallow").limit(1).get(); updateCloudStatus("Cloud test success."); }catch(e){ updateCloudStatus("Test failed: "+e.message);} }
+async function cloudPush(manual){ if(!initFirebase()) return; if(!ensureAuth()) return; try{ const docId=(state.settings.cloudDocId||"owner-main"); const payload={updatedAt:new Date().toISOString(), data:state}; await fbDb.collection("ashaMiniShallow").doc(docId).set(payload); updateCloudStatus((manual?"Manual":"Auto")+" cloud backup saved."); }catch(e){ updateCloudStatus("Push failed: "+e.message);} }
+async function cloudPull(){ if(!initFirebase()) return; if(!ensureAuth()) return; try{ const docId=(state.settings.cloudDocId||"owner-main"); const snap=await fbDb.collection("ashaMiniShallow").doc(docId).get(); if(!snap.exists){ updateCloudStatus("No cloud data found."); return;} state=normalizeState((snap.data()||{}).data||{}); localStorage.setItem(KEY,JSON.stringify(state)); refreshAll(); updateCloudStatus("Cloud data loaded."); }catch(e){ updateCloudStatus("Pull failed: "+e.message);} }
 function scheduleCloudPush(){ clearTimeout(cloudTimer); cloudTimer=setTimeout(()=>cloudPush(false),1200); }
 
 function installInfo(){alert("Mobile Chrome: menu ⋮ > Add to Home screen. Hosting করলে app-এর মতো install হবে। Firebase config দিলে cloud sync-ও হবে।")}
@@ -673,7 +794,7 @@ function printReport(){navTo("reports");setTimeout(()=>window.print(),100)}
 
 function registerSW(){if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}}
 
-function init(){setPrintMode("thermal");applyTheme();refreshAll();runLandCalc();checkLock();registerSW();updateCloudStatus(state.settings.firebaseConfig?"Cloud config available.":"Cloud not configured.");}
+function init(){setPrintMode("thermal");applyTheme();refreshAll();runLandCalc();checkLock();registerSW();if(state.settings.firebaseConfig){initFirebase();updateCloudStatus("Cloud config available. Login করুন।")}else updateCloudStatus("Cloud not configured.");updateAuthStatus();}
 init();
 </script>
 </body>
