@@ -1,19 +1,23 @@
-Asha Mini Shallow V23 Clean Rebuilt
+Asha Mini Shallow V24 Full Premium
 
-This is a fresh clean rebuild to remove all old duplicate login/auth layers.
-
-Features:
-- Single clean Email + Password admin login
-- Built-in Firebase config
-- UID locked to owner
-- WhatsApp-style customer list
-- Tap customer to open chat-style ledger
-- Bill+WA, phone call, WhatsApp, SMS reminder
+Full clean rebuilt version with:
+- Standard billing format
+- 80mm thermal, A4 half, A4 quarter, A4 landscape half print modes
+- Dynamic UPI QR based on bill due amount
+- Static QR upload mode
+- Firebase UID-locked admin login
+- WhatsApp-style customer chat ledger
+- Bill+WhatsApp image share, SMS reminder, phone call, WhatsApp open
 - Direct due payment without new bill
-- Dynamic UPI QR based on due amount
-- Bill print, share image, PDF download
-- Payment, history, reports, ledger
-- Premium calculator and land calculator
+- Customer CRUD
+- Payment, history, ledger
+- Bank-wise collection report
+- Village-wise due report
+- Month/village filters and CSV export
+- Backup export/import
+- PDF bill download
+- Premium dashboard
+- Apple/Casio-style calculator and land calculator
 - PWA install
 
-Upload these files to GitHub and clear site data/cache after upload.
+Upload all files to GitHub. Then clear browser/site data and open index.html?v=24.
