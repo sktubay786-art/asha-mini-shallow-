@@ -1,24 +1,37 @@
-Asha Mini Shallow V26 Print Modes Premium
+Asha Mini Shallow V29 Fresh iOS Pro
 
-Added/confirmed print modes:
-- Thermal 80mm
-- 2 Bills on A4 (A5)
-- 4 Bills on A4 (A6)
-- A4 Side Half
-- A4 Landscape Half
-- A4 Half
-- A4 Quarter
+This version is built from scratch, not patched from V24-V28.
 
-A4 half and 2 Bills on A4 use A5 size area: 210 x 148.5 mm.
-A4 quarter and 4 Bills on A4 use A6 size area: 105 x 148.5 mm.
-Only one bill is printed in the selected slot; remaining slots stay blank for later use/cutting.
+Files:
+- index.html
+- style.css
+- app.js
+- manifest.json
+- sw.js
+- firestore.rules
+- app-bg.jpg
+- icon-192.png
+- icon-512.png
 
-Other V25 premium features retained:
-- Firebase UID-locked admin login
-- Manual new customer inside bill
-- Country code
+Main features:
+- Clean owner login with Firebase Auth
+- Firestore cloud sync to ashaMiniShallow/ekramul-main
+- iOS-like responsive UI for mobile/tablet/desktop
+- Dashboard, Users, Bill, Pay, History, Reports, Calculator, Settings
+- New customer manually inside bill
 - Auto bill preview
-- Dynamic due amount QR
-- Static QR upload
-- Customer WhatsApp-style ledger
-- Bill image share, SMS, call, reports, backup, PDF, calculator
+- Standard/Premium/Normal/Thermal bill templates
+- Thermal 80mm, A4 A5, A4 A6, side half, landscape half, half and quarter print modes
+- Company/owner/contact/address/UPI in bill header
+- Dynamic UPI QR
+- Bill image share using Web Share where supported
+- WhatsApp text reminder to exact number
+- Receive payment, partial payment, settle amount, due receipt
+- Customer chat ledger with bill/payment/settle timeline
+- Reports: total, collected, due, bank/receive-in, village-wise due
+- Backup/import and CSV export
+- Premium calculator and land calculator
+
+Important limitation:
+Browsers cannot force WhatsApp to automatically attach an image to a specific number.
+The app can share bill image + reminder text through the native share sheet. For exact WhatsApp number, use the WhatsApp Text button.

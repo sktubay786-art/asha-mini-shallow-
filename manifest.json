@@ -1,10 +1,10 @@
 {
-  "name": "Asha Mini Shallow V26 Billing",
+  "name": "Asha Mini Shallow Fresh iOS Pro",
   "short_name": "Asha Billing",
-  "start_url": "./index.html?v=26",
+  "start_url": "./index.html?v=29",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#edf5ef",
+  "background_color": "#f4f7fb",
   "theme_color": "#075c39",
   "icons": [
     {
