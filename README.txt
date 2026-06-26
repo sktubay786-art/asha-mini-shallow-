@@ -1,14 +1,14 @@
-Asha Mini Shallow Elite V20 Premium
+Asha Mini Shallow Elite V21 Clean Final
 
-New:
-- Clean login screen: no UID, no create-owner button, no debug text.
-- Cloud/Admin tools moved inside Admin Cloud & Security details.
-- Test button fixed for locked Firestore rules.
-- WhatsApp-style customer list and customer chat ledger screen.
-- Customer chat screen: bill/payment messages date-wise, top call/WhatsApp/Bill+WA icons, 3-dot admin actions.
-- Direct due payment without creating a new bill.
-- Premium calculator keypad.
-- Improved app icon crop.
-- Previous Dynamic QR, Firebase Auth, Rules, Reports, Ledger retained.
+Fixes:
+- Old duplicate login layers hidden.
+- One clean Email + Password login screen.
+- UID/Create Owner/Login debug UI removed from visible login.
+- Customer list forced into WhatsApp-style chat list.
+- Customer tap opens date-wise bill/payment chat screen.
+- Top actions: Bill+WA, Phone call, WhatsApp.
+- 3-dot actions: Edit User, Receive Due, SMS Reminder, Ledger.
+- Cloud Test fixed for locked Firestore rules.
 
-Upload all files to GitHub and publish firestore.rules in Firebase.
+Important:
+After uploading, clear site data or hard refresh because older service worker/browser cache may show old UI.

@@ -340,6 +340,34 @@ body.dark .chatHeader{background:#101c18;border-color:#2e3b36}
 .customerChatList{display:grid;gap:8px}.chatCustomer{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #e4e7ec;border-radius:19px;padding:11px;box-shadow:0 8px 18px rgba(16,24,40,.04);cursor:pointer}.chatAvatar{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-weight:950;font-size:18px;color:#fff;background:linear-gradient(135deg,#0b4b2f,#0a8a57);flex:0 0 auto}.chatMain{flex:1;min-width:0}.chatName{font-size:16px;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chatSub{font-size:12px;color:#667085;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chatDue{font-size:12px;font-weight:950;border-radius:999px;padding:7px 10px;background:#fee4e2;color:#b42318}.chatPaid{background:#dcfae6;color:#067647}
 .fxCalc{max-width:360px;margin:10px auto;background:linear-gradient(180deg,#20242d,#11151c);border-radius:28px;padding:16px;box-shadow:0 20px 45px rgba(0,0,0,.25);color:white}.fxScreen{background:#dfe8d4;color:#101828;border-radius:14px;min-height:72px;padding:12px;font-family:monospace;font-size:26px;display:flex;align-items:end;justify-content:flex-end;margin-bottom:12px;word-break:break-all}.fxKeys{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.fxKeys button{border:0;border-radius:18px;padding:14px 10px;font-weight:900;font-size:18px;background:#2d333f;color:white}.fxKeys button.op{background:#0b7a4d}.fxKeys button.fn{background:#475467}.fxKeys button.eq{background:#f79009;color:#111}.fxKeys button.wide{grid-column:span 2}
 
+
+/* Elite V21 Clean Final Overrides */
+#authScreen,#secureGate{display:none!important;visibility:hidden!important;pointer-events:none!important}
+#strictLoginWall .strictWarning,
+#strictLoginWall .dangerNote,
+#strictLoginWall button[onclick*="strictCreate"],
+#strictLoginWall button[onclick*="Create"],
+#strictLoginWall button[onclick*="strictLogout"]{display:none!important}
+#strictLoginWall .strictLoginBox{max-width:420px!important;background:rgba(255,255,255,.98)!important;border-radius:30px!important;padding:24px!important}
+#strictLoginWall h2{font-size:26px!important;margin:0!important}
+#strictLoginWall .lockNote{font-size:13px!important;color:#667085!important}
+#strictLoginWall input{height:54px!important;border-radius:18px!important;font-size:16px!important}
+#strictLoginWall .strictLoginActions{display:block!important}
+#strictLoginWall .strictLoginActions button{width:100%!important;min-width:100%!important;border-radius:18px!important;padding:14px!important;font-size:17px!important}
+#strictLoginWall #strictMsg{font-size:12px!important;color:#b42318!important;margin-top:8px!important}
+#strictLoginWall::before{content:"";position:fixed;inset:0;background:linear-gradient(145deg,rgba(4,33,22,.94),rgba(9,93,57,.90)),url("./app-bg.jpg") center/cover no-repeat;z-index:-1}
+.v21ChatList{display:grid;gap:8px}
+.v21Row{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #e4e7ec;border-radius:18px;padding:11px;box-shadow:0 8px 18px rgba(16,24,40,.04);cursor:pointer}
+.v21Avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#0b4b2f,#0a8a57);color:#fff;font-weight:950;display:grid;place-items:center;flex:0 0 auto}
+.v21Main{flex:1;min-width:0}.v21Name{font-weight:950;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v21Sub{font-size:12px;color:#667085;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v21Due{border-radius:999px;padding:7px 10px;font-weight:950;font-size:12px;background:#fee4e2;color:#b42318}.v21Paid{background:#dcfae6;color:#067647}
+.v21ChatPage{position:fixed;inset:0;z-index:90;background:#edf7f0;display:none;flex-direction:column}
+.v21ChatPage.show{display:flex}
+.v21ChatHead{height:64px;background:#fff;border-bottom:1px solid #e4e7ec;display:flex;align-items:center;gap:9px;padding:8px 10px}
+.v21Back{font-size:30px;border:0;background:transparent;padding:4px 8px}.v21HeadTitle{flex:1;min-width:0}.v21HeadTitle b{font-size:17px}.v21HeadTitle span{display:block;font-size:12px;color:#667085;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v21TopBtn{width:40px;height:40px;border-radius:50%;border:1px solid #d0d5dd;background:#fff;display:grid;place-items:center;font-size:18px}
+.v21Menu{position:relative}.v21MenuPanel{display:none;position:absolute;right:0;top:45px;min-width:190px;background:#fff;border:1px solid #e4e7ec;border-radius:18px;box-shadow:0 16px 40px rgba(0,0,0,.14);padding:8px;z-index:2}.v21Menu.open .v21MenuPanel{display:grid;gap:6px}.v21MenuPanel button{text-align:left;justify-content:flex-start}
+.v21ChatBody{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:10px;background:linear-gradient(rgba(235,245,239,.90),rgba(235,245,239,.90)),url("./app-bg.jpg") center/cover fixed}
+.v21Day{align-self:center;background:#fff;border-radius:999px;padding:6px 11px;color:#667085;font-size:12px}.v21Msg{max-width:88%;border-radius:18px;padding:10px 12px;box-shadow:0 2px 10px rgba(0,0,0,.06);font-size:14px;line-height:1.45}.v21Bill{align-self:flex-end;background:#dcf8c6;border-top-right-radius:6px}.v21Pay{align-self:flex-start;background:#fff;border-top-left-radius:6px}.v21DueMsg{align-self:center;background:#fff7e6;border:1px solid #fedf89}.v21Meta{font-size:11px;color:#667085;text-align:right;margin-top:4px}.v21MsgActions{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.v21MsgActions button{font-size:12px;padding:6px 9px}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -1150,5 +1178,109 @@ function registerSW(){if("serviceWorker" in navigator){navigator.serviceWorker.r
 function init(){setPrintMode("thermal");applyTheme();refreshAll();runLandCalc();checkLock();registerSW();if(state.settings.firebaseConfig){initFirebase();updateCloudStatus("Cloud config available. Login করুন।");setTimeout(updateSecureGate,700);setTimeout(strictCheck,900)}else updateCloudStatus("Cloud not configured.");updateAuthStatus();}
 init();
 </script>
+
+<div id="v21ChatPage" class="v21ChatPage noPrint">
+  <div class="v21ChatHead">
+    <button class="v21Back" onclick="v21CloseChat()">‹</button>
+    <div class="v21Avatar" id="v21ChatAvatar">?</div>
+    <div class="v21HeadTitle"><b id="v21ChatName">Customer</b><span id="v21ChatSub">Phone • Village</span></div>
+    <button class="v21TopBtn" id="v21BillWA">▣</button>
+    <button class="v21TopBtn" id="v21Phone">☎</button>
+    <button class="v21TopBtn" id="v21WA">☘</button>
+    <div class="v21Menu" id="v21Menu">
+      <button class="v21TopBtn" onclick="document.getElementById('v21Menu').classList.toggle('open')">⋮</button>
+      <div class="v21MenuPanel">
+        <button class="light" id="v21Edit">Edit User</button>
+        <button class="light" id="v21Pay">Receive Due</button>
+        <button class="light" id="v21SMS">SMS Reminder</button>
+        <button class="light" id="v21Ledger">Ledger</button>
+      </div>
+    </div>
+  </div>
+  <div class="v21ChatBody" id="v21ChatBody"></div>
+</div>
+
+
+<script>
+(function(){
+  const OWNER_UID="FZIhTAr0JEMoHCeQd3kr2t8cJKk2";
+  function q(id){return document.getElementById(id)}
+  function safeEsc(s){return String(s??"").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+  function initials(n){return String(n||"?").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase()}
+  function ensureCleanLogin(){
+    const wall=q("strictLoginWall");
+    if(wall){
+      const box=wall.querySelector(".strictLoginBox");
+      if(box){
+        box.innerHTML=`<div class="strictLoginLogo"><div class="miniLogo"></div><div><h2>Asha Billing</h2><div class="lockNote">Secure admin login</div></div></div>
+        <label>Email</label><input id="strictEmail" type="email" placeholder="Email" autocomplete="off">
+        <label>Password</label><input id="strictPass" type="password" placeholder="Password" autocomplete="off">
+        <div class="strictLoginActions"><button class="primary" onclick="strictLogin()">Login</button></div>
+        <div id="strictMsg" class="strictLoginStatus"></div>`;
+      }
+    }
+  }
+  window.v21CloseChat=function(){q("v21ChatPage").classList.remove("show")}
+  window.v21OpenChat=function(id){
+    window.v21ActiveCustomer=id;
+    const c=state.customers.find(x=>x.id===id); if(!c)return;
+    q("v21ChatPage").classList.add("show");
+    renderV21Chat();
+  }
+  window.renderV21Chat=function(){
+    const c=state.customers.find(x=>x.id===window.v21ActiveCustomer); if(!c)return;
+    q("v21ChatAvatar").textContent=initials(c.name);
+    q("v21ChatName").textContent=c.name;
+    q("v21ChatSub").textContent=(c.phone||"No phone")+" • "+(c.village||"No village")+" • Due "+money(customerDue(c.id));
+    q("v21Phone").onclick=()=>callCustomer(c.id);
+    q("v21WA").onclick=()=>window.open("https://wa.me/"+sanitizePhone(c.phone),"_blank");
+    q("v21BillWA").onclick=()=>whatsappReminderImage(c.id);
+    q("v21Edit").onclick=()=>editCustomer(c.id);
+    q("v21Pay").onclick=()=>v21DirectPayment(c.id);
+    q("v21SMS").onclick=()=>smsCustomer(c.id);
+    q("v21Ledger").onclick=()=>openLedger(c.id);
+    const bills=state.bills.filter(b=>b.customerId===c.id).sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+    let last="", out=[];
+    if((+c.openingDue||0)>0) out.push(`<div class="v21Msg v21DueMsg">Opening Due: <b>${money(c.openingDue)}</b></div>`);
+    bills.forEach(b=>{
+      if(b.date!==last){last=b.date; out.push(`<div class="v21Day">${safeEsc(b.date||"No date")}</div>`)}
+      out.push(`<div class="v21Msg v21Bill"><b>${safeEsc(b.billNo)}</b><br>Name: ${safeEsc(b.customerName)}<br>Total: <b>${money(b.allTotal)}</b><br>Paid: <b>${money(billPaid(b))}</b><br>Due: <b>${money(billDue(b))}</b><div class="v21MsgActions"><button class="light" onclick="viewBill('${b.id}')">View</button><button class="light" onclick="openPayment('${b.id}')">Pay</button><button class="light" onclick="whatsappReminderImage('${c.id}')">Bill+WA</button></div><div class="v21Meta">${billStatus(b)}</div></div>`);
+      paymentsOf(b).forEach(p=>out.push(`<div class="v21Msg v21Pay">Payment received<br><b>${money(p.amount)}</b><br>${safeEsc(p.mode||"")} • ${safeEsc(p.receivedIn||"")}<div class="v21Meta">${safeEsc(p.date||"")}</div></div>`));
+    });
+    if(!out.length) out.push(`<div class="v21Msg v21DueMsg">No bill/payment yet.</div>`);
+    q("v21ChatBody").innerHTML=out.join("");
+  }
+  window.v21DirectPayment=function(id){
+    const c=state.customers.find(x=>x.id===id); if(!c)return;
+    const due=customerDue(id);
+    const amt=+(prompt("কত টাকা payment received?", due>0?due:"")||0);
+    if(!amt||amt<=0)return;
+    let remain=amt;
+    const bills=state.bills.filter(b=>b.customerId===id && billDue(b)>0).sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+    for(const b of bills){ if(remain<=0)break; const pay=Math.min(remain,billDue(b)); (b.payments=b.payments||[]).push({id:uid(),date:today(),amount:pay,mode:"Cash",receivedIn:"Cash",note:"Direct due payment"}); remain-=pay; }
+    if(remain>0 && (+c.openingDue||0)>0) c.openingDue=Math.max((+c.openingDue||0)-remain,0);
+    saveState(); renderV21Chat(); alert("Payment saved");
+  }
+  const oldRefresh=window.refreshAll;
+  window.renderCustomers=function(){
+    const box=q("customerList"); if(!box || !window.state)return;
+    const search=q("customerSearch");
+    const filter=(search?search.value:"").toLowerCase();
+    const rows=state.customers.filter(c=>(c.name+c.phone+c.village+c.address).toLowerCase().includes(filter));
+    box.innerHTML=rows.length?`<div class="v21ChatList">`+rows.map(c=>{const due=customerDue(c.id);return `<div class="v21Row" onclick="v21OpenChat('${c.id}')"><div class="v21Avatar">${safeEsc(initials(c.name))}</div><div class="v21Main"><div class="row" style="gap:8px"><div class="v21Name">${safeEsc(c.name)}</div><span class="${due>0?'v21Due':'v21Due v21Paid'} right">${due>0?money(due):'Paid'}</span></div><div class="v21Sub">📞 ${safeEsc(c.phone||"No phone")} • 📍 ${safeEsc(c.village||"No village")}</div><div class="v21Sub">${safeEsc(c.address||"")}</div></div></div>`}).join("")+`</div>`:`<p class="muted">No customer yet.</p>`;
+  }
+  window.refreshAll=function(){ if(oldRefresh) oldRefresh(); try{renderCustomers()}catch(e){} }
+  const oldTest=window.testCloud;
+  window.testCloud=async function(){
+    if(!initFirebase()) return; if(!ensureAuth()) return;
+    try{ const docId=(state.settings.cloudDocId||"ekramul-main"); await fbDb.collection("ashaMiniShallow").doc(docId).get(); updateCloudStatus("Cloud test success."); }
+    catch(e){ updateCloudStatus("Test failed: "+e.message); }
+  }
+  const oldInit=window.init;
+  window.init=function(){ if(oldInit) oldInit(); setTimeout(()=>{ensureCleanLogin(); try{renderCustomers()}catch(e){}},600); }
+  document.addEventListener("DOMContentLoaded",()=>setTimeout(()=>{ensureCleanLogin(); try{renderCustomers()}catch(e){}},900));
+})();
+</script>
+
 </body>
 </html>
