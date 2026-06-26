@@ -1,11 +1,14 @@
-Asha Mini Shallow Elite V18 Strict Login
+Asha Mini Shallow Elite V19 Premium Secure
 
 New:
-- Full login wall before dashboard.
-- Owner UID locked.
-- Public link visitors cannot see dashboard/data.
-- Firebase Email/Password required.
-- Firestore rules locked to owner UID and ekramul-main.
-- Previous features retained.
+- Clean premium login screen: only Email + Password.
+- Debug/security explanation and Owner UID removed from login UI.
+- Admin-only login check.
+- WhatsApp-style customer list.
+- Premium calculator keypad.
+- Better app icon crop so both faces are visible.
+- Previous security, dynamic QR, cloud sync, reports, ledger retained.
 
-Upload/replace all files in GitHub, then publish firestore.rules in Firebase.
+Important:
+Do not store passwords in code. Firebase Authentication stores passwords securely.
+Upload all files to GitHub and publish firestore.rules in Firebase.

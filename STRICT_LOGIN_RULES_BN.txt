@@ -1,7 +1,4 @@
-Asha Mini Shallow Elite V18 Strict Login
-
-Owner UID:
-FZIhTAr0JEMoHCeQd3kr2t8cJKk2
+Elite V19 Premium Secure Rules
 
 Firestore Rules:
 rules_version = '2';
@@ -16,8 +13,6 @@ service cloud.firestore {
 }
 
 
-Behavior:
-- Link খুললেই login wall দেখাবে।
-- Dashboard/data login ছাড়া hidden থাকবে।
-- শুধু owner UID email/password login হলে app খুলবে।
-- Firebase rules paste না করলে database পুরো secure হবে না।
+Login screen now shows only Email + Password.
+Owner UID/details are hidden from user UI.
+Only admin email should be used: sktubay786@gmail.com

@@ -272,6 +272,47 @@ body.authWall #strictLoginWall{display:flex !important}
 .strictLoginActions button{flex:1;min-width:120px}
 .strictLoginStatus{font-size:12px;margin-top:8px;color:#475467}
 
+
+/* Elite V19 Premium Secure UI */
+.premiumLoginBox{
+  background:rgba(255,255,255,.97)!important;
+  padding:24px!important;
+}
+.premiumLoginBox .lockNote{font-size:13px;color:#667085;margin-top:3px}
+.premiumLoginBox .strictLoginActions button{width:100%;font-size:17px;padding:14px 16px;border-radius:18px}
+.premiumLoginBox input{height:54px;border-radius:18px}
+#strictMsg{color:#b42318;font-weight:800}
+.customerChatList{display:grid;gap:10px}
+.chatCustomer{
+  display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #e4e7ec;border-radius:20px;padding:12px;
+  box-shadow:0 8px 18px rgba(16,24,40,.04);cursor:pointer
+}
+body.dark .chatCustomer{background:#111e1a;border-color:#2e3b36}
+.chatAvatar{
+  width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-weight:950;font-size:18px;
+  color:#fff;background:linear-gradient(135deg,#0b4b2f,#0a8a57);flex:0 0 auto
+}
+.chatMain{flex:1;min-width:0}
+.chatName{font-size:16px;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chatSub{font-size:12px;color:#667085;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chatDue{font-size:12px;font-weight:950;border-radius:999px;padding:7px 10px;background:#fee4e2;color:#b42318}
+.chatPaid{background:#dcfae6;color:#067647}
+.chatActions{display:none;margin-top:10px;gap:7px;flex-wrap:wrap}
+.chatCustomer.open{align-items:flex-start}
+.chatCustomer.open .chatActions{display:flex}
+.chatCustomer.open .chatMain{white-space:normal}
+.fxCalc{
+  max-width:360px;margin:10px auto;background:linear-gradient(180deg,#20242d,#11151c);border-radius:28px;padding:16px;
+  box-shadow:0 20px 45px rgba(0,0,0,.25);color:white
+}
+.fxScreen{
+  background:#dfe8d4;color:#101828;border-radius:14px;min-height:72px;padding:12px;font-family:monospace;font-size:26px;
+  display:flex;align-items:end;justify-content:flex-end;margin-bottom:12px;word-break:break-all
+}
+.fxKeys{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.fxKeys button{border:0;border-radius:18px;padding:14px 10px;font-weight:900;font-size:18px;background:#2d333f;color:white}
+.fxKeys button.op{background:#0b7a4d}.fxKeys button.fn{background:#475467}.fxKeys button.eq{background:#f79009;color:#111}.fxKeys button.wide{grid-column:span 2}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -286,12 +327,26 @@ body.authWall #strictLoginWall{display:flex !important}
 <body class="print-thermal">
 
 <div id="strictLoginWall" class="strictLoginWall noPrint">
-  <div class="strictLoginBox">
+  <div class="strictLoginBox premiumLoginBox">
     <div class="strictLoginLogo">
       <div class="miniLogo"></div>
-      <div><h2>Asha Billing Login</h2><div class="lockNote">Email + Password ছাড়া app open হবে না।</div></div>
+      <div>
+        <h2>Asha Billing</h2>
+        <div class="lockNote">Secure admin login</div>
+      </div>
     </div>
-    <div class="strictWarning">App link public হলেও owner login ছাড়া dashboard/data দেখা যাবে না।</div>
+    <label>Email</label>
+    <input id="strictEmail" type="email" placeholder="sktubay786@gmail.com" autocomplete="username">
+    <label>Password</label>
+    <input id="strictPass" type="password" placeholder="Password" autocomplete="current-password">
+    <div class="strictLoginActions">
+      <button class="primary" onclick="strictLogin()">Login</button>
+    </div>
+    <div id="strictMsg" class="strictLoginStatus"></div>
+  </div>
+</div>
+    </div>
+    <div class="strictWarning"></div>
     <label>Email</label><input id="strictEmail" type="email" placeholder="আপনার Gmail">
     <label>Password</label><input id="strictPass" type="password" placeholder="Password">
     <div class="strictLoginActions">
@@ -666,23 +721,43 @@ async function whatsappReminderImage(id){
 function clearCustomerForm(){["custId","custName","custPhone","custVillage","custAddress","custNote"].forEach(id=>$(id).value="");$("custOpeningDue").value=0;$("custTitle").textContent="Add Customer"}
 function editCustomer(id){const c=state.customers.find(x=>x.id===id);if(!c)return;navTo("customers");$("custId").value=c.id;$("custName").value=c.name;$("custPhone").value=c.phone||"";$("custVillage").value=c.village||"";$("custAddress").value=c.address||"";$("custOpeningDue").value=c.openingDue||0;$("custNote").value=c.note||"";$("custTitle").textContent="Edit Customer"}
 function customerDue(id){const c=state.customers.find(x=>x.id===id);return (+c?.openingDue||0)+state.bills.filter(b=>b.customerId===id).reduce((a,b)=>a+billDue(b),0)}
+function customerInitials(name){
+  return (name||"?").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase();
+}
+function toggleCustomerRow(id){
+  document.querySelectorAll(".chatCustomer").forEach(el=>{
+    if(el.dataset.id===id) el.classList.toggle("open"); else el.classList.remove("open");
+  });
+}
 function renderCustomers(){
   const q=($("customerSearch").value||"").toLowerCase();
   const rows=state.customers.filter(c=>(c.name+c.phone+c.village+c.address).toLowerCase().includes(q));
-  $("customerList").innerHTML=rows.length?rows.map(c=>{
+  $("customerList").innerHTML=rows.length?`<div class="customerChatList">`+rows.map(c=>{
     const due=customerDue(c.id);
-    return `<div class="listItem"><div class="row"><div><div class="customerNamePremium">${esc(c.name)}</div><div class="customerMetaPremium">📞 ${esc(c.phone||"No phone")} • 📍 ${esc(c.village||"No village")}</div></div><span class="${due>0?'dueBadgePremium':'paidBadgePremium'} right">${due>0?'Due '+money(due):'Paid'}</span></div><div class="muted" style="margin-top:7px">${esc(c.address||"")}</div><div class="customerActions"><button class="iconBtn" onclick="editCustomer('${c.id}')"><span class="pIcon pUser">✎</span>Edit</button><button class="iconBtn" onclick="quickBill('${c.id}')"><span class="pIcon pBill">🧾</span>Bill</button><button class="iconBtn" onclick="whatsappCustomer('${c.id}')"><span class="pIcon pWA">WA</span>Text</button><button class="iconBtn" onclick="whatsappReminderImage('${c.id}')"><span class="pIcon pWA">▣</span>Bill+WA</button><button class="iconBtn" onclick="smsCustomer('${c.id}')"><span class="pIcon pSMS">✉</span>SMS</button><button class="iconBtn" onclick="callCustomer('${c.id}')"><span class="pIcon pCall">☎</span>Call</button><button class="iconBtn" onclick="openLedger('${c.id}')"><span class="pIcon pLedger">▤</span>Ledger</button><button class="iconBtn" onclick="editCustomerDue('${c.id}')"><span class="pIcon pDue">₹</span>Edit Due</button><button class="danger" onclick="deleteCustomer('${c.id}')">Delete</button></div></div>`;
-  }).join(""):`<p class="muted">No customer yet.</p>`;
+    return `<div class="chatCustomer" data-id="${c.id}" onclick="toggleCustomerRow('${c.id}')">
+      <div class="chatAvatar">${esc(customerInitials(c.name))}</div>
+      <div class="chatMain">
+        <div class="row" style="gap:8px">
+          <div class="chatName">${esc(c.name)}</div>
+          <span class="${due>0?'chatDue':'chatDue chatPaid'} right">${due>0?money(due):'Paid'}</span>
+        </div>
+        <div class="chatSub">📞 ${esc(c.phone||"No phone")} • 📍 ${esc(c.village||"No village")}</div>
+        <div class="chatSub">${esc(c.address||"")}</div>
+        <div class="chatActions" onclick="event.stopPropagation()">
+          <button class="iconBtn" onclick="editCustomer('${c.id}')"><span class="pIcon pUser">✎</span>Edit</button>
+          <button class="iconBtn" onclick="quickBill('${c.id}')"><span class="pIcon pBill">🧾</span>Bill</button>
+          <button class="iconBtn" onclick="whatsappCustomer('${c.id}')"><span class="pIcon pWA">WA</span>Text</button>
+          <button class="iconBtn" onclick="whatsappReminderImage('${c.id}')"><span class="pIcon pWA">▣</span>Bill+WA</button>
+          <button class="iconBtn" onclick="smsCustomer('${c.id}')"><span class="pIcon pSMS">✉</span>SMS</button>
+          <button class="iconBtn" onclick="callCustomer('${c.id}')"><span class="pIcon pCall">☎</span>Call</button>
+          <button class="iconBtn" onclick="openLedger('${c.id}')"><span class="pIcon pLedger">▤</span>Ledger</button>
+          <button class="iconBtn" onclick="editCustomerDue('${c.id}')"><span class="pIcon pSMS">₹</span>Edit Due</button>
+          <button class="danger" onclick="deleteCustomer('${c.id}')">Delete</button>
+        </div>
+      </div>
+    </div>`;
+  }).join("")+`</div>`:`<p class="muted">No customer yet.</p>`;
 }
-
-function editCustomerDue(id){
-  const c=state.customers.find(x=>x.id===id); if(!c)return;
-  const val=prompt("Opening/adjustment due amount দিন", c.openingDue||0);
-  if(val===null) return;
-  c.openingDue=+val||0;
-  saveState();
-}
-
 function deleteCustomer(id){if(confirm("Delete customer?")){state.customers=state.customers.filter(c=>c.id!==id);saveState()}}
 function quickBill(id){navTo("bill");$("billCustomer").value=id;fillCustomerBill()}
 function fillCustomerBill(){currentBillForPreview=null;const c=state.customers.find(x=>x.id===$("billCustomer").value);if(!c)return;$("prevDue").value=customerDue(c.id);calcBill()}
@@ -773,6 +848,17 @@ function exportCustomersCSV(){downloadBlob(new Blob([csv([["Name","Phone","Villa
 function exportData(){state.settings.lastBackup=today();localStorage.setItem(KEY,JSON.stringify(state));downloadBlob(new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),`asha_backup_${today()}.json`);refreshAll(false)}
 function importData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{state=JSON.parse(r.result);saveState();alert("Backup imported")}catch(err){alert("Invalid backup")}};r.readAsText(f)}
 function runLandCalc(){let amt=+$("calcLand").value||0,rate=+$("calcRate").value||0,paid=+$("calcPaid").value||0,b=amt;if($("calcUnit").value==="katha")b=amt/20;if($("calcUnit").value==="decimal")b=amt/40;const total=round(b*rate),due=Math.max(total-paid,0);$("landCalcOut").innerHTML=`<div class="kv"><span>Bigha</span><b>${round(b)}</b></div><div class="kv"><span>Total</span><b>${money(total)}</b></div><div class="kv"><span>Due</span><b>${money(due)}</b></div>`}
+
+let fxVal="";
+function fxPress(v){
+  if(v==="C"){fxVal="";fxRender();return;}
+  if(v==="⌫"){fxVal=fxVal.slice(0,-1);fxRender();return;}
+  if(v==="="){try{fxVal=String(Function("return ("+fxVal.replace(/×/g,"*").replace(/÷/g,"/")+")")());}catch(e){fxVal="Error";}fxRender();return;}
+  if(fxVal==="Error") fxVal="";
+  fxVal+=v;fxRender();
+}
+function fxRender(){const el=$("fxScreen");if(el)el.textContent=fxVal||"0";}
+
 function runNormalCalc(){const ex=$("normalExpr").value.trim();if(!/^[0-9+\-*/().%\s]+$/.test(ex)){$("normalCalcOut").innerHTML='<span class="bad">Invalid</span>';return}try{$("normalCalcOut").innerHTML="Result: <b>"+money(Function("return ("+ex+")")())+"</b>"}catch(e){$("normalCalcOut").innerHTML='<span class="bad">Invalid</span>'}}
 
 
@@ -867,6 +953,7 @@ async function gateCreate(){
 
 function updateCloudStatus(msg){const el=$("cloudStatus"); if(el) el.textContent=msg;}
 
+const OWNER_EMAIL="sktubay786@gmail.com";
 const OWNER_UID="FZIhTAr0JEMoHCeQd3kr2t8cJKk2";
 function strictWallOn(){document.body.classList.add("authWall");}
 function strictWallOff(){document.body.classList.remove("authWall");const w=$("strictLoginWall");if(w)w.style.display="none";}
@@ -882,11 +969,11 @@ async function strictLogin(){
   try{
     if(!initFirebase()) return;
     await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
-    const email=$("strictEmail").value.trim(), pass=$("strictPass").value;
+    const email=$("strictEmail").value.trim(), pass=$("strictPass").value; if(email.toLowerCase()!==OWNER_EMAIL.toLowerCase()){strictMsg("Only admin email allowed."); return;}
     const cred=await firebase.auth().signInWithEmailAndPassword(email,pass);
     if(cred.user.uid!==OWNER_UID){
       await firebase.auth().signOut(); sessionStorage.removeItem("ashaStrictLoginOK");
-      strictMsg("এই email owner account নয়। Access denied."); strictWallOn(); return;
+      strictMsg("Only admin account allowed."); strictWallOn(); return;
     }
     state.settings.ownerUid=OWNER_UID; localStorage.setItem(KEY,JSON.stringify(state));
     sessionStorage.setItem("ashaStrictLoginOK","yes");
@@ -897,7 +984,7 @@ async function strictCreate(){
   try{
     if(!initFirebase()) return;
     await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
-    const email=$("strictEmail").value.trim(), pass=$("strictPass").value;
+    const email=$("strictEmail").value.trim(), pass=$("strictPass").value; if(email.toLowerCase()!==OWNER_EMAIL.toLowerCase()){strictMsg("Only admin email allowed."); return;}
     const cred=await firebase.auth().createUserWithEmailAndPassword(email,pass);
     if(cred.user.uid!==OWNER_UID){
       strictMsg("নতুন UID আপনার locked UID নয়। আগের owner email দিয়ে Login করুন।"); return;
