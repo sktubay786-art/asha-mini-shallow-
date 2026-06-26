@@ -1,23 +1,24 @@
-Asha Mini Shallow V24 Full Premium
+Asha Mini Shallow V26 Print Modes Premium
 
-Full clean rebuilt version with:
-- Standard billing format
-- 80mm thermal, A4 half, A4 quarter, A4 landscape half print modes
-- Dynamic UPI QR based on bill due amount
-- Static QR upload mode
+Added/confirmed print modes:
+- Thermal 80mm
+- 2 Bills on A4 (A5)
+- 4 Bills on A4 (A6)
+- A4 Side Half
+- A4 Landscape Half
+- A4 Half
+- A4 Quarter
+
+A4 half and 2 Bills on A4 use A5 size area: 210 x 148.5 mm.
+A4 quarter and 4 Bills on A4 use A6 size area: 105 x 148.5 mm.
+Only one bill is printed in the selected slot; remaining slots stay blank for later use/cutting.
+
+Other V25 premium features retained:
 - Firebase UID-locked admin login
-- WhatsApp-style customer chat ledger
-- Bill+WhatsApp image share, SMS reminder, phone call, WhatsApp open
-- Direct due payment without new bill
-- Customer CRUD
-- Payment, history, ledger
-- Bank-wise collection report
-- Village-wise due report
-- Month/village filters and CSV export
-- Backup export/import
-- PDF bill download
-- Premium dashboard
-- Apple/Casio-style calculator and land calculator
-- PWA install
-
-Upload all files to GitHub. Then clear browser/site data and open index.html?v=24.
+- Manual new customer inside bill
+- Country code
+- Auto bill preview
+- Dynamic due amount QR
+- Static QR upload
+- Customer WhatsApp-style ledger
+- Bill image share, SMS, call, reports, backup, PDF, calculator

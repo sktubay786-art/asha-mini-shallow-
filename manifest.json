@@ -1,7 +1,7 @@
 {
-  "name": "Asha Mini Shallow Billing",
+  "name": "Asha Mini Shallow V26 Billing",
   "short_name": "Asha Billing",
-  "start_url": "./index.html",
+  "start_url": "./index.html?v=26",
   "scope": "./",
   "display": "standalone",
   "background_color": "#edf5ef",
