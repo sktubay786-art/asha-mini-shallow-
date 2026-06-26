@@ -22,3 +22,35 @@ main{max-width:1180px;margin:auto}.page{display:none;padding:18px}.page.active{d
 .entry-tools button{border:1px solid var(--line);background:#fff;border-radius:13px;padding:5px 8px;font-size:12px}
 .small-danger{color:var(--bad);font-weight:900}
 @media print{.entry-tools,.bubble-actions{display:none!important}}
+
+/* V31 bill design polish */
+.bill-design-hint{margin:10px 0 0;background:#f0fdf4;color:#075c39;border:1px solid #bbf7d0;border-radius:16px;padding:9px 12px;font-size:12px;font-weight:800}
+.invoice.v31bill{border:2px solid #075c39;border-radius:18px;padding:12px;background:#fff;overflow:hidden}
+.invoice.v31bill .v31-head{background:linear-gradient(135deg,#075c39,#0aa66d);color:#fff;padding:12px 10px;border-radius:14px;text-align:center;margin-bottom:10px}
+.invoice.v31bill .v31-head h3{margin:0;font-size:22px;letter-spacing:.2px}
+.invoice.v31bill .v31-head .subline{margin-top:5px;font-size:11px;line-height:1.45;opacity:.95}
+.invoice.v31bill .v31-section{border:1px solid #dbe7df;border-radius:14px;padding:9px;margin:8px 0;background:#fbfffc}
+.invoice.v31bill .v31-section-title{font-size:11px;font-weight:900;color:#075c39;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+.invoice.v31bill .customer-lines{font-size:12px;line-height:1.55}
+.invoice.v31bill .customer-lines b{font-size:14px}
+.invoice.v31bill .v31-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid #eef2ef;font-size:12px}
+.invoice.v31bill .v31-row:last-child{border-bottom:0}
+.invoice.v31bill .v31-row span:first-child{color:#475467}
+.invoice.v31bill .v31-row b{text-align:right}
+.invoice.v31bill .v31-total{background:#ecfdf3;border-radius:12px;padding:8px;margin-top:5px}
+.invoice.v31bill .qr{width:112px!important;height:112px!important;border:2px solid #075c39;border-radius:12px;padding:4px}
+.invoice.v31bill .footer-note{color:#667085;font-size:11px;text-align:center;margin-top:8px}
+.invoice.v31bill.normal,.invoice.v31bill.standard{border-color:#111}
+.invoice.v31bill.normal .v31-head,.invoice.v31bill.standard .v31-head{background:#111}
+.invoice.v31bill.boxed{border-color:#111}
+.invoice.v31bill.boxed .v31-head{background:linear-gradient(135deg,#111,#444)}
+.invoice.v31bill.bengali .v31-row span:first-child{font-size:13px;font-weight:850}
+.invoice.v31bill.bengali .v31-head h3{font-size:25px}
+.invoice.v31bill.qrfirst .qr{width:135px!important;height:135px!important}
+.invoice.v31bill.compact{padding:8px;border-radius:12px}
+.invoice.v31bill.compact .v31-head h3{font-size:17px}
+.invoice.v31bill.compact .v31-row{font-size:10.5px;padding:3px 0}
+.invoice.v31bill.thermal{border-radius:8px;padding:6px}
+.invoice.v31bill.thermal .v31-head{padding:8px 6px;border-radius:7px}
+.invoice.v31bill.thermal .v31-head h3{font-size:16px}
+.invoice.v31bill.thermal .v31-section{padding:6px;border-radius:8px}

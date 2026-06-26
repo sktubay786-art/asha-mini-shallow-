@@ -293,3 +293,52 @@ ready(function(){
   renderAll(true);loadSettings();
 });
 })();
+
+
+/* ===== V31 BILL DESIGN PATCH ===== */
+(function(){
+function ready(fn){if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>setTimeout(fn,120));else setTimeout(fn,120)}
+ready(function(){
+  if(document.querySelector(".hero-chips span:last-child"))document.querySelector(".hero-chips span:last-child").textContent="V31 Bill Design Pro";
+  function billTemplateOptions(){return '<option value="classic">Classic Official Bill</option><option value="premium">Premium Green Bill</option><option value="boxed">Boxed Modern Bill</option><option value="bengali">Bengali Heavy Bill</option><option value="qrfirst">QR Focused Bill</option><option value="standard">Standard Clean Bill</option><option value="normal">Normal Black Bill</option><option value="thermal">Thermal Compact Bill</option><option value="compact">Compact A6 Bill</option>'}
+  const oldFillSelects=window.fillSelects;
+  window.fillSelects=function(){
+    if(oldFillSelects)oldFillSelects();
+    const t=document.getElementById("template");
+    if(t){
+      const current=state.settings.template||t.value||"classic";
+      t.innerHTML=billTemplateOptions();
+      t.value=current;
+      if(!document.querySelector(".bill-design-hint"))t.insertAdjacentHTML("afterend",'<div class="bill-design-hint">Bill design এখান থেকেই change করুন — change করলেই পাশে live preview দেখাবে।</div>');
+      t.onchange=()=>{state.settings.template=t.value;previewBill()};
+    }
+    const st=document.getElementById("setTemplate");
+    if(st){st.innerHTML=billTemplateOptions();st.value=state.settings.template||"classic"}
+  };
+  window.invoiceHTML=function(b,cls){
+    let due=billDue(b),paid=billPaid(b),tpl=document.getElementById("template")?.value||state.settings.template||"classic";
+    let rowsTop=[["Bill No",b.billNo],["Date",b.date]];
+    let landRows=[["Season",b.season],["জমির পরিমাণ",`${b.landAmount} ${b.unit}`],["Converted",`${b.bigha.toFixed(2)} বিঘা`],["Rate",`${money(b.rate)}/বিঘা`]];
+    let amountRows=[["Current Bill",money(b.current)],["Previous Due",money(b.previousDue)],["All Total",money(b.allTotal)],["Paid / Adjusted",money(paid)],["Due",money(due)],["Status",billStatus(b)],["Payment",b.payments?.[0]?.mode||"-"],["Received",b.payments?.[0]?.receivedIn||"-"]];
+    let row=(l,v,cls2="")=>`<div class="v31-row ${cls2}"><span>${esc(l)}</span><b>${esc(v)}</b></div>`;
+    let section=(title,html,extra="")=>`<div class="v31-section ${extra}"><div class="v31-section-title">${title}</div>${html}</div>`;
+    let customerBlock=`<div class="customer-lines"><b>Name:</b> ${esc(b.customerName)}<br><b>Phone:</b> ${esc(b.phone||"")}<br><b>Address:</b> ${esc(b.address||b.village||"")}</div>`;
+    let noteBlock=b.note?section("Note / Remarks",`<div class="customer-lines">${esc(b.note)}</div>`):"";
+    return `<div class="invoice v31bill ${cls} ${tpl}">
+      <div class="v31-head"><h3>${esc(state.settings.company)}</h3><div class="subline">Pro: ${esc(state.settings.owner)}<br>☎/WhatsApp: ${esc(state.settings.contact)}<br>${esc(state.settings.address)}</div></div>
+      ${section("Bill Details",rowsTop.map(x=>row(x[0],x[1])).join(""))}
+      ${section("Customer Details",customerBlock)}
+      ${section("Land / Season",landRows.map(x=>row(x[0],x[1])).join(""))}
+      ${section("Amount Summary",amountRows.map((x,i)=>row(x[0],x[1],i>=2?"v31-total":"")).join(""))}
+      <div class="v31-section v31-pay-section"><div class="v31-section-title">Payment QR</div><div class="head-small">UPI: ${esc(state.settings.upi)}</div><img class="qr" src="${qrSrc(due>0?due:b.allTotal,b.billNo)}"><div class="head-small"><b>Scan & Pay ${money(due>0?due:b.allTotal)}</b></div></div>
+      ${noteBlock}
+      <div class="footer-note">ধন্যবাদ। সময়মতো বিল পরিশোধ করার জন্য অনুরোধ করা হচ্ছে।</div>
+      <div style="text-align:right;font-size:11px;margin-top:8px">Sign: ${esc(state.settings.owner)}</div>
+      <div style="text-align:center;font-size:11px;color:#777">Thank you</div>
+    </div>`;
+  };
+  const oldSaveSettings=window.saveSettings;
+  window.saveSettings=function(){if(document.getElementById("template"))state.settings.template=document.getElementById("template").value||state.settings.template||"classic";if(oldSaveSettings)oldSaveSettings()};
+  renderAll(true);
+});
+})();
