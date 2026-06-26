@@ -1,14 +1,14 @@
-Asha Mini Shallow Elite V19 Premium Secure
+Asha Mini Shallow Elite V20 Premium
 
 New:
-- Clean premium login screen: only Email + Password.
-- Debug/security explanation and Owner UID removed from login UI.
-- Admin-only login check.
-- WhatsApp-style customer list.
+- Clean login screen: no UID, no create-owner button, no debug text.
+- Cloud/Admin tools moved inside Admin Cloud & Security details.
+- Test button fixed for locked Firestore rules.
+- WhatsApp-style customer list and customer chat ledger screen.
+- Customer chat screen: bill/payment messages date-wise, top call/WhatsApp/Bill+WA icons, 3-dot admin actions.
+- Direct due payment without creating a new bill.
 - Premium calculator keypad.
-- Better app icon crop so both faces are visible.
-- Previous security, dynamic QR, cloud sync, reports, ledger retained.
+- Improved app icon crop.
+- Previous Dynamic QR, Firebase Auth, Rules, Reports, Ledger retained.
 
-Important:
-Do not store passwords in code. Firebase Authentication stores passwords securely.
 Upload all files to GitHub and publish firestore.rules in Firebase.

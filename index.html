@@ -313,6 +313,33 @@ body.dark .chatCustomer{background:#111e1a;border-color:#2e3b36}
 .fxKeys button{border:0;border-radius:18px;padding:14px 10px;font-weight:900;font-size:18px;background:#2d333f;color:white}
 .fxKeys button.op{background:#0b7a4d}.fxKeys button.fn{background:#475467}.fxKeys button.eq{background:#f79009;color:#111}.fxKeys button.wide{grid-column:span 2}
 
+
+/* Elite V20 Premium App: clean login, admin settings, WhatsApp-style customer ledger */
+body.authWall main,
+body.authWall .nav,
+body.authWall .appbar,
+body.authWall .page,
+body.authWall #lockScreen{display:none!important}
+body.authWall #strictLoginWall{display:flex!important}
+.strictLoginWall{position:fixed!important;inset:0!important;z-index:9999!important;align-items:center;justify-content:center;padding:18px;background:linear-gradient(145deg,rgba(4,33,22,.94),rgba(9,93,57,.92)),url("./app-bg.jpg") center/cover no-repeat!important}
+.strictLoginBox{width:100%;max-width:430px;background:rgba(255,255,255,.97)!important;border-radius:30px;padding:24px!important;box-shadow:0 32px 90px rgba(0,0,0,.36);border:1px solid rgba(255,255,255,.55)}
+.strictLoginLogo{display:flex;align-items:center;gap:12px;margin-bottom:14px}.strictLoginLogo .miniLogo{width:58px;height:58px;border-radius:18px;background:url("./icon-192.png") center/cover no-repeat;border:2px solid #0b4b2f}.strictLoginBox h2{margin:0;font-size:25px}.strictLoginBox .lockNote{font-size:13px;color:#667085}.strictLoginBox input{height:54px;border-radius:18px;font-size:16px}.strictLoginActions button{width:100%;font-size:17px;padding:14px;border-radius:18px}.strictLoginStatus{font-size:12px;margin-top:8px;color:#b42318;font-weight:900}
+.adminCloudDetails{border:1px solid #d8e6de;border-radius:20px;padding:12px;background:#f7fbf8;margin-top:12px}
+.adminCloudDetails summary{font-weight:950;cursor:pointer;color:#0b4b2f}
+.adminLine{font-size:12px;color:#667085;margin-top:6px}
+.chatPage{padding:0!important;overflow:hidden}
+.chatHeader{position:sticky;top:0;z-index:8;background:rgba(255,255,255,.98);border-bottom:1px solid #e4e7ec;padding:10px 12px;display:flex;align-items:center;gap:10px}
+body.dark .chatHeader{background:#101c18;border-color:#2e3b36}
+.chatBack{border:0;background:transparent;font-size:28px;padding:4px 8px}.chatTitle{flex:1;min-width:0}.chatTitle b{font-size:17px}.chatTitle span{display:block;font-size:12px;color:#667085;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topIcon{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;border:1px solid #d0d5dd;background:#fff;font-size:19px}
+.chatMenu{position:relative}.chatMenuPanel{display:none;position:absolute;right:0;top:44px;background:#fff;border:1px solid #e4e7ec;border-radius:18px;box-shadow:0 16px 40px rgba(16,24,40,.16);padding:8px;min-width:190px;z-index:20}.chatMenu.open .chatMenuPanel{display:grid;gap:6px}.chatMenuPanel button{justify-content:flex-start}
+.chatBody{background:linear-gradient(rgba(235,245,239,.9),rgba(235,245,239,.9)),url("./app-bg.jpg") center/cover fixed;min-height:72vh;padding:12px;display:flex;flex-direction:column;gap:10px}
+.dayChip{align-self:center;background:#fff;border-radius:999px;padding:6px 11px;color:#667085;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.msgBubble{max-width:88%;border-radius:18px;padding:10px 12px;box-shadow:0 2px 10px rgba(0,0,0,.06);font-size:14px;line-height:1.45}
+.msgBill{align-self:flex-end;background:#dcf8c6;border-top-right-radius:6px}.msgPay{align-self:flex-start;background:#fff;border-top-left-radius:6px}.msgDue{align-self:center;background:#fff7e6;border:1px solid #fedf89}.msgMeta{font-size:11px;color:#667085;text-align:right;margin-top:4px}.msgActions{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.msgActions button{font-size:12px;padding:6px 9px}
+.customerChatList{display:grid;gap:8px}.chatCustomer{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #e4e7ec;border-radius:19px;padding:11px;box-shadow:0 8px 18px rgba(16,24,40,.04);cursor:pointer}.chatAvatar{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-weight:950;font-size:18px;color:#fff;background:linear-gradient(135deg,#0b4b2f,#0a8a57);flex:0 0 auto}.chatMain{flex:1;min-width:0}.chatName{font-size:16px;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chatSub{font-size:12px;color:#667085;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chatDue{font-size:12px;font-weight:950;border-radius:999px;padding:7px 10px;background:#fee4e2;color:#b42318}.chatPaid{background:#dcfae6;color:#067647}
+.fxCalc{max-width:360px;margin:10px auto;background:linear-gradient(180deg,#20242d,#11151c);border-radius:28px;padding:16px;box-shadow:0 20px 45px rgba(0,0,0,.25);color:white}.fxScreen{background:#dfe8d4;color:#101828;border-radius:14px;min-height:72px;padding:12px;font-family:monospace;font-size:26px;display:flex;align-items:end;justify-content:flex-end;margin-bottom:12px;word-break:break-all}.fxKeys{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.fxKeys button{border:0;border-radius:18px;padding:14px 10px;font-weight:900;font-size:18px;background:#2d333f;color:white}.fxKeys button.op{background:#0b7a4d}.fxKeys button.fn{background:#475467}.fxKeys button.eq{background:#f79009;color:#111}.fxKeys button.wide{grid-column:span 2}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -336,7 +363,18 @@ body.dark .chatCustomer{background:#111e1a;border-color:#2e3b36}
       </div>
     </div>
     <label>Email</label>
-    <input id="strictEmail" type="email" placeholder="sktubay786@gmail.com" autocomplete="username">
+    <input id="strictEmail" type="email" placeholder="Email" autocomplete="off" inputmode="email">
+    <label>Password</label>
+    <input id="strictPass" type="password" placeholder="Password" autocomplete="off">
+    <div class="strictLoginActions">
+      <button class="primary" onclick="strictLogin()">Login</button>
+    </div>
+    <div id="strictMsg" class="strictLoginStatus"></div>
+  </div>
+</div>
+    </div>
+    <label>Email</label>
+    <input id="strictEmail" type="email" placeholder="Email" autocomplete="username">
     <label>Password</label>
     <input id="strictPass" type="password" placeholder="Password" autocomplete="current-password">
     <div class="strictLoginActions">
@@ -359,20 +397,7 @@ body.dark .chatCustomer{background:#111e1a;border-color:#2e3b36}
 </div>
 
 
-<div id="secureGate" class="secureGate noPrint">
-  <div class="secureGateBox">
-    <div class="secureBadge">🔐 Secure Login Required</div>
-    <h2>Asha Billing Lockdown</h2>
-    <div class="muted">Owner/staff login ছাড়া app data দেখা যাবে না।</div>
-    <div class="dangerNote">Firebase Rules-এ Owner UID lock করলেই আসল database security হবে।</div>
-    <label>Email</label><input id="gateEmail" type="email" placeholder="your@email.com">
-    <label>Password</label><input id="gatePass" type="password" placeholder="Password">
-    <div class="row" style="margin-top:12px">
-      <button class="primary" onclick="gateLogin()">Login</button>
-      <button class="light" onclick="gateCreate()">Create Owner Login</button>
-    </div>
-    <div id="gateMsg" class="tiny" style="margin-top:8px"></div>
-  </div>
+
 </div>
 
 <div id="lockScreen" class="lock">
@@ -386,9 +411,7 @@ body.dark .chatCustomer{background:#111e1a;border-color:#2e3b36}
 </div>
 
 
-<div id="authScreen" class="authOverlay noPrint">
-  <div class="authBox">
-    <div class="row"><div class="logo">AS</div><div><h2>Secure Cloud Login</h2><div class="muted">Owner/staff email দিয়ে login করুন।</div></div></div>
+</div>
     <label>Email</label><input id="authEmail" type="email" placeholder="owner@example.com">
     <label>Password</label><input id="authPass" type="password" placeholder="Password">
     <div class="row" style="margin-top:12px">
@@ -523,15 +546,19 @@ body.dark .chatCustomer{background:#111e1a;border-color:#2e3b36}
 <section id="calculator" class="page">
   <div class="grid">
     <div class="span-6 card">
+      <h2>Premium Calculator</h2>
+      <div class="fxCalc"><div id="fxScreen" class="fxScreen">0</div><div class="fxKeys">
+        <button class="fn" onclick="fxPress('C')">AC</button><button class="fn" onclick="fxPress('⌫')">DEL</button><button class="op" onclick="fxPress('%')">%</button><button class="op" onclick="fxPress('÷')">÷</button>
+        <button onclick="fxPress('7')">7</button><button onclick="fxPress('8')">8</button><button onclick="fxPress('9')">9</button><button class="op" onclick="fxPress('×')">×</button>
+        <button onclick="fxPress('4')">4</button><button onclick="fxPress('5')">5</button><button onclick="fxPress('6')">6</button><button class="op" onclick="fxPress('-')">−</button>
+        <button onclick="fxPress('1')">1</button><button onclick="fxPress('2')">2</button><button onclick="fxPress('3')">3</button><button class="op" onclick="fxPress('+')">+</button>
+        <button class="wide" onclick="fxPress('0')">0</button><button onclick="fxPress('.')">.</button><button class="eq" onclick="fxPress('=')">=</button>
+      </div></div>
+    </div>
+    <div class="span-6 card">
       <h2>Land Calculator</h2><div class="muted">1 বিঘা = 20 কাঠা = 40 ডেসিমেল</div>
       <div class="calcGrid"><div><label>Land</label><input id="calcLand" type="number" step="0.01" value="0" oninput="runLandCalc()"></div><div><label>Unit</label><select id="calcUnit" onchange="runLandCalc()"><option value="bigha">বিঘা</option><option value="katha">কাঠা</option><option value="decimal">ডেসিমেল</option></select></div><div><label>Rate ₹/Bigha</label><input id="calcRate" type="number" step="0.01" value="2200" oninput="runLandCalc()"></div><div><label>Paid ₹</label><input id="calcPaid" type="number" step="0.01" value="0" oninput="runLandCalc()"></div></div>
       <div class="resultBox" id="landCalcOut" style="margin-top:12px"></div>
-    </div>
-    <div class="span-6 card">
-      <h2>Normal Calculator</h2>
-      <label>Expression</label><input id="normalExpr" placeholder="Example: (2200/20)*10 + 500 - 1000">
-      <div class="row" style="margin-top:10px"><button class="primary" onclick="runNormalCalc()">Calculate</button><button class="light" onclick="normalExpr.value='';normalCalcOut.innerHTML='Result: ₹0'">Clear</button></div>
-      <div class="resultBox" id="normalCalcOut" style="margin-top:12px">Result: ₹0</div>
     </div>
   </div>
 </section>
@@ -556,15 +583,24 @@ body.dark .chatCustomer{background:#111e1a;border-color:#2e3b36}
       <label>Auto Backup Reminder</label><select id="setBackupReminder" onchange="saveThemeNow()"><option value="on">On</option><option value="off">Off</option></select>
       <hr style="border:0;border-top:1px solid #e4e7ec;margin:14px 0">
       <div class="row"><button class="secondary" onclick="exportData()">Export Backup</button><button class="light" onclick="importFile.click()">Import Backup</button><input id="importFile" class="hidden" type="file" accept="application/json" onchange="importData(event)"></div>
-      <div class="cloudBox">
-        <h3>Cloud Sync (Firebase)</h3>
+      <details class="adminCloudDetails">
+        <summary>Admin Cloud & Security</summary>
+        <div class="adminLine">Only admin can manage cloud sync and password.</div>
         <label>Firebase Config JSON</label><textarea id="setFirebaseConfig" placeholder='{"apiKey":"...","authDomain":"...","projectId":"..."}'></textarea>
-        <label>Cloud Doc ID</label><input id="setCloudDocId" placeholder="owner-main">
+        <label>Cloud Doc ID</label><input id="setCloudDocId" placeholder="ekramul-main">
         <label>Auto Cloud Sync</label><select id="setCloudAuto"><option value="off">Off</option><option value="on">On</option></select>
-        <label>Owner Auth UID</label><input id="setOwnerUid" placeholder="Login করলে auto fill হবে">
-        <div class="row" style="margin-top:10px"><button class="primary" onclick="saveCloudSettings()">Save Cloud Settings</button><button class="light" onclick="showAuth()">Login</button><button class="light" onclick="authLogout()">Logout</button><button class="light" onclick="testCloud()">Test</button><button class="light" onclick="cloudPush(true)">Push</button><button class="light" onclick="cloudPull()">Pull</button></div>
+        <input id="setOwnerUid" type="hidden">
+        <label>Change Admin Password</label><input id="adminNewPass" type="password" placeholder="New password">
+        <div class="row" style="margin-top:10px">
+          <button class="primary" onclick="saveCloudSettings()">Save Cloud</button>
+          <button class="light" onclick="changeAdminPassword()">Change Password</button>
+          <button class="light" onclick="testCloud()">Test</button>
+          <button class="light" onclick="cloudPush(true)">Push</button>
+          <button class="light" onclick="cloudPull()">Pull</button>
+          <button class="light" onclick="authLogout()">Logout</button>
+        </div>
         <div id="cloudStatus" class="tiny" style="margin-top:8px">Cloud not configured.</div>
-      </div>
+      </details>
       <div class="notice" style="margin-top:12px">QR add না হলে browser storage full হতে পারে। ছোট QR image ব্যবহার করুন।</div>
     </div>
   </div>
@@ -623,7 +659,7 @@ function normalizeState(s){
   return s;
 }
 function saveState(){localStorage.setItem(KEY,JSON.stringify(state));applyTheme();refreshAll();if(state.settings.cloudAutoSync==="on") scheduleCloudPush();}
-function navTo(page){document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));$(page).classList.add("active");document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));refreshAll(false); if(page==="ledger")renderLedger()}
+function navTo(page){document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));$(page).classList.add("active");document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));refreshAll(false); if(page==="ledger")renderLedger(); if(page==="customerChat")renderCustomerChat()}
 function refreshAll(recalc=true){$("headCompany").textContent=state.settings.company;fillSelects();loadSettings();renderDashboard();renderCustomers();renderHistory();renderPayments();renderReports();if(recalc)calcBill()}
 function fillSelects(){
   $("dashSeason").innerHTML='<option>All</option>'+state.seasons.map(s=>`<option>${s}</option>`).join("");
@@ -721,43 +757,83 @@ async function whatsappReminderImage(id){
 function clearCustomerForm(){["custId","custName","custPhone","custVillage","custAddress","custNote"].forEach(id=>$(id).value="");$("custOpeningDue").value=0;$("custTitle").textContent="Add Customer"}
 function editCustomer(id){const c=state.customers.find(x=>x.id===id);if(!c)return;navTo("customers");$("custId").value=c.id;$("custName").value=c.name;$("custPhone").value=c.phone||"";$("custVillage").value=c.village||"";$("custAddress").value=c.address||"";$("custOpeningDue").value=c.openingDue||0;$("custNote").value=c.note||"";$("custTitle").textContent="Edit Customer"}
 function customerDue(id){const c=state.customers.find(x=>x.id===id);return (+c?.openingDue||0)+state.bills.filter(b=>b.customerId===id).reduce((a,b)=>a+billDue(b),0)}
-function customerInitials(name){
-  return (name||"?").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase();
-}
-function toggleCustomerRow(id){
-  document.querySelectorAll(".chatCustomer").forEach(el=>{
-    if(el.dataset.id===id) el.classList.toggle("open"); else el.classList.remove("open");
-  });
+
+let activeChatCustomerId="";
+function customerInitials(name){return (name||"?").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase();}
+function openCustomerChat(id){
+  activeChatCustomerId=id;
+  const c=state.customers.find(x=>x.id===id); if(!c)return;
+  navTo("customerChat");
+  renderCustomerChat();
 }
 function renderCustomers(){
   const q=($("customerSearch").value||"").toLowerCase();
   const rows=state.customers.filter(c=>(c.name+c.phone+c.village+c.address).toLowerCase().includes(q));
   $("customerList").innerHTML=rows.length?`<div class="customerChatList">`+rows.map(c=>{
     const due=customerDue(c.id);
-    return `<div class="chatCustomer" data-id="${c.id}" onclick="toggleCustomerRow('${c.id}')">
+    return `<div class="chatCustomer" onclick="openCustomerChat('${c.id}')">
       <div class="chatAvatar">${esc(customerInitials(c.name))}</div>
-      <div class="chatMain">
-        <div class="row" style="gap:8px">
-          <div class="chatName">${esc(c.name)}</div>
-          <span class="${due>0?'chatDue':'chatDue chatPaid'} right">${due>0?money(due):'Paid'}</span>
-        </div>
-        <div class="chatSub">📞 ${esc(c.phone||"No phone")} • 📍 ${esc(c.village||"No village")}</div>
-        <div class="chatSub">${esc(c.address||"")}</div>
-        <div class="chatActions" onclick="event.stopPropagation()">
-          <button class="iconBtn" onclick="editCustomer('${c.id}')"><span class="pIcon pUser">✎</span>Edit</button>
-          <button class="iconBtn" onclick="quickBill('${c.id}')"><span class="pIcon pBill">🧾</span>Bill</button>
-          <button class="iconBtn" onclick="whatsappCustomer('${c.id}')"><span class="pIcon pWA">WA</span>Text</button>
-          <button class="iconBtn" onclick="whatsappReminderImage('${c.id}')"><span class="pIcon pWA">▣</span>Bill+WA</button>
-          <button class="iconBtn" onclick="smsCustomer('${c.id}')"><span class="pIcon pSMS">✉</span>SMS</button>
-          <button class="iconBtn" onclick="callCustomer('${c.id}')"><span class="pIcon pCall">☎</span>Call</button>
-          <button class="iconBtn" onclick="openLedger('${c.id}')"><span class="pIcon pLedger">▤</span>Ledger</button>
-          <button class="iconBtn" onclick="editCustomerDue('${c.id}')"><span class="pIcon pSMS">₹</span>Edit Due</button>
-          <button class="danger" onclick="deleteCustomer('${c.id}')">Delete</button>
-        </div>
-      </div>
+      <div class="chatMain"><div class="row" style="gap:8px"><div class="chatName">${esc(c.name)}</div><span class="${due>0?'chatDue':'chatDue chatPaid'} right">${due>0?money(due):'Paid'}</span></div>
+      <div class="chatSub">📞 ${esc(c.phone||"No phone")} • 📍 ${esc(c.village||"No village")}</div><div class="chatSub">${esc(c.address||"")}</div></div>
     </div>`;
   }).join("")+`</div>`:`<p class="muted">No customer yet.</p>`;
 }
+function renderCustomerChat(){
+  const c=state.customers.find(x=>x.id===activeChatCustomerId); if(!c)return;
+  $("chatAvatar").textContent=customerInitials(c.name);
+  $("chatName").textContent=c.name;
+  $("chatSub").textContent=(c.phone||"No phone")+" • "+(c.village||"No village")+" • Due "+money(customerDue(c.id));
+  $("chatCall").onclick=()=>callCustomer(c.id);
+  $("chatWaCall").onclick=()=>window.open("https://wa.me/"+sanitizePhone(c.phone),"_blank");
+  $("chatBillWA").onclick=()=>whatsappReminderImage(c.id);
+  $("chatEditBtn").onclick=()=>editCustomer(c.id);
+  $("chatDirectPayBtn").onclick=()=>directCustomerPayment(c.id);
+  $("chatSmsBtn").onclick=()=>smsCustomer(c.id);
+  $("chatLedgerBtn").onclick=()=>openLedger(c.id);
+  const bills=state.bills.filter(b=>b.customerId===c.id).sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+  let lastDate="";
+  let out=[];
+  if(!bills.length && (+c.openingDue||0)>0){
+    out.push(`<div class="msgBubble msgDue">Opening Due: <b>${money(c.openingDue)}</b></div>`);
+  }
+  bills.forEach(b=>{
+    if(b.date!==lastDate){lastDate=b.date;out.push(`<div class="dayChip">${esc(b.date||"No date")}</div>`);}
+    out.push(`<div class="msgBubble msgBill"><b>${esc(b.billNo)}</b><br>Name: ${esc(b.customerName)}<br>Total: <b>${money(b.allTotal)}</b><br>Paid: <b>${money(billPaid(b))}</b><br>Due: <b>${money(billDue(b))}</b><div class="msgActions"><button class="light" onclick="viewBill('${b.id}')">View Bill</button><button class="light" onclick="openPayment('${b.id}')">Pay</button><button class="light" onclick="whatsappReminderImage('${c.id}')">Bill+WA</button></div><div class="msgMeta">${billStatus(b)}</div></div>`);
+    paymentsOf(b).forEach(p=>{
+      out.push(`<div class="msgBubble msgPay">Payment received<br><b>${money(p.amount)}</b><br>${esc(p.mode||"")} • ${esc(p.receivedIn||"")}<div class="msgMeta">${esc(p.date||"")}</div></div>`);
+    });
+  });
+  if(!out.length) out.push(`<div class="msgBubble msgDue">No bill/payment yet. Use ⋮ menu or New Bill.</div>`);
+  $("chatBody").innerHTML=out.join("");
+}
+function directCustomerPayment(id){
+  const c=state.customers.find(x=>x.id===id); if(!c)return;
+  const due=customerDue(id);
+  const amt=+(prompt("কত টাকা payment received?", due>0?due:"")||0);
+  if(!amt || amt<=0)return;
+  let remain=amt;
+  const bills=state.bills.filter(b=>b.customerId===id && billDue(b)>0).sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+  for(const b of bills){
+    if(remain<=0)break;
+    const pay=Math.min(remain,billDue(b));
+    (b.payments=b.payments||[]).push({id:uid(),date:today(),amount:pay,mode:"Cash",receivedIn:"Cash",note:"Direct due payment"});
+    remain-=pay;
+  }
+  if(remain>0 && (+c.openingDue||0)>0){c.openingDue=Math.max((+c.openingDue||0)-remain,0);}
+  saveState(); activeChatCustomerId=id; renderCustomerChat(); alert("Payment saved");
+}
+async function changeAdminPassword(){
+  try{
+    if(!window.firebase || !firebase.auth || !firebase.auth().currentUser){alert("আগে login করুন");return;}
+    const np=$("adminNewPass").value;
+    if(!np || np.length<6){alert("Password minimum 6 characters দিন");return;}
+    await firebase.auth().currentUser.updatePassword(np);
+    $("adminNewPass").value="";
+    updateCloudStatus("Admin password changed.");
+    alert("Password changed");
+  }catch(e){alert("Password change failed: "+e.message);}
+}
+
 function deleteCustomer(id){if(confirm("Delete customer?")){state.customers=state.customers.filter(c=>c.id!==id);saveState()}}
 function quickBill(id){navTo("bill");$("billCustomer").value=id;fillCustomerBill()}
 function fillCustomerBill(){currentBillForPreview=null;const c=state.customers.find(x=>x.id===$("billCustomer").value);if(!c)return;$("prevDue").value=customerDue(c.id);calcBill()}
@@ -953,7 +1029,6 @@ async function gateCreate(){
 
 function updateCloudStatus(msg){const el=$("cloudStatus"); if(el) el.textContent=msg;}
 
-const OWNER_EMAIL="sktubay786@gmail.com";
 const OWNER_UID="FZIhTAr0JEMoHCeQd3kr2t8cJKk2";
 function strictWallOn(){document.body.classList.add("authWall");}
 function strictWallOff(){document.body.classList.remove("authWall");const w=$("strictLoginWall");if(w)w.style.display="none";}
@@ -969,7 +1044,7 @@ async function strictLogin(){
   try{
     if(!initFirebase()) return;
     await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
-    const email=$("strictEmail").value.trim(), pass=$("strictPass").value; if(email.toLowerCase()!==OWNER_EMAIL.toLowerCase()){strictMsg("Only admin email allowed."); return;}
+    const email=$("strictEmail").value.trim(), pass=$("strictPass").value;
     const cred=await firebase.auth().signInWithEmailAndPassword(email,pass);
     if(cred.user.uid!==OWNER_UID){
       await firebase.auth().signOut(); sessionStorage.removeItem("ashaStrictLoginOK");
@@ -984,7 +1059,7 @@ async function strictCreate(){
   try{
     if(!initFirebase()) return;
     await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
-    const email=$("strictEmail").value.trim(), pass=$("strictPass").value; if(email.toLowerCase()!==OWNER_EMAIL.toLowerCase()){strictMsg("Only admin email allowed."); return;}
+    const email=$("strictEmail").value.trim(), pass=$("strictPass").value;
     const cred=await firebase.auth().createUserWithEmailAndPassword(email,pass);
     if(cred.user.uid!==OWNER_UID){
       strictMsg("নতুন UID আপনার locked UID নয়। আগের owner email দিয়ে Login করুন।"); return;
@@ -1015,7 +1090,7 @@ function initFirebase(){
     return true;
   }catch(e){updateCloudStatus("Cloud error: "+e.message);return false;}
 }
-async function testCloud(){ if(!initFirebase()) return; if(!ensureAuth()) return; try{ await fbDb.collection("ashaMiniShallow").limit(1).get(); updateCloudStatus("Cloud test success."); }catch(e){ updateCloudStatus("Test failed: "+e.message);} }
+async function testCloud(){ if(!initFirebase()) return; if(!ensureAuth()) return; try{ const docId=(state.settings.cloudDocId||"ekramul-main"); await fbDb.collection("ashaMiniShallow").doc(docId).get(); updateCloudStatus("Cloud test success."); }catch(e){ updateCloudStatus("Test failed: "+e.message);} }
 async function cloudPush(manual){ if(!initFirebase()) return; if(!ensureAuth()) return; try{ const docId=(state.settings.cloudDocId||"owner-main"); const payload={updatedAt:new Date().toISOString(), data:state}; await fbDb.collection("ashaMiniShallow").doc(docId).set(payload); updateCloudStatus((manual?"Manual":"Auto")+" cloud backup saved."); }catch(e){ updateCloudStatus("Push failed: "+e.message);} }
 async function cloudPull(){ if(!initFirebase()) return; if(!ensureAuth()) return; try{ const docId=(state.settings.cloudDocId||"owner-main"); const snap=await fbDb.collection("ashaMiniShallow").doc(docId).get(); if(!snap.exists){ updateCloudStatus("No cloud data found."); return;} state=normalizeState((snap.data()||{}).data||{}); localStorage.setItem(KEY,JSON.stringify(state)); refreshAll(); updateCloudStatus("Cloud data loaded."); }catch(e){ updateCloudStatus("Pull failed: "+e.message);} }
 function scheduleCloudPush(){ clearTimeout(cloudTimer); cloudTimer=setTimeout(()=>cloudPush(false),1200); }

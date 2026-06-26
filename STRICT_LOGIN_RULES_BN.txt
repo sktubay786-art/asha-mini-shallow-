@@ -1,4 +1,4 @@
-Elite V19 Premium Secure Rules
+Elite V20 Rules
 
 Firestore Rules:
 rules_version = '2';
@@ -12,7 +12,3 @@ service cloud.firestore {
   }
 }
 
-
-Login screen now shows only Email + Password.
-Owner UID/details are hidden from user UI.
-Only admin email should be used: sktubay786@gmail.com
