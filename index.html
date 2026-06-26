@@ -368,6 +368,36 @@ body.dark .chatHeader{background:#101c18;border-color:#2e3b36}
 .v21ChatBody{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:10px;background:linear-gradient(rgba(235,245,239,.90),rgba(235,245,239,.90)),url("./app-bg.jpg") center/cover fixed}
 .v21Day{align-self:center;background:#fff;border-radius:999px;padding:6px 11px;color:#667085;font-size:12px}.v21Msg{max-width:88%;border-radius:18px;padding:10px 12px;box-shadow:0 2px 10px rgba(0,0,0,.06);font-size:14px;line-height:1.45}.v21Bill{align-self:flex-end;background:#dcf8c6;border-top-right-radius:6px}.v21Pay{align-self:flex-start;background:#fff;border-top-left-radius:6px}.v21DueMsg{align-self:center;background:#fff7e6;border:1px solid #fedf89}.v21Meta{font-size:11px;color:#667085;text-align:right;margin-top:4px}.v21MsgActions{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.v21MsgActions button{font-size:12px;padding:6px 9px}
 
+
+/* Elite V22 Stable Clean Fix */
+#authScreen,#secureGate{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}
+#strictLoginWall button[onclick*="strictCreate"],
+#strictLoginWall button[onclick*="strictLogout"],
+#strictLoginWall button[onclick*="Logout"],
+#strictLoginWall button[onclick*="Create"],
+#strictLoginWall .strictWarning,
+#strictLoginWall .dangerNote{display:none!important}
+body.authWall main,body.authWall .nav,body.authWall .appbar,body.authWall .page,body.authWall #lockScreen{display:none!important}
+body.authWall #strictLoginWall{display:flex!important}
+#strictLoginWall{position:fixed!important;inset:0!important;z-index:99999!important;align-items:center!important;justify-content:center!important;background:linear-gradient(145deg,rgba(4,33,22,.94),rgba(9,93,57,.92)),url("./app-bg.jpg") center/cover no-repeat!important}
+#strictLoginWall .strictLoginBox{width:calc(100% - 32px)!important;max-width:420px!important;background:rgba(255,255,255,.98)!important;border-radius:30px!important;padding:24px!important;box-shadow:0 32px 90px rgba(0,0,0,.36)!important}
+#strictLoginWall .strictLoginBox input{height:54px!important;border-radius:18px!important;font-size:16px!important}
+#strictLoginWall .strictLoginActions button{width:100%!important;border-radius:18px!important;padding:14px!important;font-size:17px!important}
+#strictLoginWall #strictMsg{font-size:12px!important;color:#b42318!important;margin-top:8px!important;font-weight:900!important}
+.v22List{display:grid;gap:9px}
+.v22User{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid #e4e7ec;border-radius:18px;padding:11px;box-shadow:0 8px 18px rgba(16,24,40,.04)}
+.v22Avatar{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#0b4b2f,#0a8a57);color:#fff;font-weight:950}
+.v22Main{flex:1;min-width:0}.v22Name{font-size:16px;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v22Sub{font-size:12px;color:#667085;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v22Due{font-size:12px;font-weight:950;border-radius:999px;padding:7px 10px;background:#fee4e2;color:#b42318}.v22Paid{background:#dcfae6;color:#067647}
+#v22Chat{position:fixed;inset:0;display:none;flex-direction:column;background:#edf7f0;z-index:9990}
+#v22Chat.show{display:flex}
+.v22Head{height:66px;background:#fff;border-bottom:1px solid #e4e7ec;display:flex;align-items:center;gap:9px;padding:8px 10px}
+.v22Back{border:0;background:transparent;font-size:32px;padding:4px 8px}.v22Title{flex:1;min-width:0}.v22Title b{font-size:17px}.v22Title span{display:block;font-size:12px;color:#667085;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v22Top{width:40px;height:40px;border-radius:50%;border:1px solid #d0d5dd;background:#fff;display:grid;place-items:center;font-size:18px}
+.v22Menu{position:relative}.v22Panel{display:none;position:absolute;right:0;top:45px;background:#fff;border:1px solid #e4e7ec;border-radius:18px;box-shadow:0 16px 40px rgba(0,0,0,.14);padding:8px;min-width:190px;z-index:5}.v22Menu.open .v22Panel{display:grid;gap:6px}
+.v22Body{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:10px;background:linear-gradient(rgba(235,245,239,.92),rgba(235,245,239,.92)),url("./app-bg.jpg") center/cover fixed}
+.v22Day{align-self:center;background:#fff;border-radius:999px;padding:6px 11px;color:#667085;font-size:12px}
+.v22Msg{max-width:88%;border-radius:18px;padding:10px 12px;box-shadow:0 2px 10px rgba(0,0,0,.06);font-size:14px;line-height:1.45}.v22Bill{align-self:flex-end;background:#dcf8c6;border-top-right-radius:6px}.v22Pay{align-self:flex-start;background:#fff;border-top-left-radius:6px}.v22Center{align-self:center;background:#fff7e6;border:1px solid #fedf89}.v22Meta{font-size:11px;color:#667085;text-align:right;margin-top:4px}.v22Actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.v22Actions button{font-size:12px;padding:6px 9px}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -382,13 +412,17 @@ body.dark .chatHeader{background:#101c18;border-color:#2e3b36}
 <body class="print-thermal">
 
 <div id="strictLoginWall" class="strictLoginWall noPrint">
-  <div class="strictLoginBox premiumLoginBox">
+  <div class="strictLoginBox">
     <div class="strictLoginLogo">
       <div class="miniLogo"></div>
-      <div>
-        <h2>Asha Billing</h2>
-        <div class="lockNote">Secure admin login</div>
-      </div>
+      <div><h2>Asha Billing</h2><div class="lockNote">Secure admin login</div></div>
+    </div>
+    <label>Email</label><input id="strictEmail" type="email" placeholder="Email" autocomplete="off">
+    <label>Password</label><input id="strictPass" type="password" placeholder="Password" autocomplete="off">
+    <div class="strictLoginActions"><button class="primary" onclick="strictLogin()">Login</button></div>
+    <div id="strictMsg" class="strictLoginStatus"></div>
+  </div>
+</div>
     </div>
     <label>Email</label>
     <input id="strictEmail" type="email" placeholder="Email" autocomplete="off" inputmode="email">
@@ -1279,6 +1313,108 @@ init();
   const oldInit=window.init;
   window.init=function(){ if(oldInit) oldInit(); setTimeout(()=>{ensureCleanLogin(); try{renderCustomers()}catch(e){}},600); }
   document.addEventListener("DOMContentLoaded",()=>setTimeout(()=>{ensureCleanLogin(); try{renderCustomers()}catch(e){}},900));
+})();
+</script>
+
+
+<div id="v22Chat" class="noPrint">
+  <div class="v22Head">
+    <button class="v22Back" onclick="v22Close()">‹</button>
+    <div class="v22Avatar" id="v22Avatar">?</div>
+    <div class="v22Title"><b id="v22Name">Customer</b><span id="v22Sub">Phone • Village</span></div>
+    <button class="v22Top" id="v22BillWA">▣</button>
+    <button class="v22Top" id="v22Call">☎</button>
+    <button class="v22Top" id="v22WA">☘</button>
+    <div class="v22Menu" id="v22Menu">
+      <button class="v22Top" onclick="document.getElementById('v22Menu').classList.toggle('open')">⋮</button>
+      <div class="v22Panel">
+        <button class="light" id="v22Edit">Edit User</button>
+        <button class="light" id="v22Pay">Receive Due</button>
+        <button class="light" id="v22SMS">SMS Reminder</button>
+        <button class="light" id="v22Ledger">Ledger</button>
+      </div>
+    </div>
+  </div>
+  <div class="v22Body" id="v22Body"></div>
+</div>
+
+
+<script>
+(function(){
+  const OWNER_UID="FZIhTAr0JEMoHCeQd3kr2t8cJKk2";
+  const $id=(id)=>document.getElementById(id);
+  const esc2=(s)=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
+  const initials=(n)=>String(n||"?").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase();
+  function cleanLogin(){
+    const old1=$id("authScreen"), old2=$id("secureGate");
+    if(old1) old1.remove(); if(old2) old2.remove();
+    const wall=$id("strictLoginWall");
+    if(wall){
+      const box=wall.querySelector(".strictLoginBox");
+      if(box) box.innerHTML=`<div class="strictLoginLogo"><div class="miniLogo"></div><div><h2>Asha Billing</h2><div class="lockNote">Secure admin login</div></div></div>
+      <label>Email</label><input id="strictEmail" type="email" placeholder="Email" autocomplete="off">
+      <label>Password</label><input id="strictPass" type="password" placeholder="Password" autocomplete="off">
+      <div class="strictLoginActions"><button class="primary" onclick="strictLogin()">Login</button></div>
+      <div id="strictMsg" class="strictLoginStatus"></div>`;
+    }
+  }
+  window.v22Open=function(id){
+    window.v22Active=id;
+    const c=state.customers.find(x=>x.id===id); if(!c)return;
+    $id("v22Chat").classList.add("show");
+    renderV22();
+  }
+  window.v22Close=function(){$id("v22Chat").classList.remove("show")}
+  window.renderV22=function(){
+    const c=state.customers.find(x=>x.id===window.v22Active); if(!c)return;
+    $id("v22Avatar").textContent=initials(c.name);
+    $id("v22Name").textContent=c.name;
+    $id("v22Sub").textContent=(c.phone||"No phone")+" • "+(c.village||"No village")+" • Due "+money(customerDue(c.id));
+    $id("v22Call").onclick=()=>callCustomer(c.id);
+    $id("v22WA").onclick=()=>window.open("https://wa.me/"+sanitizePhone(c.phone),"_blank");
+    $id("v22BillWA").onclick=()=>whatsappReminderImage(c.id);
+    $id("v22Edit").onclick=()=>editCustomer(c.id);
+    $id("v22Pay").onclick=()=>v22DirectPay(c.id);
+    $id("v22SMS").onclick=()=>smsCustomer(c.id);
+    $id("v22Ledger").onclick=()=>openLedger(c.id);
+    const bills=state.bills.filter(b=>b.customerId===c.id).sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+    let last="", out=[];
+    if((+c.openingDue||0)>0) out.push(`<div class="v22Msg v22Center">Opening Due: <b>${money(c.openingDue)}</b></div>`);
+    bills.forEach(b=>{
+      if(b.date!==last){last=b.date; out.push(`<div class="v22Day">${esc2(b.date||"No date")}</div>`);}
+      out.push(`<div class="v22Msg v22Bill"><b>${esc2(b.billNo)}</b><br>Name: ${esc2(b.customerName)}<br>Total: <b>${money(b.allTotal)}</b><br>Paid: <b>${money(billPaid(b))}</b><br>Due: <b>${money(billDue(b))}</b><div class="v22Actions"><button class="light" onclick="viewBill('${b.id}')">View</button><button class="light" onclick="openPayment('${b.id}')">Pay</button><button class="light" onclick="whatsappReminderImage('${c.id}')">Bill+WA</button></div><div class="v22Meta">${billStatus(b)}</div></div>`);
+      paymentsOf(b).forEach(p=>out.push(`<div class="v22Msg v22Pay">Payment received<br><b>${money(p.amount)}</b><br>${esc2(p.mode||"")} • ${esc2(p.receivedIn||"")}<div class="v22Meta">${esc2(p.date||"")}</div></div>`));
+    });
+    if(!out.length) out.push(`<div class="v22Msg v22Center">No bill/payment yet.</div>`);
+    $id("v22Body").innerHTML=out.join("");
+  }
+  window.v22DirectPay=function(id){
+    const c=state.customers.find(x=>x.id===id); if(!c)return;
+    const due=customerDue(id);
+    const amt=+(prompt("কত টাকা payment received?", due>0?due:"")||0);
+    if(!amt||amt<=0)return;
+    let remain=amt;
+    const bills=state.bills.filter(b=>b.customerId===id && billDue(b)>0).sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+    for(const b of bills){if(remain<=0)break;const pay=Math.min(remain,billDue(b));(b.payments=b.payments||[]).push({id:uid(),date:today(),amount:pay,mode:"Cash",receivedIn:"Cash",note:"Direct due payment"});remain-=pay;}
+    if(remain>0 && (+c.openingDue||0)>0)c.openingDue=Math.max((+c.openingDue||0)-remain,0);
+    saveState(); renderV22(); alert("Payment saved");
+  }
+  window.renderCustomers=function(){
+    const box=$id("customerList"); if(!box || !window.state)return;
+    const sr=$id("customerSearch"); const q=(sr?sr.value:"").toLowerCase();
+    const rows=state.customers.filter(c=>(c.name+c.phone+c.village+c.address).toLowerCase().includes(q));
+    box.innerHTML=rows.length?`<div class="v22List">`+rows.map(c=>{const due=customerDue(c.id);return `<div class="v22User" onclick="v22Open('${c.id}')"><div class="v22Avatar">${esc2(initials(c.name))}</div><div class="v22Main"><div class="row" style="gap:8px"><div class="v22Name">${esc2(c.name)}</div><span class="${due>0?'v22Due':'v22Due v22Paid'} right">${due>0?money(due):'Paid'}</span></div><div class="v22Sub">📞 ${esc2(c.phone||"No phone")} • 📍 ${esc2(c.village||"No village")}</div><div class="v22Sub">${esc2(c.address||"")}</div></div></div>`}).join("")+`</div>`:`<p class="muted">No customer yet.</p>`;
+  }
+  const rf=window.refreshAll;
+  window.refreshAll=function(){if(rf)rf();setTimeout(()=>{try{renderCustomers()}catch(e){console.warn(e)}},50);}
+  window.testCloud=async function(){
+    if(!initFirebase())return;if(!ensureAuth())return;
+    try{const docId=(state.settings.cloudDocId||"ekramul-main");await fbDb.collection("ashaMiniShallow").doc(docId).get();updateCloudStatus("Cloud test success.");}
+    catch(e){updateCloudStatus("Test failed: "+e.message);}
+  }
+  const oldInit=window.init;
+  window.init=function(){if(oldInit)oldInit();setTimeout(()=>{cleanLogin();try{renderCustomers()}catch(e){console.warn(e)}},700);}
+  document.addEventListener("DOMContentLoaded",()=>setTimeout(()=>{cleanLogin();try{renderCustomers()}catch(e){console.warn(e)}},900));
 })();
 </script>
 
