@@ -44,7 +44,7 @@
       </div>
       <div class="hero-chips">
         <span id="cloudChip">Cloud: checking</span>
-        <span>V29 Fresh iOS Pro</span>
+        <span>V30 Final iOS Pro</span>
       </div>
     </header>
 
@@ -202,12 +202,17 @@
           <label>Address</label><textarea id="setAddress"></textarea>
           <div class="two">
             <div><label>UPI ID</label><input id="setUpi"></div>
-            <div><label>Payee Name</label><input id="setPayee"></div>
-            <div><label>Country Code</label><input id="setCountry" value="+91"></div>
-            <div><label>Theme Colour</label><input id="setAccent" type="color"></div>
+            <div><label>App Theme Colour</label><input id="setAccent" type="color"></div>
           </div>
+          <input id="setPayee" type="hidden">
+          <input id="setCountry" type="hidden" value="+91">
+          <label>QR Mode</label>
+          <select id="setQrMode"><option value="dynamic">Dynamic amount QR</option><option value="static">Uploaded static QR</option></select>
+          <label>Upload / Change QR Image</label>
+          <input id="setQrImage" type="file" accept="image/*">
+          <div class="action-bar"><button class="btn" id="removeQrBtn">Remove QR</button></div>
           <label>Default Print Size</label><select id="setPrint"></select>
-          <label>Default Template</label><select id="setTemplate"></select>
+          <label>Default Bill Template</label><select id="setTemplate"></select>
           <div class="action-bar">
             <button class="btn primary" id="saveSettingsBtn">Save Settings</button>
             <button class="btn" id="cloudPullBtn">Pull Cloud</button>
@@ -246,6 +251,7 @@
       <button id="chatSettle">Settle</button>
       <button id="chatLedger">Ledger</button>
       <button id="chatEdit">Edit</button>
+      <button id="chatMore">More</button>
     </div>
   </div>
 
@@ -265,6 +271,17 @@
     </div>
   </div>
 
+  <div id="actionModal" class="modal hidden">
+    <div class="modal-card">
+      <h2 id="actionTitle">Action</h2>
+      <div id="actionBody"></div>
+      <div class="action-bar">
+        <button class="btn primary" id="actionSave">Save</button>
+        <button class="btn danger" id="actionDelete">Delete</button>
+        <button class="btn" id="actionClose">Cancel</button>
+      </div>
+    </div>
+  </div>
   <input id="importFile" type="file" accept=".json" hidden>
   <script src="./app.js"></script>
 </body>

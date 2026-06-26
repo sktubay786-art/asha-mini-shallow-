@@ -139,3 +139,157 @@ function bind(){
 }
 function boot(){bind();setupCalc();renderAll(true);loadSettings();if(auth){auth.onAuthStateChanged(u=>{if(u&&u.uid===OWNER_UID){$("login").classList.add("hidden");$("app").classList.remove("hidden");$("cloudChip").textContent="Cloud: logged in"}else{$("login").classList.remove("hidden");$("app").classList.add("hidden");$("cloudChip").textContent="Cloud: locked"}})}else{$("login").classList.add("hidden");$("app").classList.remove("hidden")}if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js").catch(()=>{})}
 document.addEventListener("DOMContentLoaded",boot);
+
+
+/* ===== V30 FINAL PATCH LAYER ===== */
+(function(){
+function ready(fn){ if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",()=>setTimeout(fn,120)); else setTimeout(fn,120); }
+
+ready(function(){
+  const V30_KEY="asha_v30_final_app";
+  if(localStorage.getItem("asha_v29_fresh_ios_pro") && !localStorage.getItem(V30_KEY)){
+    localStorage.setItem(V30_KEY, localStorage.getItem("asha_v29_fresh_ios_pro"));
+  }
+  try{ state = mergeDefaults(JSON.parse(localStorage.getItem(V30_KEY)) || state); }catch(e){}
+  window.saveState=function(sync=true){localStorage.setItem(V30_KEY,JSON.stringify(state));renderAll();if(sync&&auth?.currentUser?.uid===OWNER_UID)pushCloud(false)}
+
+  if(document.querySelector(".hero-chips span:last-child")) document.querySelector(".hero-chips span:last-child").textContent="V30 Final iOS Pro";
+
+  window.normalPhone=function(raw){
+    raw=String(raw||"").trim(); if(!raw)return "";
+    let d=raw.replace(/\D/g,"");
+    if(raw.startsWith("+"))return raw;
+    if(d.length===10)return "+91 "+d;
+    if(d.length>10&&d.startsWith("91"))return "+91 "+d.slice(-10);
+    return "+91 "+d;
+  }
+
+  const oldFill=window.fillSelects;
+  window.fillSelects=function(){
+    if(oldFill) oldFill();
+    if($("setTemplate")){
+      $("setTemplate").innerHTML='<option value="premium">Premium Colour</option><option value="standard">Standard Clean</option><option value="normal">Normal Black</option><option value="thermal">Thermal Compact</option><option value="classic">Classic Bill</option><option value="boxed">Boxed Modern</option><option value="bengali">Bengali Heavy</option><option value="compact">Compact A6</option><option value="qrfirst">QR Focused</option>';
+      $("setTemplate").value=state.settings.template||"premium";
+    }
+    if($("setQrMode")) $("setQrMode").value=state.settings.qrMode||"dynamic";
+    updatePayInfo();
+  }
+
+  window.qrSrc=function(amount,billNo){
+    if(state.settings.qrMode==="static"&&state.settings.qrImage)return state.settings.qrImage;
+    let link=`upi://pay?pa=${encodeURIComponent(state.settings.upi)}&pn=${encodeURIComponent(state.settings.owner||state.settings.payee||"Asha")}&am=${Number(amount||0).toFixed(2)}&cu=INR&tn=${encodeURIComponent(billNo||"Asha Bill")}`;
+    return `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(link)}`;
+  }
+
+  window.invoiceHTML=function(b,cls){
+    let due=billDue(b),paid=billPaid(b),tpl=$("template")?.value||state.settings.template||"premium";
+    let rows=[["Bill No",b.billNo],["Date",b.date],["Name",b.customerName],["Phone",b.phone||""],["Village",b.village||""],["Address",b.address||""],["Season",b.season],["জমির পরিমাণ",`${b.landAmount} ${b.unit}`],["Converted",`${b.bigha.toFixed(2)} বিঘা`],["Rate",`${money(b.rate)}/বিঘা`],["Current Bill",money(b.current)],["Previous Due",money(b.previousDue)],["All Total",money(b.allTotal)],["Paid / Adjusted",money(paid)],["Due",money(due)],["Status",billStatus(b)],["Payment",b.payments?.[0]?.mode||"-"],["Received",b.payments?.[0]?.receivedIn||"-"]];
+    return `<div class="invoice ${cls} ${tpl}"><h3>${esc(state.settings.company)}</h3><div class="head-small">Pro: ${esc(state.settings.owner)}<br>☎/WhatsApp: ${esc(state.settings.contact)}<br>${esc(state.settings.address)}</div><div class="line"></div>${rows.map(([l,v])=>`<div class="item"><span>${esc(l)}</span><b>${esc(v)}</b></div>`).join("")}<div class="line"></div><div class="head-small">UPI: ${esc(state.settings.upi)}</div><img class="qr" src="${qrSrc(due>0?due:b.allTotal,b.billNo)}"><div class="head-small"><b>Scan & Pay ${money(due>0?due:b.allTotal)}</b></div><div class="line"></div>${b.note?`<div style="font-size:11px"><b>Note:</b> ${esc(b.note)}</div>`:""}<div class="head-small">ধন্যবাদ। সময়মতো বিল পরিশোধ করার জন্য অনুরোধ করা হচ্ছে।</div><div style="text-align:right;font-size:11px;margin-top:8px">Sign: ${esc(state.settings.owner)}</div><div style="text-align:center;font-size:11px;color:#777">Thank you</div></div>`;
+  }
+
+  window.reminderTextByBill=function(b){
+    return `${state.settings.company}\nBill No: ${b.billNo}\nName: ${b.customerName}\nTotal: ${money(b.allTotal)}\nPaid/Adjusted: ${money(billPaid(b))}\nDue: ${money(billDue(b))}\nNote: ${b.note||"-"}\nContact: ${state.settings.contact}\nUPI: ${state.settings.upi}`;
+  }
+
+  window.findPayment=function(paymentId){
+    for(const b of state.bills){let p=(b.payments||[]).find(x=>x.id===paymentId);if(p)return {bill:b,p};}
+    return null;
+  }
+  window.editEntry=function(paymentId){
+    let fp=findPayment(paymentId); if(!fp)return;
+    actionContext={type:"payment",paymentId};
+    $("actionTitle").textContent=(fp.p.mode==="Settlement"?"Edit Settlement":"Edit Payment");
+    $("actionBody").innerHTML=`<label>Amount</label><input id="editAmount" type="number" value="${fp.p.amount}"><label>Mode</label><select id="editMode"><option>Cash</option><option>UPI</option><option>Bank</option><option>Online</option><option>Settlement</option></select><label>Received In</label><input id="editReceived" value="${esc(fp.p.receivedIn||"")}"><label>Note</label><input id="editNote" value="${esc(fp.p.note||"")}">`;
+    $("editMode").value=fp.p.mode;
+    $("actionSave").classList.remove("hidden"); $("actionDelete").classList.remove("hidden"); $("actionModal").classList.remove("hidden");
+  }
+  window.saveAction=function(){
+    if(!actionContext)return closeAction();
+    let fp=findPayment(actionContext.paymentId); if(!fp)return closeAction();
+    fp.p.amount=+$("editAmount").value||0; fp.p.mode=$("editMode").value; fp.p.receivedIn=$("editReceived").value; fp.p.note=$("editNote").value;
+    saveState(); if(activeCustomer)renderChat(); closeAction();
+  }
+  window.deleteAction=function(){
+    if(!actionContext)return closeAction();
+    let fp=findPayment(actionContext.paymentId); if(!fp)return closeAction();
+    if(confirm("Delete this entry?")){fp.bill.payments=(fp.bill.payments||[]).filter(p=>p.id!==actionContext.paymentId);saveState();if(activeCustomer)renderChat();}
+    closeAction();
+  }
+  window.closeAction=function(){actionContext=null;$("actionModal").classList.add("hidden");$("actionSave").classList.remove("hidden");$("actionDelete").classList.remove("hidden");}
+
+  window.deleteCustomer=function(id){
+    if(!confirm("Delete this customer and all bills?"))return;
+    state.customers=state.customers.filter(c=>c.id!==id);state.bills=state.bills.filter(b=>b.customerId!==id);
+    closeChat();closeAction();saveState();
+  }
+  window.deleteBill=function(id){
+    if(!confirm("Delete this bill?"))return;
+    state.bills=state.bills.filter(b=>b.id!==id);saveState();if(activeCustomer)renderChat();
+  }
+
+  window.openMoreMenu=function(id){
+    let c=state.customers.find(x=>x.id===id); if(!c)return;
+    actionContext={type:"more",customerId:id};
+    $("actionTitle").textContent="User Actions";
+    $("actionBody").innerHTML=`<div class="action-sheet"><button class="btn" onclick="openCustomer('${id}');closeAction()">Edit User</button><button class="btn" onclick="smsReminder('${id}')">SMS Reminder</button><button class="btn" onclick="waCustomerText('${id}')">WhatsApp Reminder</button><button class="btn" onclick="renderChatLedger('${id}');closeAction()">View Ledger</button><button class="btn danger" onclick="deleteCustomer('${id}')">Delete User</button></div>`;
+    $("actionSave").classList.add("hidden");$("actionDelete").classList.add("hidden");$("actionModal").classList.remove("hidden");
+  }
+
+  window.customerReminderText=function(c){return `${state.settings.company}\nName: ${c.name}\nDue: ${money(customerDue(c.id))}\nContact: ${state.settings.contact}\nUPI: ${state.settings.upi}`}
+  window.waCustomerText=function(id){let c=state.customers.find(x=>x.id===id);if(!c)return;open("https://wa.me/"+phone(c.phone)+"?text="+encodeURIComponent(customerReminderText(c)),"_blank")}
+  window.smsReminder=function(id){let c=state.customers.find(x=>x.id===id);if(!c)return;location.href="sms:"+phone(c.phone)+"?body="+encodeURIComponent(customerReminderText(c))}
+
+  window.renderChat=function(){
+    let c=state.customers.find(x=>x.id===activeCustomer);if(!c)return;
+    $("chatAvatar").textContent=initials(c.name);$("chatName").textContent=c.name;$("chatSub").textContent=(c.phone||"No phone")+" • "+(c.village||"No village")+" • Due "+money(customerDue(c.id));
+    $("chatCall").onclick=()=>location.href="tel:"+phone(c.phone);$("chatWhats").onclick=()=>open("https://wa.me/"+phone(c.phone),"_blank");$("chatShare").onclick=()=>shareCustomerBill(c.id);
+    $("chatBill").onclick=()=>{closeChat();showPage("billPage");$("billCustomer").value=c.id;toggleManual();previewBill()};
+    $("chatPay").onclick=()=>directPay(c.id,false);$("chatSettle").onclick=()=>directPay(c.id,true);$("chatLedger").onclick=()=>renderChatLedger(c.id);$("chatEdit").onclick=()=>openCustomer(c.id);
+    if($("chatMore"))$("chatMore").onclick=()=>openMoreMenu(c.id);
+    let bills=state.bills.filter(b=>b.customerId===c.id).sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+    let out=[];if((+c.openingDue||0)>0)out.push(`<div class="bubble setB">Opening Due: <b>${money(c.openingDue)}</b></div>`);
+    bills.forEach(b=>{out.push(`<div class="day">${esc(b.date)}</div><div class="bubble billB"><b>${esc(b.billNo)}</b><br>Total ${money(b.allTotal)}<br>Paid/Adjusted ${money(billPaid(b))}<br>Due <b>${money(billDue(b))}</b><br>${b.note?`<small>Note: ${esc(b.note)}</small>`:""}<div class="bubble-actions"><button onclick="viewBill('${b.id}')">View</button><button onclick="openPayment('${b.id}')">Pay</button><button onclick="shareCustomerBill('${c.id}')">Reminder + Bill</button><button onclick="deleteBill('${b.id}')">Delete</button></div></div>`);(b.payments||[]).forEach(p=>out.push(`<div class="bubble ${(p.mode||"").includes("Settlement")?"setB":"payB"}">${esc(p.mode)}<br><b>${money(p.amount)}</b><br>${esc(p.receivedIn)}<br><small>${esc(p.note||"")}</small><div class="entry-tools"><button onclick="editEntry('${p.id}')">Edit</button><button onclick="editEntry('${p.id}')">Undo/Delete</button></div></div>`))});
+    $("chatBody").innerHTML=out.join("")||`<div class="bubble setB">No bill yet</div>`;
+  }
+
+  window.renderChatLedger=function(id){
+    let entries=[];state.bills.filter(b=>b.customerId===id).forEach(b=>{entries.push(`<div class="ledger-row"><span>${esc(b.billNo)} bill</span><b class="due">+${money(b.allTotal)}</b></div>`);(b.payments||[]).forEach(p=>entries.push(`<div class="ledger-row"><span>${esc(p.mode)} ${esc(p.date)} <button onclick="editEntry('${p.id}')">Edit</button></span><b class="paid">-${money(p.amount)}</b></div>`))});
+    $("chatBody").innerHTML=`<div class="bubble setB">Live Due <b>${money(customerDue(id))}</b></div>`+entries.join("");
+  }
+
+  window.renderHistory=function(){
+    $("historyList").innerHTML=state.bills.slice().reverse().map(b=>`<div class="card"><b>${esc(b.billNo)}</b><p>${esc(b.customerName)} • ${esc(b.date)} • Due ${money(billDue(b))}</p><div class="action-bar"><button class="btn" onclick="viewBill('${b.id}')">View</button><button class="btn" onclick="openPayment('${b.id}')">Pay</button><button class="btn danger" onclick="deleteBill('${b.id}')">Delete</button></div></div>`).join("")||`<div class="card muted">No history</div>`;
+  }
+
+  window.renderReports=function(){
+    let month=$("reportMonth").value,vill=$("reportVillage").value||"all";
+    let bills=state.bills.filter(b=>(!month||String(b.date).startsWith(month))&&(vill==="all"||b.village===vill));
+    let total=0,collected=0,due=0,settled=0,bank={},village={},custDue={};
+    bills.forEach(b=>{total+=+b.allTotal||0;collected+=billPaid(b);due+=billDue(b);village[b.village||"Unknown"]=(village[b.village||"Unknown"]||0)+billDue(b);custDue[b.customerName]=(custDue[b.customerName]||0)+billDue(b);(b.payments||[]).forEach(p=>{bank[p.receivedIn||p.mode]=(bank[p.receivedIn||p.mode]||0)+(+p.amount||0);if((p.mode||"").toLowerCase().includes("settle"))settled+=+p.amount||0})});
+    const row=(a,b)=>`<div class="report-row"><span>${esc(a)}</span><b>${b}</b></div>`;
+    $("reportBox").innerHTML=`<div class="metrics"><div class="metric"><small>Total</small><b>${money(total)}</b></div><div class="metric"><small>Collected</small><b>${money(collected)}</b></div><div class="metric"><small>Due</small><b>${money(due)}</b></div><div class="metric"><small>Settled</small><b>${money(settled)}</b></div></div><div class="card"><h3>Bank / Receive In</h3>${Object.entries(bank).map(([k,v])=>row(k,money(v))).join("")||row("No data","-")}</div><div class="card"><h3>Village-wise Due</h3>${Object.entries(village).map(([k,v])=>row(k,money(v))).join("")||row("No data","-")}</div><div class="card"><h3>Customer-wise Due</h3>${Object.entries(custDue).filter(([,v])=>v>0).map(([k,v])=>row(k,money(v))).join("")||row("No due","-")}</div>`;
+  }
+
+  window.loadQr=function(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{state.settings.qrImage=r.result;state.settings.qrMode="static";saveState();loadSettings();alert("QR uploaded")};r.readAsDataURL(f)}
+  window.removeQr=function(){state.settings.qrImage="";state.settings.qrMode="dynamic";saveState();loadSettings();alert("QR removed")}
+  const oldLoadSettings=window.loadSettings;
+  window.loadSettings=function(){
+    oldLoadSettings();
+    if($("setQrMode"))$("setQrMode").value=state.settings.qrMode||"dynamic";
+    if($("setPayee"))$("setPayee").value=state.settings.owner;
+    if($("setCountry"))$("setCountry").value="+91";
+  }
+  window.saveSettings=function(){
+    Object.assign(state.settings,{company:$("setCompany").value,owner:$("setOwner").value,contact:$("setContact").value,address:$("setAddress").value,upi:$("setUpi").value,payee:$("setOwner").value,country:"+91",accent:$("setAccent").value,print:$("setPrint").value,template:$("setTemplate").value,qrMode:$("setQrMode")?.value||"dynamic"});
+    $("printMode").value=state.settings.print;$("template").value=state.settings.template;saveState();alert("Settings saved");
+  }
+
+  if($("setQrImage"))$("setQrImage").onchange=loadQr;
+  if($("removeQrBtn"))$("removeQrBtn").onclick=removeQr;
+  if($("actionSave"))$("actionSave").onclick=saveAction;
+  if($("actionDelete"))$("actionDelete").onclick=deleteAction;
+  if($("actionClose"))$("actionClose").onclick=closeAction;
+
+  renderAll(true);loadSettings();
+});
+})();
