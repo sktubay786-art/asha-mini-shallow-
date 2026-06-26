@@ -1,1422 +1,165 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<meta name="theme-color" content="#0b4b2f"/>
-<title>Asha Mini Shallow Elite</title>
-<style>
-:root{
-  --bg:#eef4f0;--card:#fff;--ink:#101828;--muted:#667085;--line:#d0d5dd;
-  --brand:#0b4b2f;--brand2:#168456;--soft:#e8f6ee;--ok:#067647;--okbg:#dcfae6;
-  --bad:#b42318;--badbg:#fee4e2;--warn:#b54708;--warnbg:#fef0c7;
-  --shadow:0 14px 36px rgba(16,24,40,.09);--r:22px;
-}
-*{box-sizing:border-box}
-body{margin:0;background:radial-gradient(circle at top left,#dff4e8,transparent 40%),var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans Bengali","Noto Sans",Arial,sans-serif}
-button,input,select,textarea{font:inherit}
-.appbar{position:sticky;top:0;z-index:20;background:linear-gradient(135deg,#073b25,#168456);color:#fff;padding:16px 14px 18px;border-bottom-left-radius:26px;border-bottom-right-radius:26px;box-shadow:0 14px 28px rgba(11,75,47,.22)}
-.top{display:flex;align-items:center;gap:12px}.logo{width:45px;height:45px;border-radius:16px;background:#ffffff20;border:1px solid #ffffff35;display:grid;place-items:center;font-weight:950}
-h1{font-size:19px;margin:0}.appbar p{font-size:12px;margin:3px 0 0;opacity:.9}.right{margin-left:auto}
-.status{margin-top:10px;background:#ffffff16;border:1px solid #ffffff24;border-radius:14px;padding:8px 10px;font-size:12px}
-.wrap{max-width:1180px;margin:0 auto;padding:14px 12px 94px}
-.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
-.span-12{grid-column:span 12}.span-8{grid-column:span 8}.span-7{grid-column:span 7}.span-6{grid-column:span 6}.span-5{grid-column:span 5}.span-4{grid-column:span 4}.span-3{grid-column:span 3}
-.card,.stat{background:rgba(255,255,255,.92);border:1px solid #e4e7ec;border-radius:var(--r);box-shadow:var(--shadow);padding:14px;backdrop-filter:blur(10px)}
-h2{font-size:18px;margin:0 0 10px}h3{font-size:15px;margin:0 0 10px}.muted,.tiny{color:var(--muted);font-size:12px}.tiny{font-size:11px}
-.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-label{display:block;margin:9px 0 5px;font-size:12px;font-weight:900;color:#344054}
-input,select,textarea{width:100%;border:1px solid var(--line);border-radius:14px;padding:10px 11px;background:#fff;color:var(--ink);outline:none}
-textarea{min-height:70px;resize:vertical}
-input:focus,select:focus,textarea:focus{border-color:var(--brand2);box-shadow:0 0 0 4px rgba(22,132,86,.12)}
-button{cursor:pointer}.primary{border:0;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;padding:10px 13px;border-radius:14px;font-weight:950}
-.secondary{border:0;background:#344054;color:#fff;padding:10px 13px;border-radius:14px;font-weight:950}
-.light{background:#f2f4f7;color:#172033;border:1px solid var(--line);padding:9px 11px;border-radius:14px;font-weight:900}
-.danger{border:0;background:var(--bad);color:#fff;padding:9px 11px;border-radius:14px;font-weight:900}
-.nav{position:fixed;left:8px;right:8px;bottom:8px;z-index:40;background:#fff;border:1px solid #e4e7ec;border-radius:24px;box-shadow:var(--shadow);display:flex;gap:5px;padding:6px;overflow:auto}
-.nav button{min-width:70px;border:0;background:transparent;border-radius:18px;padding:7px 5px;font-size:10px;font-weight:900;color:#344054}
-.nav span{display:grid;place-items:center;width:32px;height:32px;margin:0 auto 3px;border-radius:12px;background:#f2f4f7;border:1px solid #e4e7ec;font-size:16px}
-.nav button.active{background:#eaf7ef;color:var(--brand)}.nav button.active span{background:linear-gradient(135deg,var(--brand),var(--brand2));color:white;border-color:transparent}
-.page{display:none}.page.active{display:block}
-.stat .label{font-size:12px;color:var(--muted);font-weight:900}.stat b{font-size:22px;display:block;margin-top:5px}.ok{color:var(--ok)}.bad{color:var(--bad)}.warn{color:var(--warn)}
-.chip{display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border-radius:999px;background:#f2f4f7;font-size:12px;font-weight:900}.chip.ok{background:var(--okbg);color:var(--ok)}.chip.bad{background:var(--badbg);color:var(--bad)}.chip.warn{background:var(--warnbg);color:var(--warn)}
-.listItem{border:1px solid #e4e7ec;border-radius:18px;background:#fff;padding:12px;margin:8px 0}
-.searchBox{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:8px}.searchBox input{border:0;padding:5px}.searchBox input:focus{box-shadow:none}
-.quickActions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.quickAction{border:1px solid #e4e7ec;background:linear-gradient(180deg,#fff,#f7fbf8);border-radius:18px;padding:12px;text-align:left}.quickAction span{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:var(--soft);color:var(--brand);font-size:17px}.quickAction b{display:block;margin-top:5px}
-.resultBox,.notice{background:#fff8e8;border:1px solid #fedf89;border-radius:16px;padding:11px;color:#7a2e0e;font-size:13px}.resultBox{background:linear-gradient(180deg,#f7fbf8,#edf7f1);border-color:#d7ebdf;color:#172033}
-.kv{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px dashed #e4e7ec}.kv:last-child{border-bottom:0}
-.calcGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.hidden{display:none!important}
-.invoiceWrap{display:grid;place-items:start center;background:#f9fafb;border-radius:18px;padding:12px;overflow:auto}
-.invoice{background:#fff;color:#111;border:1px solid #ddd;padding:8px;font-size:12px;line-height:1.28;font-family:"Noto Sans Bengali","Noto Sans",Arial,sans-serif;overflow:visible}
-.invoice.thermal{width:80mm}.invoice.a4half{width:100%;max-width:680px;padding:14px;font-size:12px}.invoice.a4quarter{width:100%;max-width:360px;padding:12px;font-size:11.5px}
-.invoice h1{font-size:18px;text-align:center;margin:0 0 2px}.invoice .sub{text-align:center;font-size:11px;margin:1px 0}.dashline{border-top:1px dashed #333;margin:6px 0}.billrow{display:flex;justify-content:space-between;gap:8px;margin:2px 0}.billrow span:first-child{font-weight:800}.total{font-size:15px;font-weight:950}.center{text-align:center}.sign{text-align:right;margin-top:10px}.qr{display:block;max-width:78px;max-height:78px;margin:5px auto;border:1px solid #ddd;padding:2px}
-.lock{position:fixed;inset:0;z-index:100;background:linear-gradient(135deg,#073b25,#168456);display:none;align-items:center;justify-content:center;padding:16px}.lock.show{display:flex}.lockbox{width:100%;max-width:380px;background:#fff;border-radius:26px;padding:18px;box-shadow:0 24px 80px rgba(0,0,0,.25)}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:90;display:none;align-items:center;justify-content:center;padding:14px}.modal.show{display:flex}.modalBox{background:#fff;border-radius:24px;max-width:520px;width:100%;padding:16px}
-@media(max-width:850px){.span-8,.span-7,.span-6,.span-5,.span-4,.span-3{grid-column:span 12}.quickActions,.calcGrid{grid-template-columns:repeat(2,1fr)}.wrap{padding-left:10px;padding-right:10px}.appbar{border-radius:0 0 22px 22px}}
-@media print{
-  .appbar,.nav,.noPrint{display:none!important}body{background:white}.wrap{padding:0;margin:0}.card{border:0;box-shadow:none;padding:0}.invoiceWrap{display:block;background:white;padding:0}
-  body.print-thermal .invoice{border:0;width:80mm;margin:0;padding:4mm;font-size:12px}
-  body.print-a4half .invoice{border:1px dashed #ddd;width:148mm;height:105mm;margin:0;padding:7mm;font-size:11px}
-  body.print-a4quarter .invoice{border:1px dashed #ddd;width:105mm;height:148mm;margin:0;padding:6mm;font-size:10.5px}
-  body.print-a4quarter .invoice .qr{max-width:54px;max-height:54px}body.print-a4half .invoice .qr{max-width:72px;max-height:72px}
-}
-
-body.dark{
-  --bg:#0b1110;--card:#101c18;--ink:#f2f4f7;--muted:#98a2b3;--line:#2e3b36;
-  --soft:#10291d;--shadow:0 14px 36px rgba(0,0,0,.34);
-  background:radial-gradient(circle at top left,#123d2b,transparent 42%),#0b1110;
-}
-body.dark .card,body.dark .stat,body.dark .listItem,body.dark .invoiceWrap{background:rgba(16,28,24,.94);border-color:#2e3b36}
-body.dark input,body.dark select,body.dark textarea{background:#0f1a17;color:#f2f4f7;border-color:#2e3b36}
-body.dark .light{background:#17231f;color:#f2f4f7;border-color:#2e3b36}
-body.dark .searchBox{background:#0f1a17;border-color:#2e3b36}
-body.dark .nav{background:#101c18;border-color:#2e3b36}
-body.dark .quickAction{background:linear-gradient(180deg,#14221d,#0f1a17);border-color:#2e3b36;color:#f2f4f7}
-body.dark .resultBox{background:#102019;border-color:#244233;color:#f2f4f7}
-body.dark .notice{background:#251a0b;border-color:#6b430b;color:#ffd599}
-.templateModern.invoice{border-radius:14px;border:2px solid #0b4b2f}
-.templateModern.invoice h1{background:linear-gradient(135deg,#0b4b2f,#168456);color:#fff;border-radius:10px;padding:7px;margin-bottom:5px}
-.templateModern .dashline{border-color:#0b4b2f}
-.miniTable{width:100%;border-collapse:separate;border-spacing:0 7px}
-.miniTable td,.miniTable th{font-size:12px;padding:8px;background:#fff;border-top:1px solid #e4e7ec;border-bottom:1px solid #e4e7ec}
-.miniTable td:first-child,.miniTable th:first-child{border-left:1px solid #e4e7ec;border-radius:12px 0 0 12px}
-.miniTable td:last-child,.miniTable th:last-child{border-right:1px solid #e4e7ec;border-radius:0 12px 12px 0}
-body.dark .miniTable td,body.dark .miniTable th{background:#0f1a17;border-color:#2e3b36}
-
-
-/* V10 final premium updates */
-:root{--gold:#f4c430}
-.premiumRibbon{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#fff7d6,#e8f6ee);color:#0b4b2f;border:1px solid #e8d27a;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:950}
-body.dark .premiumRibbon{background:#231f12;color:#ffe58f;border-color:#5c4b17}
-.actionGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.actionGrid button{width:100%}
-@media(max-width:700px){.actionGrid{grid-template-columns:repeat(2,1fr)}}
-@media print{
-  .templateModern.invoice{border:2px solid #0b4b2f!important;border-radius:0!important}
-  .templateModern.invoice h1{background:#0b4b2f!important;color:#fff!important;border-radius:0!important;padding:5px!important;margin:0 0 4px!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .templateModern .dashline{border-top:1px solid #0b4b2f!important}
-  .templateModern .total{background:#e8f6ee!important;padding:2px 4px!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-}
-.invoice.templateModern .billrow{border-bottom:1px dotted #d0d5dd;padding:1px 0}
-.invoice.templateModern .qr{border:2px solid #0b4b2f;border-radius:8px}
-
-
-/* V11 clean dashboard + side-half print */
-.cleanMini{font-size:11px;color:var(--muted)}
-body .status{font-size:11px}
-body .premiumRibbon{background:#eef7f2;border-color:#bfe6ce;color:#0b4b2f}
-body.dark .premiumRibbon{background:#13251d;color:#bff0cf;border-color:#315b42}
-.invoice.a4side{width:96mm;min-height:270mm;padding:9mm;font-size:12px}
-.invoice.a4landscape{width:140mm;min-height:190mm;padding:9mm;font-size:12px}
-@media screen{
-  .invoiceWrap.sidePreview{place-items:start}
-  .invoice.a4side{width:100%;max-width:390px;min-height:auto}
-  .invoice.a4landscape{width:100%;max-width:680px;min-height:auto}
-}
-@media print{
-  @page{size:A4 portrait;margin:8mm}
-  body.print-a4side .invoiceWrap{display:block!important;padding:0!important;margin:0!important}
-  body.print-a4side .invoice{width:96mm!important;min-height:270mm!important;height:auto!important;margin:0 auto 0 0!important;padding:6mm!important;font-size:11px!important}
-  body.print-a4side .invoice h1{font-size:15px!important}
-  body.print-a4side .invoice .qr{max-width:58px!important;max-height:58px!important}
-  body.print-a4landscape .invoiceWrap{display:block!important;padding:0!important;margin:0!important}
-  body.print-a4landscape .invoice{width:140mm!important;min-height:190mm!important;height:auto!important;margin:0 auto 0 0!important;padding:7mm!important;font-size:11px!important}
-  body.print-a4landscape .invoice h1{font-size:16px!important}
-  body.print-a4landscape .invoice .qr{max-width:70px!important;max-height:70px!important}
-}
-
-
-/* Elite V13 additions */
-.cloudBox{background:linear-gradient(180deg,#f7fbf8,#edf7f1);border:1px solid #d7ebdf;border-radius:16px;padding:12px;margin-top:12px}
-body.dark .cloudBox{background:#102019;border-color:#244233}
-.pageMock{background:#fff;border:1px solid #d0d5dd;position:relative;width:100%;max-width:720px;aspect-ratio:210/297;box-shadow:0 10px 24px rgba(0,0,0,.06)}
-.pageMock.two:before{content:"";position:absolute;left:0;right:0;top:50%;border-top:2px dashed #d0d5dd}
-.pageMock.four:before{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:2px dashed #d0d5dd}
-.pageMock.four:after{content:"";position:absolute;left:0;right:0;top:50%;border-top:2px dashed #d0d5dd}
-.pageMock .slot{position:absolute;left:0;top:0;overflow:hidden}
-.pageMock .slot.a5{width:100%;height:50%}
-.pageMock .slot.a6{width:50%;height:50%}
-.invoice.a5slot{width:210mm;min-height:148.5mm;padding:4.2mm;font-size:9.6px;line-height:1.18}
-.invoice.a6slot{width:105mm;min-height:148.5mm;padding:3.0mm;font-size:7.5px;line-height:1.12}
-.invoice.a5slot h1{font-size:17px}.invoice.a6slot h1{font-size:12px}
-.invoice.a5slot .sub{font-size:10px}.invoice.a6slot .sub{font-size:7px}
-.invoice.a5slot .qr{max-width:58px;max-height:58px}.invoice.a6slot .qr{max-width:42px;max-height:42px}
-.invoice.a6slot .center,.invoice.a6slot .sign,.invoice.a6slot .tiny{font-size:6.7px}
-.invoice.a6slot .total{font-size:8.2px}
-.quickAction span{font-size:18px}
-@media screen{.invoiceWrap.slotPreview{padding:18px;background:#f3f4f6;border:1px solid #e4e7ec}.invoiceWrap.slotPreview .slot .invoice{width:100%;height:100%;max-width:none;border:0}}
-@media print{
-  body.print-a5slot .invoiceWrap,body.print-a6slot .invoiceWrap{display:block!important;padding:0!important;background:#fff!important}
-  body.print-a5slot .pageMock,body.print-a6slot .pageMock{width:210mm!important;height:297mm!important;position:relative!important;border:0!important;box-shadow:none!important}
-  body.print-a5slot .pageMock.two:before{content:"";position:absolute;left:0;right:0;top:148.5mm;border-top:1px dashed #ccc}
-  body.print-a6slot .pageMock.four:before{content:"";position:absolute;left:105mm;top:0;bottom:0;border-left:1px dashed #ccc}
-  body.print-a6slot .pageMock.four:after{content:"";position:absolute;left:0;right:0;top:148.5mm;border-top:1px dashed #ccc}
-  body.print-a5slot .slot.a5{position:absolute;left:0;top:0;width:210mm;height:148.5mm;overflow:hidden}
-  body.print-a6slot .slot.a6{position:absolute;left:0;top:0;width:105mm;height:148.5mm;overflow:hidden}
-  body.print-a5slot .slot .invoice{width:210mm!important;min-height:148.5mm!important;height:148.5mm!important;margin:0!important;border:0!important;padding:4.2mm!important;font-size:9.6px!important}
-  body.print-a6slot .slot .invoice{width:105mm!important;min-height:148.5mm!important;height:148.5mm!important;margin:0!important;border:0!important;padding:3.0mm!important;font-size:7.5px!important}
-  body.print-a5slot .invoice h1{font-size:17px!important} body.print-a6slot .invoice h1{font-size:12px!important}
-  body.print-a5slot .invoice .sub{font-size:10px!important} body.print-a6slot .invoice .sub{font-size:7px!important}
-  body.print-a6slot .invoice .center, body.print-a6slot .invoice .sign{font-size:6.7px!important}
-  body.print-a6slot .invoice .qr{max-width:42px!important;max-height:42px!important} body.print-a5slot .invoice .qr{max-width:58px!important;max-height:58px!important}
-}
-
-
-/* Elite V14: custom photo background, WhatsApp, Call, clean preview */
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  background:linear-gradient(rgba(238,244,240,.88),rgba(238,244,240,.93)), url("./app-bg.jpg") center/cover no-repeat;
-  z-index:-2;
-}
-body.dark::before{
-  background:linear-gradient(rgba(5,16,12,.86),rgba(5,16,12,.92)), url("./app-bg.jpg") center/cover no-repeat;
-}
-.logo{
-  background-image:linear-gradient(rgba(11,75,47,.25),rgba(11,75,47,.25)), url("./icon-192.png") !important;
-  background-size:cover !important;
-  background-position:center !important;
-  color:transparent !important;
-}
-.actionIcon{
-  display:inline-grid;
-  place-items:center;
-  min-width:22px;
-  height:22px;
-  border-radius:999px;
-  font-size:13px;
-  margin-right:5px;
-  font-weight:950;
-}
-.whatsappIcon{background:#25D366;color:#fff}
-.callIcon{background:#0b84ff;color:#fff}
-.userIcon{background:#e8f6ee;color:#0b4b2f}
-.ledgerIcon{background:#fff4d8;color:#b54708}
-.previewNote{font-size:11px;color:var(--muted);margin-top:5px}
-.customerActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
-.customerActions .light,.customerActions .danger{padding:8px 10px}
-
-
-/* Elite V15: Firebase Auth + secure reminders */
-.authOverlay{position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:120;display:none;align-items:center;justify-content:center;padding:16px}
-.authOverlay.show{display:flex}
-.authBox{width:100%;max-width:420px;background:#fff;border-radius:26px;padding:18px;box-shadow:0 28px 80px rgba(0,0,0,.25);border:1px solid #e4e7ec}
-body.dark .authBox{background:#101c18;border-color:#2e3b36}
-.ownerStamp{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.35}
-.secureChip{display:inline-flex;align-items:center;gap:5px;background:#e8f6ee;color:#0b4b2f;border:1px solid #bfe6ce;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:950}
-
-
-/* Elite V16: Dynamic UPI QR + premium customer UI */
-.iconBtn{display:inline-flex;align-items:center;gap:7px;border:1px solid #d8e6de;background:linear-gradient(180deg,#fff,#f6faf8);color:#182230;border-radius:14px;padding:8px 10px;font-weight:900;box-shadow:0 6px 14px rgba(16,24,40,.04)}
-body.dark .iconBtn{background:#111e1a;border-color:#2e3b36;color:#f2f4f7}
-.pIcon{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:10px;font-size:12px;font-weight:950}.pUser{background:#e7f0ff;color:#175cd3}.pBill{background:#e8f6ee;color:#0b4b2f}.pWA{background:#dcfae6;color:#079455}.pCall{background:#e0f2fe;color:#026aa2}.pSMS{background:#fff7d6;color:#b54708}.pLedger{background:#f4ebff;color:#6941c6}.pDue{background:#ffe5e5;color:#b42318}
-.customerNamePremium{font-size:18px;font-weight:950;letter-spacing:.1px}.customerMetaPremium{font-size:12px;color:var(--muted);font-weight:750}.dueBadgePremium{background:linear-gradient(135deg,#fee4e2,#fff2f1);color:#b42318;border:1px solid #fecdca;border-radius:999px;padding:8px 12px;font-weight:950}.paidBadgePremium{background:linear-gradient(135deg,#dcfae6,#f0fff4);color:#067647;border:1px solid #abefc6;border-radius:999px;padding:8px 12px;font-weight:950}
-.invoice .upiLine{font-size:10px;text-align:center;margin-top:3px}.dynamicQrLabel{font-size:10px;text-align:center;color:#0b4b2f;font-weight:900;margin-top:2px}.qrModeNote{font-size:11px;color:var(--muted);margin-top:6px}
-
-
-/* Elite V17 Lockdown Security */
-body.secureLocked main,
-body.secureLocked .nav,
-body.secureLocked .page,
-body.secureLocked .appbar .top button,
-body.secureLocked .status{
-  filter:blur(3px);
-  pointer-events:none;
-  user-select:none;
-}
-body.secureLocked #secureGate{display:flex}
-.secureGate{
-  position:fixed;inset:0;z-index:160;display:none;align-items:center;justify-content:center;
-  padding:18px;background:linear-gradient(145deg,rgba(4,33,22,.94),rgba(9,93,57,.9));
-}
-.secureGateBox{
-  width:100%;max-width:430px;background:#fff;border-radius:28px;padding:20px;
-  box-shadow:0 30px 90px rgba(0,0,0,.34);border:1px solid rgba(255,255,255,.35);
-}
-body.dark .secureGateBox{background:#101c18;border-color:#2e3b36}
-.secureGateBox h2{margin-bottom:6px}
-.secureGateBox .dangerNote{
-  background:#fff4e5;border:1px solid #fedf89;color:#93370d;padding:10px;border-radius:16px;
-  font-size:12px;margin:10px 0;
-}
-.secureBadge{
-  display:inline-flex;align-items:center;gap:6px;border-radius:999px;background:#dcfae6;color:#067647;
-  padding:6px 10px;font-size:12px;font-weight:950;margin-bottom:8px;
-}
-
-
-/* Elite V18 Strict Login Wall */
-body.authWall main,
-body.authWall .nav,
-body.authWall .appbar,
-body.authWall .page,
-body.authWall #lockScreen{
-  display:none !important;
-}
-body.authWall #strictLoginWall{display:flex !important}
-.strictLoginWall{
-  position:fixed;inset:0;z-index:999;display:none;align-items:center;justify-content:center;
-  padding:18px;background:linear-gradient(145deg,rgba(4,33,22,.94),rgba(9,93,57,.92)),url("./app-bg.jpg") center/cover no-repeat;
-}
-.strictLoginBox{
-  width:100%;max-width:440px;background:rgba(255,255,255,.96);border-radius:30px;padding:22px;
-  box-shadow:0 32px 90px rgba(0,0,0,.36);border:1px solid rgba(255,255,255,.55);
-}
-.strictLoginLogo{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.strictLoginLogo .miniLogo{width:54px;height:54px;border-radius:18px;background:url("./icon-192.png") center/cover no-repeat;border:2px solid #0b4b2f}
-.strictLoginBox h2{font-size:24px;margin:0}
-.strictLoginBox .lockNote{font-size:13px;color:#475467;line-height:1.45;margin:8px 0 14px}
-.strictWarning{background:#fff4e5;border:1px solid #fedf89;color:#93370d;padding:10px;border-radius:16px;font-size:12px;margin:10px 0}
-.strictLoginActions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
-.strictLoginActions button{flex:1;min-width:120px}
-.strictLoginStatus{font-size:12px;margin-top:8px;color:#475467}
-
-
-/* Elite V19 Premium Secure UI */
-.premiumLoginBox{
-  background:rgba(255,255,255,.97)!important;
-  padding:24px!important;
-}
-.premiumLoginBox .lockNote{font-size:13px;color:#667085;margin-top:3px}
-.premiumLoginBox .strictLoginActions button{width:100%;font-size:17px;padding:14px 16px;border-radius:18px}
-.premiumLoginBox input{height:54px;border-radius:18px}
-#strictMsg{color:#b42318;font-weight:800}
-.customerChatList{display:grid;gap:10px}
-.chatCustomer{
-  display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #e4e7ec;border-radius:20px;padding:12px;
-  box-shadow:0 8px 18px rgba(16,24,40,.04);cursor:pointer
-}
-body.dark .chatCustomer{background:#111e1a;border-color:#2e3b36}
-.chatAvatar{
-  width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-weight:950;font-size:18px;
-  color:#fff;background:linear-gradient(135deg,#0b4b2f,#0a8a57);flex:0 0 auto
-}
-.chatMain{flex:1;min-width:0}
-.chatName{font-size:16px;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.chatSub{font-size:12px;color:#667085;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.chatDue{font-size:12px;font-weight:950;border-radius:999px;padding:7px 10px;background:#fee4e2;color:#b42318}
-.chatPaid{background:#dcfae6;color:#067647}
-.chatActions{display:none;margin-top:10px;gap:7px;flex-wrap:wrap}
-.chatCustomer.open{align-items:flex-start}
-.chatCustomer.open .chatActions{display:flex}
-.chatCustomer.open .chatMain{white-space:normal}
-.fxCalc{
-  max-width:360px;margin:10px auto;background:linear-gradient(180deg,#20242d,#11151c);border-radius:28px;padding:16px;
-  box-shadow:0 20px 45px rgba(0,0,0,.25);color:white
-}
-.fxScreen{
-  background:#dfe8d4;color:#101828;border-radius:14px;min-height:72px;padding:12px;font-family:monospace;font-size:26px;
-  display:flex;align-items:end;justify-content:flex-end;margin-bottom:12px;word-break:break-all
-}
-.fxKeys{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
-.fxKeys button{border:0;border-radius:18px;padding:14px 10px;font-weight:900;font-size:18px;background:#2d333f;color:white}
-.fxKeys button.op{background:#0b7a4d}.fxKeys button.fn{background:#475467}.fxKeys button.eq{background:#f79009;color:#111}.fxKeys button.wide{grid-column:span 2}
-
-
-/* Elite V20 Premium App: clean login, admin settings, WhatsApp-style customer ledger */
-body.authWall main,
-body.authWall .nav,
-body.authWall .appbar,
-body.authWall .page,
-body.authWall #lockScreen{display:none!important}
-body.authWall #strictLoginWall{display:flex!important}
-.strictLoginWall{position:fixed!important;inset:0!important;z-index:9999!important;align-items:center;justify-content:center;padding:18px;background:linear-gradient(145deg,rgba(4,33,22,.94),rgba(9,93,57,.92)),url("./app-bg.jpg") center/cover no-repeat!important}
-.strictLoginBox{width:100%;max-width:430px;background:rgba(255,255,255,.97)!important;border-radius:30px;padding:24px!important;box-shadow:0 32px 90px rgba(0,0,0,.36);border:1px solid rgba(255,255,255,.55)}
-.strictLoginLogo{display:flex;align-items:center;gap:12px;margin-bottom:14px}.strictLoginLogo .miniLogo{width:58px;height:58px;border-radius:18px;background:url("./icon-192.png") center/cover no-repeat;border:2px solid #0b4b2f}.strictLoginBox h2{margin:0;font-size:25px}.strictLoginBox .lockNote{font-size:13px;color:#667085}.strictLoginBox input{height:54px;border-radius:18px;font-size:16px}.strictLoginActions button{width:100%;font-size:17px;padding:14px;border-radius:18px}.strictLoginStatus{font-size:12px;margin-top:8px;color:#b42318;font-weight:900}
-.adminCloudDetails{border:1px solid #d8e6de;border-radius:20px;padding:12px;background:#f7fbf8;margin-top:12px}
-.adminCloudDetails summary{font-weight:950;cursor:pointer;color:#0b4b2f}
-.adminLine{font-size:12px;color:#667085;margin-top:6px}
-.chatPage{padding:0!important;overflow:hidden}
-.chatHeader{position:sticky;top:0;z-index:8;background:rgba(255,255,255,.98);border-bottom:1px solid #e4e7ec;padding:10px 12px;display:flex;align-items:center;gap:10px}
-body.dark .chatHeader{background:#101c18;border-color:#2e3b36}
-.chatBack{border:0;background:transparent;font-size:28px;padding:4px 8px}.chatTitle{flex:1;min-width:0}.chatTitle b{font-size:17px}.chatTitle span{display:block;font-size:12px;color:#667085;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.topIcon{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;border:1px solid #d0d5dd;background:#fff;font-size:19px}
-.chatMenu{position:relative}.chatMenuPanel{display:none;position:absolute;right:0;top:44px;background:#fff;border:1px solid #e4e7ec;border-radius:18px;box-shadow:0 16px 40px rgba(16,24,40,.16);padding:8px;min-width:190px;z-index:20}.chatMenu.open .chatMenuPanel{display:grid;gap:6px}.chatMenuPanel button{justify-content:flex-start}
-.chatBody{background:linear-gradient(rgba(235,245,239,.9),rgba(235,245,239,.9)),url("./app-bg.jpg") center/cover fixed;min-height:72vh;padding:12px;display:flex;flex-direction:column;gap:10px}
-.dayChip{align-self:center;background:#fff;border-radius:999px;padding:6px 11px;color:#667085;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
-.msgBubble{max-width:88%;border-radius:18px;padding:10px 12px;box-shadow:0 2px 10px rgba(0,0,0,.06);font-size:14px;line-height:1.45}
-.msgBill{align-self:flex-end;background:#dcf8c6;border-top-right-radius:6px}.msgPay{align-self:flex-start;background:#fff;border-top-left-radius:6px}.msgDue{align-self:center;background:#fff7e6;border:1px solid #fedf89}.msgMeta{font-size:11px;color:#667085;text-align:right;margin-top:4px}.msgActions{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.msgActions button{font-size:12px;padding:6px 9px}
-.customerChatList{display:grid;gap:8px}.chatCustomer{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #e4e7ec;border-radius:19px;padding:11px;box-shadow:0 8px 18px rgba(16,24,40,.04);cursor:pointer}.chatAvatar{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-weight:950;font-size:18px;color:#fff;background:linear-gradient(135deg,#0b4b2f,#0a8a57);flex:0 0 auto}.chatMain{flex:1;min-width:0}.chatName{font-size:16px;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chatSub{font-size:12px;color:#667085;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chatDue{font-size:12px;font-weight:950;border-radius:999px;padding:7px 10px;background:#fee4e2;color:#b42318}.chatPaid{background:#dcfae6;color:#067647}
-.fxCalc{max-width:360px;margin:10px auto;background:linear-gradient(180deg,#20242d,#11151c);border-radius:28px;padding:16px;box-shadow:0 20px 45px rgba(0,0,0,.25);color:white}.fxScreen{background:#dfe8d4;color:#101828;border-radius:14px;min-height:72px;padding:12px;font-family:monospace;font-size:26px;display:flex;align-items:end;justify-content:flex-end;margin-bottom:12px;word-break:break-all}.fxKeys{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.fxKeys button{border:0;border-radius:18px;padding:14px 10px;font-weight:900;font-size:18px;background:#2d333f;color:white}.fxKeys button.op{background:#0b7a4d}.fxKeys button.fn{background:#475467}.fxKeys button.eq{background:#f79009;color:#111}.fxKeys button.wide{grid-column:span 2}
-
-
-/* Elite V21 Clean Final Overrides */
-#authScreen,#secureGate{display:none!important;visibility:hidden!important;pointer-events:none!important}
-#strictLoginWall .strictWarning,
-#strictLoginWall .dangerNote,
-#strictLoginWall button[onclick*="strictCreate"],
-#strictLoginWall button[onclick*="Create"],
-#strictLoginWall button[onclick*="strictLogout"]{display:none!important}
-#strictLoginWall .strictLoginBox{max-width:420px!important;background:rgba(255,255,255,.98)!important;border-radius:30px!important;padding:24px!important}
-#strictLoginWall h2{font-size:26px!important;margin:0!important}
-#strictLoginWall .lockNote{font-size:13px!important;color:#667085!important}
-#strictLoginWall input{height:54px!important;border-radius:18px!important;font-size:16px!important}
-#strictLoginWall .strictLoginActions{display:block!important}
-#strictLoginWall .strictLoginActions button{width:100%!important;min-width:100%!important;border-radius:18px!important;padding:14px!important;font-size:17px!important}
-#strictLoginWall #strictMsg{font-size:12px!important;color:#b42318!important;margin-top:8px!important}
-#strictLoginWall::before{content:"";position:fixed;inset:0;background:linear-gradient(145deg,rgba(4,33,22,.94),rgba(9,93,57,.90)),url("./app-bg.jpg") center/cover no-repeat;z-index:-1}
-.v21ChatList{display:grid;gap:8px}
-.v21Row{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #e4e7ec;border-radius:18px;padding:11px;box-shadow:0 8px 18px rgba(16,24,40,.04);cursor:pointer}
-.v21Avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#0b4b2f,#0a8a57);color:#fff;font-weight:950;display:grid;place-items:center;flex:0 0 auto}
-.v21Main{flex:1;min-width:0}.v21Name{font-weight:950;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v21Sub{font-size:12px;color:#667085;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v21Due{border-radius:999px;padding:7px 10px;font-weight:950;font-size:12px;background:#fee4e2;color:#b42318}.v21Paid{background:#dcfae6;color:#067647}
-.v21ChatPage{position:fixed;inset:0;z-index:90;background:#edf7f0;display:none;flex-direction:column}
-.v21ChatPage.show{display:flex}
-.v21ChatHead{height:64px;background:#fff;border-bottom:1px solid #e4e7ec;display:flex;align-items:center;gap:9px;padding:8px 10px}
-.v21Back{font-size:30px;border:0;background:transparent;padding:4px 8px}.v21HeadTitle{flex:1;min-width:0}.v21HeadTitle b{font-size:17px}.v21HeadTitle span{display:block;font-size:12px;color:#667085;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v21TopBtn{width:40px;height:40px;border-radius:50%;border:1px solid #d0d5dd;background:#fff;display:grid;place-items:center;font-size:18px}
-.v21Menu{position:relative}.v21MenuPanel{display:none;position:absolute;right:0;top:45px;min-width:190px;background:#fff;border:1px solid #e4e7ec;border-radius:18px;box-shadow:0 16px 40px rgba(0,0,0,.14);padding:8px;z-index:2}.v21Menu.open .v21MenuPanel{display:grid;gap:6px}.v21MenuPanel button{text-align:left;justify-content:flex-start}
-.v21ChatBody{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:10px;background:linear-gradient(rgba(235,245,239,.90),rgba(235,245,239,.90)),url("./app-bg.jpg") center/cover fixed}
-.v21Day{align-self:center;background:#fff;border-radius:999px;padding:6px 11px;color:#667085;font-size:12px}.v21Msg{max-width:88%;border-radius:18px;padding:10px 12px;box-shadow:0 2px 10px rgba(0,0,0,.06);font-size:14px;line-height:1.45}.v21Bill{align-self:flex-end;background:#dcf8c6;border-top-right-radius:6px}.v21Pay{align-self:flex-start;background:#fff;border-top-left-radius:6px}.v21DueMsg{align-self:center;background:#fff7e6;border:1px solid #fedf89}.v21Meta{font-size:11px;color:#667085;text-align:right;margin-top:4px}.v21MsgActions{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.v21MsgActions button{font-size:12px;padding:6px 9px}
-
-
-/* Elite V22 Stable Clean Fix */
-#authScreen,#secureGate{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}
-#strictLoginWall button[onclick*="strictCreate"],
-#strictLoginWall button[onclick*="strictLogout"],
-#strictLoginWall button[onclick*="Logout"],
-#strictLoginWall button[onclick*="Create"],
-#strictLoginWall .strictWarning,
-#strictLoginWall .dangerNote{display:none!important}
-body.authWall main,body.authWall .nav,body.authWall .appbar,body.authWall .page,body.authWall #lockScreen{display:none!important}
-body.authWall #strictLoginWall{display:flex!important}
-#strictLoginWall{position:fixed!important;inset:0!important;z-index:99999!important;align-items:center!important;justify-content:center!important;background:linear-gradient(145deg,rgba(4,33,22,.94),rgba(9,93,57,.92)),url("./app-bg.jpg") center/cover no-repeat!important}
-#strictLoginWall .strictLoginBox{width:calc(100% - 32px)!important;max-width:420px!important;background:rgba(255,255,255,.98)!important;border-radius:30px!important;padding:24px!important;box-shadow:0 32px 90px rgba(0,0,0,.36)!important}
-#strictLoginWall .strictLoginBox input{height:54px!important;border-radius:18px!important;font-size:16px!important}
-#strictLoginWall .strictLoginActions button{width:100%!important;border-radius:18px!important;padding:14px!important;font-size:17px!important}
-#strictLoginWall #strictMsg{font-size:12px!important;color:#b42318!important;margin-top:8px!important;font-weight:900!important}
-.v22List{display:grid;gap:9px}
-.v22User{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid #e4e7ec;border-radius:18px;padding:11px;box-shadow:0 8px 18px rgba(16,24,40,.04)}
-.v22Avatar{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#0b4b2f,#0a8a57);color:#fff;font-weight:950}
-.v22Main{flex:1;min-width:0}.v22Name{font-size:16px;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v22Sub{font-size:12px;color:#667085;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v22Due{font-size:12px;font-weight:950;border-radius:999px;padding:7px 10px;background:#fee4e2;color:#b42318}.v22Paid{background:#dcfae6;color:#067647}
-#v22Chat{position:fixed;inset:0;display:none;flex-direction:column;background:#edf7f0;z-index:9990}
-#v22Chat.show{display:flex}
-.v22Head{height:66px;background:#fff;border-bottom:1px solid #e4e7ec;display:flex;align-items:center;gap:9px;padding:8px 10px}
-.v22Back{border:0;background:transparent;font-size:32px;padding:4px 8px}.v22Title{flex:1;min-width:0}.v22Title b{font-size:17px}.v22Title span{display:block;font-size:12px;color:#667085;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.v22Top{width:40px;height:40px;border-radius:50%;border:1px solid #d0d5dd;background:#fff;display:grid;place-items:center;font-size:18px}
-.v22Menu{position:relative}.v22Panel{display:none;position:absolute;right:0;top:45px;background:#fff;border:1px solid #e4e7ec;border-radius:18px;box-shadow:0 16px 40px rgba(0,0,0,.14);padding:8px;min-width:190px;z-index:5}.v22Menu.open .v22Panel{display:grid;gap:6px}
-.v22Body{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:10px;background:linear-gradient(rgba(235,245,239,.92),rgba(235,245,239,.92)),url("./app-bg.jpg") center/cover fixed}
-.v22Day{align-self:center;background:#fff;border-radius:999px;padding:6px 11px;color:#667085;font-size:12px}
-.v22Msg{max-width:88%;border-radius:18px;padding:10px 12px;box-shadow:0 2px 10px rgba(0,0,0,.06);font-size:14px;line-height:1.45}.v22Bill{align-self:flex-end;background:#dcf8c6;border-top-right-radius:6px}.v22Pay{align-self:flex-start;background:#fff;border-top-left-radius:6px}.v22Center{align-self:center;background:#fff7e6;border:1px solid #fedf89}.v22Meta{font-size:11px;color:#667085;text-align:right;margin-top:4px}.v22Actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.v22Actions button{font-size:12px;padding:6px 9px}
-
-</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Asha Mini Shallow Billing</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#075c39">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-<link rel="manifest" href="./manifest.json">
-<link rel="icon" href="./icon-192.png">
-<link rel="apple-touch-icon" href="./icon-192.png">
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<style>
+:root{--green:#075c39;--green2:#0b8a57;--bg:#edf5ef;--card:#fff;--muted:#667085;--line:#e4e7ec;--danger:#b42318;--ok:#067647}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:#182230}button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}.noPrint{}
+.loginScreen{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:18px;background:linear-gradient(145deg,rgba(4,33,22,.94),rgba(9,93,57,.92)),url("./app-bg.jpg") center/cover no-repeat}
+.loginBox{width:100%;max-width:420px;background:rgba(255,255,255,.98);border-radius:30px;padding:24px;box-shadow:0 35px 100px rgba(0,0,0,.35)}
+.loginTop{display:flex;gap:12px;align-items:center;margin-bottom:16px}.loginLogo{width:58px;height:58px;border-radius:18px;background:url("./icon-192.png") center/cover no-repeat;border:2px solid var(--green)}.loginBox h1{margin:0;font-size:26px}.sub{color:var(--muted);font-size:13px}
+label{display:block;margin:12px 0 6px;font-weight:800;font-size:13px}input,select,textarea{width:100%;border:1px solid #d0d5dd;border-radius:17px;padding:12px 14px;background:#fff;outline:none}textarea{min-height:90px}.primary{border:0;background:linear-gradient(135deg,var(--green),var(--green2));color:white;border-radius:18px;padding:13px 16px;font-weight:900}.light{border:1px solid #d0d5dd;background:#fff;border-radius:16px;padding:10px 13px;font-weight:850}.danger{border:0;background:#b42318;color:white;border-radius:16px;padding:10px 13px;font-weight:850}.msg{font-size:12px;color:#b42318;margin-top:9px;font-weight:800}
+.app{min-height:100vh;padding-bottom:92px}.hero{background:linear-gradient(135deg,#064e31,#0b8a57);color:white;border-bottom-left-radius:32px;border-bottom-right-radius:32px;padding:18px 18px 22px;box-shadow:0 16px 40px rgba(7,92,57,.25)}.heroTop{display:flex;align-items:center;gap:12px}.appIcon{width:58px;height:58px;border-radius:18px;background:url("./icon-192.png") center/cover no-repeat;border:2px solid rgba(255,255,255,.35)}.hero h1{margin:0;font-size:28px}.hero .chip{display:inline-flex;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:7px 10px;font-size:12px;font-weight:900;margin-top:10px}.topActions{margin-left:auto;display:flex;gap:8px}.topActions button{border:0;background:#fff;color:#182230;border-radius:18px;padding:10px 14px;font-weight:900}
+.page{display:none;padding:18px}.page.active{display:block}.card{background:var(--card);border:1px solid var(--line);border-radius:26px;padding:16px;margin-bottom:14px;box-shadow:0 10px 24px rgba(16,24,40,.05)}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.tile{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;min-height:112px}.tile b{display:block;font-size:17px;margin-top:10px}.tile small{color:var(--muted)}.stat{font-size:28px;font-weight:950}.ok{color:var(--ok)}.bad{color:var(--danger)}
+.nav{position:fixed;left:10px;right:10px;bottom:10px;background:rgba(255,255,255,.96);border:1px solid var(--line);border-radius:28px;box-shadow:0 20px 60px rgba(16,24,40,.16);display:flex;gap:6px;justify-content:space-around;padding:8px;z-index:80}.nav button{border:0;background:transparent;border-radius:20px;padding:8px 10px;color:#344054;font-weight:850;font-size:12px}.nav button.active{background:#e8f6ee;color:#075c39}.nav i{display:block;font-size:20px}
+.row{display:flex;align-items:center;gap:10px}.right{margin-left:auto}.muted{color:var(--muted)}.pill{border-radius:999px;padding:6px 10px;font-size:12px;font-weight:900}.duePill{background:#fee4e2;color:#b42318}.paidPill{background:#dcfae6;color:#067647}
+.customerList{display:grid;gap:9px}.userRow{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:20px;padding:12px;box-shadow:0 8px 18px rgba(16,24,40,.04)}.avatar{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;display:grid;place-items:center;font-weight:950;flex:0 0 auto}.uMain{flex:1;min-width:0}.uName{font-weight:950;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.uSub{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat{position:fixed;inset:0;background:#edf7f0;z-index:200;display:none;flex-direction:column}.chat.show{display:flex}.chatHead{height:66px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;padding:8px 10px}.back{border:0;background:transparent;font-size:34px;padding:4px 8px}.chatTitle{flex:1;min-width:0}.chatTitle b{font-size:17px}.chatTitle span{font-size:12px;color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.roundBtn{width:40px;height:40px;border-radius:50%;border:1px solid #d0d5dd;background:#fff;display:grid;place-items:center;font-size:18px}.menu{position:relative}.menuPanel{display:none;position:absolute;right:0;top:45px;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 16px 40px rgba(0,0,0,.16);padding:8px;min-width:190px}.menu.open .menuPanel{display:grid;gap:6px}.chatBody{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:10px;background:linear-gradient(rgba(235,245,239,.92),rgba(235,245,239,.92)),url("./app-bg.jpg") center/cover fixed}.day{align-self:center;background:#fff;border-radius:999px;padding:6px 11px;color:var(--muted);font-size:12px}.bubble{max-width:88%;border-radius:18px;padding:10px 12px;box-shadow:0 2px 10px rgba(0,0,0,.06);font-size:14px;line-height:1.45}.billB{align-self:flex-end;background:#dcf8c6;border-top-right-radius:6px}.payB{align-self:flex-start;background:#fff;border-top-left-radius:6px}.centerB{align-self:center;background:#fff7e6;border:1px solid #fedf89}.meta{font-size:11px;color:var(--muted);text-align:right;margin-top:4px}.bubbleActions{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.bubbleActions button{font-size:12px;padding:6px 9px}
+.invoice{width:78mm;background:#fff;color:#111;border:1px solid #0b4b2f;padding:8px;margin:auto;font-family:Arial,sans-serif}.invoice h3{text-align:center;margin:2px 0 6px}.line{border-top:1px dashed #555;margin:5px 0}.item{display:flex;justify-content:space-between;border-bottom:1px solid #eee;padding:3px 0;font-size:12px}.qr{width:96px;height:96px;display:block;margin:6px auto}.printArea{background:#f8fafc;padding:12px;border-radius:20px;overflow:auto}.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.fxCalc{max-width:360px;margin:10px auto;background:linear-gradient(180deg,#20242d,#11151c);border-radius:28px;padding:16px;color:white;box-shadow:0 20px 45px rgba(0,0,0,.25)}.fxScreen{background:#dfe8d4;color:#101828;border-radius:14px;min-height:72px;padding:12px;font-family:monospace;font-size:26px;display:flex;align-items:end;justify-content:flex-end;margin-bottom:12px}.fxKeys{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.fxKeys button{border:0;border-radius:18px;padding:14px 10px;font-weight:900;font-size:18px;background:#2d333f;color:#fff}.fxKeys .op{background:#0b7a4d}.fxKeys .fn{background:#475467}.fxKeys .eq{background:#f79009;color:#111}.wide{grid-column:span 2}
+@media print{.noPrint,.hero,.nav,.page:not(.printVisible){display:none!important}.invoice{width:78mm;border:0}.printArea{padding:0}.app{padding:0}body{background:#fff}}
+</style>
 </head>
-<body class="print-thermal">
-
-<div id="strictLoginWall" class="strictLoginWall noPrint">
-  <div class="strictLoginBox">
-    <div class="strictLoginLogo">
-      <div class="miniLogo"></div>
-      <div><h2>Asha Billing</h2><div class="lockNote">Secure admin login</div></div>
-    </div>
-    <label>Email</label><input id="strictEmail" type="email" placeholder="Email" autocomplete="off">
-    <label>Password</label><input id="strictPass" type="password" placeholder="Password" autocomplete="off">
-    <div class="strictLoginActions"><button class="primary" onclick="strictLogin()">Login</button></div>
-    <div id="strictMsg" class="strictLoginStatus"></div>
-  </div>
-</div>
-    </div>
-    <label>Email</label>
-    <input id="strictEmail" type="email" placeholder="Email" autocomplete="off" inputmode="email">
-    <label>Password</label>
-    <input id="strictPass" type="password" placeholder="Password" autocomplete="off">
-    <div class="strictLoginActions">
-      <button class="primary" onclick="strictLogin()">Login</button>
-    </div>
-    <div id="strictMsg" class="strictLoginStatus"></div>
-  </div>
-</div>
-    </div>
-    <label>Email</label>
-    <input id="strictEmail" type="email" placeholder="Email" autocomplete="username">
-    <label>Password</label>
-    <input id="strictPass" type="password" placeholder="Password" autocomplete="current-password">
-    <div class="strictLoginActions">
-      <button class="primary" onclick="strictLogin()">Login</button>
-    </div>
-    <div id="strictMsg" class="strictLoginStatus"></div>
-  </div>
-</div>
-    </div>
-    <div class="strictWarning"></div>
-    <label>Email</label><input id="strictEmail" type="email" placeholder="আপনার Gmail">
-    <label>Password</label><input id="strictPass" type="password" placeholder="Password">
-    <div class="strictLoginActions">
-      <button class="primary" onclick="strictLogin()">Login</button>
-      <button class="light" onclick="strictCreate()">Create Owner Login</button>
-      <button class="light" onclick="strictLogout()">Logout</button>
-    </div>
-    <div id="strictMsg" class="strictLoginStatus">Owner UID: FZIhTAr0JEMoHCeQd3kr2t8cJKk2</div>
+<body>
+<div id="loginScreen" class="loginScreen noPrint">
+  <div class="loginBox">
+    <div class="loginTop"><div class="loginLogo"></div><div><h1>Asha Billing</h1><div class="sub">Secure admin login</div></div></div>
+    <label>Email</label><input id="loginEmail" type="email" placeholder="Email" autocomplete="off">
+    <label>Password</label><input id="loginPass" type="password" placeholder="Password" autocomplete="off">
+    <button class="primary" style="width:100%;margin-top:14px" onclick="login()">Login</button>
+    <div id="loginMsg" class="msg"></div>
   </div>
 </div>
 
+<div class="app" id="app">
+  <div class="hero noPrint">
+    <div class="heroTop"><div class="appIcon"></div><div><h1>আশা মিনি শ্যালো</h1><div class="sub" style="color:#e7fff3">Smart Billing • Cloud • Print • Call • WhatsApp</div></div>
+      <div class="topActions"><button onclick="exportBackup()">Backup</button><button onclick="installApp()">Install</button></div>
+    </div>
+    <div><span class="chip" id="authChip">Cloud Auth: checking</span> <span class="chip" id="saveChip">Auto-save enabled</span></div>
+  </div>
 
+  <section id="home" class="page active">
+    <div class="card"><h2>Dashboard</h2><div class="sub">Today collection, due, village and bank overview</div></div>
+    <div class="grid">
+      <div class="tile" onclick="nav('bill')">🧾<b>New Bill</b><small>Create bill</small></div>
+      <div class="tile" onclick="nav('customers')">👥<b>Customer</b><small>Add/search</small></div>
+      <div class="tile" onclick="nav('calc')">Σ<b>Calculator</b><small>Normal + land</small></div>
+      <div class="tile" onclick="nav('reports')">◴<b>Reports</b><small>Export data</small></div>
+    </div>
+    <div id="dashStats"></div>
+  </section>
 
+  <section id="customers" class="page">
+    <div class="card">
+      <div class="row"><h2>Customers</h2><button class="primary right" onclick="openCustomerForm()">+ Add</button></div>
+      <input id="customerSearch" placeholder="Search customer" oninput="renderCustomers()">
+    </div>
+    <div id="customerList" class="customerList"></div>
+  </section>
+
+  <section id="bill" class="page">
+    <div class="card"><h2>Generate Bill</h2>
+      <label>Customer</label><select id="billCustomer" onchange="fillBillCustomer()"></select>
+      <div class="grid"><div><label>Season</label><select id="billSeason"><option>খরা</option><option>বর্ষা</option><option>বোরো</option><option>আমন</option></select></div><div><label>Land</label><input id="billLand" type="number" step="0.01" value="0"></div></div>
+      <div class="grid"><div><label>Unit</label><select id="billUnit"><option value="katha">কাঠা</option><option value="bigha">বিঘা</option><option value="decimal">ডেসিমেল</option></select></div><div><label>Rate / Bigha</label><input id="billRate" type="number" value="2200"></div></div>
+      <div class="grid"><div><label>Paid</label><input id="billPaid" type="number" value="0"></div><div><label>Payment Mode</label><select id="billPayMode"><option>Cash</option><option>Online</option><option>Bank</option></select></div></div>
+      <label>Note</label><input id="billNote" placeholder="Optional note">
+      <div class="actions"><button class="primary" onclick="saveBill()">Save Bill</button><button class="light" onclick="previewBill()">Preview</button></div>
+    </div>
+    <div class="printArea"><div id="invoiceBox"></div></div>
+    <div class="actions"><button class="light" onclick="printBill()">Print</button><button class="light" onclick="shareBillImage()">Bill+WA</button><button class="light" onclick="downloadPDF()">PDF</button></div>
+  </section>
+
+  <section id="pay" class="page">
+    <div class="card"><h2>Payment</h2><label>Bill</label><select id="payBill"></select><div class="grid"><div><label>Amount</label><input id="payAmount" type="number"></div><div><label>Mode</label><select id="payMode"><option>Cash</option><option>Online</option><option>Bank</option></select></div></div><label>Received In</label><input id="payIn" value="Cash"><button class="primary" style="margin-top:10px" onclick="savePayment()">Save Payment</button></div>
+  </section>
+
+  <section id="history" class="page"><div class="card"><h2>Bill History</h2></div><div id="historyList"></div></section>
+  <section id="reports" class="page"><div class="card"><h2>Reports</h2><div id="reportBox"></div><button class="light" onclick="exportCSV()">Export Monthly CSV</button></div></section>
+  <section id="ledger" class="page"><div class="card"><h2>Ledger</h2><select id="ledgerCustomer" onchange="renderLedger()"></select><div id="ledgerBox"></div></div></section>
+
+  <section id="calc" class="page">
+    <div class="card"><h2>Premium Calculator</h2><div class="fxCalc"><div id="fxScreen" class="fxScreen">0</div><div class="fxKeys">
+      <button class="fn" onclick="fx('C')">AC</button><button class="fn" onclick="fx('⌫')">DEL</button><button class="op" onclick="fx('%')">%</button><button class="op" onclick="fx('÷')">÷</button>
+      <button onclick="fx('7')">7</button><button onclick="fx('8')">8</button><button onclick="fx('9')">9</button><button class="op" onclick="fx('×')">×</button>
+      <button onclick="fx('4')">4</button><button onclick="fx('5')">5</button><button onclick="fx('6')">6</button><button class="op" onclick="fx('-')">−</button>
+      <button onclick="fx('1')">1</button><button onclick="fx('2')">2</button><button onclick="fx('3')">3</button><button class="op" onclick="fx('+')">+</button>
+      <button class="wide" onclick="fx('0')">0</button><button onclick="fx('.')">.</button><button class="eq" onclick="fx('=')">=</button>
+    </div></div></div>
+    <div class="card"><h2>Land Calculator</h2><div class="grid"><div><label>Land</label><input id="landCalc" type="number" value="0" oninput="landOut()"></div><div><label>Unit</label><select id="landUnit" onchange="landOut()"><option value="bigha">বিঘা</option><option value="katha">কাঠা</option><option value="decimal">ডেসিমেল</option></select></div></div><label>Rate</label><input id="landRate" type="number" value="2200" oninput="landOut()"><div id="landResult" class="card"></div></div>
+  </section>
+
+  <section id="settings" class="page">
+    <div class="card"><h2>Settings</h2><label>Company</label><input id="setCompany"><label>Owner</label><input id="setOwner"><label>Contact</label><input id="setContact"><label>Address</label><textarea id="setAddress"></textarea><label>UPI ID</label><input id="setUpi"><label>Payee Name</label><input id="setPayee"><label>QR Mode</label><select id="setQrMode"><option value="dynamic">Dynamic due amount QR</option><option value="static">Uploaded static QR</option></select><button class="primary" style="margin-top:12px" onclick="saveSettings()">Save Settings</button></div>
+    <details class="card"><summary><b>Admin Cloud & Security</b></summary><div class="sub">Only admin can manage cloud and password.</div><label>Auto Cloud Sync</label><select id="setAuto"><option value="on">On</option><option value="off">Off</option></select><label>Change Admin Password</label><input id="newPass" type="password" placeholder="New password"><div class="actions"><button class="primary" onclick="changePassword()">Change Password</button><button class="light" onclick="cloudTest()">Test</button><button class="light" onclick="pullCloud()">Pull</button><button class="light" onclick="pushCloud(true)">Push</button><button class="light" onclick="logout()">Logout</button></div><div id="cloudStatus" class="sub"></div></details>
+  </section>
 </div>
 
-<div id="lockScreen" class="lock">
-  <div class="lockbox">
-    <h2>🔐 Asha Billing Lock</h2>
-    <p class="muted">PIN দিন। PIN set না থাকলে Settings থেকে set করতে পারবেন।</p>
-    <label>PIN</label><input id="unlockPin" type="password" inputmode="numeric" placeholder="Enter PIN">
-    <div class="row" style="margin-top:12px"><button class="primary" onclick="unlockApp()">Unlock</button></div>
-    <div id="lockMsg" class="bad tiny" style="margin-top:8px"></div>
-  </div>
+<div class="nav noPrint" id="nav">
+  <button class="active" onclick="nav('home')"><i>⌂</i>Home</button><button onclick="nav('customers')"><i>●</i>Users</button><button onclick="nav('bill')"><i>▣</i>Bill</button><button onclick="nav('pay')"><i>₹</i>Pay</button><button onclick="nav('history')"><i>◴</i>History</button><button onclick="nav('settings')"><i>⚙</i>Set</button>
 </div>
 
+<div id="chat" class="chat noPrint"><div class="chatHead"><button class="back" onclick="closeChat()">‹</button><div class="avatar" id="chatAv">?</div><div class="chatTitle"><b id="chatName">Customer</b><span id="chatSub">Phone • Village</span></div><button class="roundBtn" id="chatBillWA">▣</button><button class="roundBtn" id="chatCall">☎</button><button class="roundBtn" id="chatWA">☘</button><div class="menu" id="chatMenu"><button class="roundBtn" onclick="toggleChatMenu()">⋮</button><div class="menuPanel"><button class="light" id="mEdit">Edit User</button><button class="light" id="mPay">Receive Due</button><button class="light" id="mSMS">SMS Reminder</button><button class="light" id="mLedger">Ledger</button></div></div></div><div class="chatBody" id="chatBody"></div></div>
 
-</div>
-    <label>Email</label><input id="authEmail" type="email" placeholder="owner@example.com">
-    <label>Password</label><input id="authPass" type="password" placeholder="Password">
-    <div class="row" style="margin-top:12px">
-      <button class="primary" onclick="authLogin()">Login</button>
-      <button class="light" onclick="authSignup()">Create Login</button>
-      <button class="light" onclick="hideAuth()">Later</button>
-    </div>
-    <div id="authMsg" class="tiny" style="margin-top:8px"></div>
-  </div>
-</div>
-
-<header class="appbar noPrint">
-  <div class="top">
-    <div class="logo">AS</div>
-    <div><h1 id="headCompany">আশা মিনি শ্যালো</h1><p>Smart Billing • Cloud • Print • Call • WhatsApp</p></div>
-    <button class="light right" onclick="exportData()">Backup</button><button class="light" onclick="installInfo()">Install</button>
-  </div>
-  <div class="status" id="appStatus"><span id="authStatus" class="secureChip">Cloud Auth: checking</span> <span class="premiumRibbon">Auto-save enabled</span> Data locally saved. <span id="backupStatus"></span></div>
-</header>
-
-<main class="wrap">
-<section id="dashboard" class="page active">
-  <div class="grid">
-    <div class="span-12 card">
-      <div class="row"><div><h2>Dashboard</h2><div class="muted">Today collection, due, village and bank overview</div></div><select id="dashSeason" class="right" style="max-width:160px"></select><select id="dashMonth" style="max-width:160px"></select></div>
-    </div>
-    <div class="span-12 card noPrint"><div class="quickActions">
-      <button class="quickAction" onclick="navTo('bill')"><span>▣</span><b>New Bill</b><div class="tiny">Create bill</div></button>
-      <button class="quickAction" onclick="navTo('customers')"><span>◉</span><b>Customer</b><div class="tiny">Add/search</div></button>
-      <button class="quickAction" onclick="navTo('calculator')"><span>∑</span><b>Calculator</b><div class="tiny">Normal + land</div></button>
-      <button class="quickAction" onclick="navTo('reports')"><span>◷</span><b>Reports</b><div class="tiny">Export data</div></button>
-      <button class="quickAction" onclick="navTo('ledger')"><span>☷</span><b>Ledger</b><div class="tiny">Customer account</div></button>
-    </div></div>
-    <div class="span-3 stat"><div class="label">Total Bill</div><b id="stTotal">₹0</b></div>
-    <div class="span-3 stat"><div class="label">Collected</div><b id="stPaid" class="ok">₹0</b></div>
-    <div class="span-3 stat"><div class="label">Due</div><b id="stDue" class="bad">₹0</b></div>
-    <div class="span-3 stat"><div class="label">Bills</div><b id="stBills">0</b></div>
-    <div class="span-4 card"><h3>Bank-wise Collection</h3><div id="bankSummary"></div></div>
-    <div class="span-4 card"><h3>Village-wise Due</h3><div id="villageSummary"></div></div>
-    <div class="span-4 card"><h3>Top Due Customers</h3><div id="dueSummary"></div></div>
-  </div>
-</section>
-
-<section id="customers" class="page">
-  <div class="grid">
-    <div class="span-5 card">
-      <h2 id="custTitle">Add Customer</h2><input id="custId" type="hidden">
-      <label>Name</label><input id="custName" placeholder="Customer name">
-      <label>Phone</label><input id="custPhone" placeholder="10 digit mobile">
-      <label>Village</label><input id="custVillage" placeholder="Village">
-      <label>Address</label><textarea id="custAddress"></textarea>
-      <label>Opening Due ₹</label><input id="custOpeningDue" type="number" step="0.01" value="0">
-      <label>Note</label><textarea id="custNote"></textarea>
-      <div class="row" style="margin-top:12px"><button class="primary" onclick="saveCustomer()">Save Customer</button><button class="light" onclick="clearCustomerForm()">Clear</button></div>
-    </div>
-    <div class="span-7 card">
-      <div class="row"><h2>Customer List</h2><button class="light right" onclick="exportCustomersCSV()">Export</button></div>
-      <div class="searchBox"><span>🔎</span><input id="customerSearch" oninput="renderCustomers()" placeholder="Search name / phone / village"></div>
-      <div id="customerList"></div>
-    </div>
-  </div>
-</section>
-
-<section id="bill" class="page">
-  <div class="grid">
-    <div class="span-5 card noPrint">
-      <h2>New Bill</h2>
-      <label>Print Size</label><select id="printMode" onchange="setPrintMode(this.value);renderInvoice()">
-        <option value="thermal">Bluetooth Thermal 80mm</option>
-        <option value="a5slot">2 Bills on A4 (A5 = 210 × 148.5 mm)</option>
-        <option value="a6slot">4 Bills on A4 (A6 = 105 × 148.5 mm)</option>
-        <option value="a4side">A4 Side Half — Left Side Full Bill</option>
-        <option value="a4landscape">A4 Landscape Half — Left Side</option>
-        <option value="a4half">A4 Half Page</option>
-        <option value="a4quarter">A4 Quarter Page</option>
-        <option value="thermalText">Thermal Text for Printer App</option>
-      </select>
-      <div class="cleanMini" style="margin-top:4px">A5/A6 mode standard A4 slot size follow করবে। A4 Side mode-এ bill left side-এ থাকবে।</div>
-      <label>Customer</label><select id="billCustomer" onchange="fillCustomerBill()"></select>
-      <div class="row" style="margin-top:8px"><button class="light" onclick="navTo('customers')">+ New Customer</button></div>
-      <label>Season</label><select id="billSeason" onchange="applySeasonRate();calcBill()"></select>
-      <div class="calcGrid"><div><label>Land Amount</label><input id="landAmount" type="number" step="0.01" value="0" oninput="calcBill()"></div><div><label>Unit</label><select id="landUnit" onchange="calcBill()"><option value="bigha">বিঘা</option><option value="katha">কাঠা</option><option value="decimal">ডেসিমেল</option></select></div></div>
-      <label>Rate per Bigha ₹</label><input id="ratePerBigha" type="number" step="0.01" oninput="calcBill()">
-      <div class="calcGrid"><div><label>Previous Due ₹</label><input id="prevDue" type="number" step="0.01" value="0" oninput="calcBill()"></div><div><label>Paid Now ₹</label><input id="paidAmount" type="number" step="0.01" value="0" oninput="calcBill()"></div></div>
-      <label>Payment Mode</label><select id="payMode"><option>Cash</option><option>Online</option><option>Cash + Online</option><option>Not Paid</option></select>
-      <label>Received In / Bank / UPI</label><input id="receivedIn" placeholder="Cash / SBI / UPI / PhonePe">
-      <label>Note</label><textarea id="billNote"></textarea>
-      <div class="notice" id="calcBox">Calculation...</div>
-      <div class="row" style="margin-top:12px"><button class="primary" onclick="saveBill()">Save Bill</button><button class="secondary" onclick="smartPrint()">Print Modern</button><button class="light" onclick="downloadBillPDF()">PDF</button><button class="light" onclick="downloadBillImage()">Image</button><button class="light" onclick="shareBillImage()">WhatsApp Image</button><button class="light" onclick="resetBillForm()">Normal Preview</button></div>
-    </div>
-    <div class="span-7 card">
-      <div class="row noPrint"><h2>Bill Preview</h2><button class="light right" onclick="downloadBillImage()">Image</button><button class="secondary" onclick="smartPrint()">Print</button></div><div class="previewNote noPrint">Form edit করলে preview normal/current bill দেখাবে; History থেকে View করলে saved bill দেখাবে।</div>
-      <div class="invoiceWrap" id="invoicePreview"></div>
-    </div>
-  </div>
-</section>
-
-<section id="payments" class="page">
-  <div class="card">
-    <div class="row"><h2>Partial Payments / Due Payment</h2><input id="paymentSearch" class="right" oninput="renderPayments()" placeholder="Search due bills" style="max-width:320px"></div>
-    <div id="paymentList"></div>
-  </div>
-</section>
-
-<section id="history" class="page">
-  <div class="card">
-    <div class="row"><h2>Bill History</h2><button class="light right" onclick="exportBillsCSV()">Export CSV</button></div>
-    <div class="searchBox"><span>🔎</span><input id="historySearch" oninput="renderHistory()" placeholder="Search bill no / name / phone / village"></div>
-    <div id="historyList"></div>
-  </div>
-</section>
-
-
-<section id="ledger" class="page">
-  <div class="grid">
-    <div class="span-12 card">
-      <div class="row"><div><h2>Customer Ledger</h2><div class="muted">একজন customer-এর সব bill, payment, due এক জায়গায়</div></div><select id="ledgerCustomer" class="right" style="max-width:360px" onchange="renderLedger()"></select><button class="light" onclick="exportLedgerCSV()">Export Ledger</button></div>
-      <div id="ledgerBox"></div>
-    </div>
-  </div>
-</section>
-
-<section id="reports" class="page">
-  <div class="grid">
-    <div class="span-6 card"><h2>Reports</h2><div class="row"><select id="reportMonth"></select><button class="primary" onclick="exportMonthlyCSV()">Monthly CSV</button><button class="light" onclick="exportBillsCSV()">All Bills CSV</button></div><div class="actionGrid" style="margin-top:10px"><button class="light" onclick="dataHealthCheck()">Data Check</button><button class="light" onclick="printReport()">Print Report</button><button class="light" onclick="exportData()">Backup Now</button></div><div class="resultBox" id="reportBox" style="margin-top:12px"></div></div>
-    <div class="span-6 card"><h2>Village Report</h2><div id="villageReport"></div></div>
-    <div class="span-6 card"><h2>Bank-wise Report</h2><div id="bankReport"></div></div>
-    <div class="span-6 card"><h2>Due List</h2><div id="dueReport"></div></div>
-  </div>
-</section>
-
-<section id="calculator" class="page">
-  <div class="grid">
-    <div class="span-6 card">
-      <h2>Premium Calculator</h2>
-      <div class="fxCalc"><div id="fxScreen" class="fxScreen">0</div><div class="fxKeys">
-        <button class="fn" onclick="fxPress('C')">AC</button><button class="fn" onclick="fxPress('⌫')">DEL</button><button class="op" onclick="fxPress('%')">%</button><button class="op" onclick="fxPress('÷')">÷</button>
-        <button onclick="fxPress('7')">7</button><button onclick="fxPress('8')">8</button><button onclick="fxPress('9')">9</button><button class="op" onclick="fxPress('×')">×</button>
-        <button onclick="fxPress('4')">4</button><button onclick="fxPress('5')">5</button><button onclick="fxPress('6')">6</button><button class="op" onclick="fxPress('-')">−</button>
-        <button onclick="fxPress('1')">1</button><button onclick="fxPress('2')">2</button><button onclick="fxPress('3')">3</button><button class="op" onclick="fxPress('+')">+</button>
-        <button class="wide" onclick="fxPress('0')">0</button><button onclick="fxPress('.')">.</button><button class="eq" onclick="fxPress('=')">=</button>
-      </div></div>
-    </div>
-    <div class="span-6 card">
-      <h2>Land Calculator</h2><div class="muted">1 বিঘা = 20 কাঠা = 40 ডেসিমেল</div>
-      <div class="calcGrid"><div><label>Land</label><input id="calcLand" type="number" step="0.01" value="0" oninput="runLandCalc()"></div><div><label>Unit</label><select id="calcUnit" onchange="runLandCalc()"><option value="bigha">বিঘা</option><option value="katha">কাঠা</option><option value="decimal">ডেসিমেল</option></select></div><div><label>Rate ₹/Bigha</label><input id="calcRate" type="number" step="0.01" value="2200" oninput="runLandCalc()"></div><div><label>Paid ₹</label><input id="calcPaid" type="number" step="0.01" value="0" oninput="runLandCalc()"></div></div>
-      <div class="resultBox" id="landCalcOut" style="margin-top:12px"></div>
-    </div>
-  </div>
-</section>
-
-<section id="settings" class="page">
-  <div class="grid">
-    <div class="span-6 card">
-      <h2>Business Settings</h2>
-      <label>Company</label><input id="setCompany"><label>Proprietor</label><input id="setOwner"><label>Contact</label><input id="setContact"><label>Address</label><textarea id="setAddress"></textarea>
-      <label>Default Rate ₹/Bigha</label><input id="setRate" type="number">
-      <div class="calcGrid"><div><label>খরা Rate</label><input id="rateKhora" type="number"></div><div><label>বর্ষা Rate</label><input id="rateBorsha" type="number"></div><div><label>বোরো Rate</label><input id="rateBoro" type="number"></div><div><label>আমন Rate</label><input id="rateAman" type="number"></div></div>
-      <label>UPI ID</label><input id="setUpi"><label>Payee Name for UPI QR</label><input id="setPayeeName" placeholder="SK ENAMUL HAQUE"><label>QR Mode in Bill</label><select id="setQrMode"><option value="dynamic">Dynamic UPI QR with due amount</option><option value="static">Uploaded static QR image</option></select><div class="qrModeNote">Dynamic mode-এ bill/due amount অনুযায়ী QR তৈরি হবে। Static mode-এ upload করা QR ব্যবহার হবে।</div><label>Default Note</label><textarea id="setNote"></textarea>
-      <div class="row" style="margin-top:12px"><button class="primary" onclick="saveSettings()">Save Settings</button></div>
-    </div>
-    <div class="span-6 card">
-      <h2>QR / Security / Backup</h2>
-      <label>Upload UPI QR</label><input id="qrFile" type="file" accept="image/*" onchange="uploadQR(event)"><div id="qrPreviewBox" style="margin:12px 0"></div>
-      <label>Set / Change PIN</label><input id="setPin" type="password" inputmode="numeric" placeholder="New PIN">
-      <div class="row" style="margin-top:10px"><button class="secondary" onclick="savePin()">Save PIN</button><button class="light" onclick="removePin()">Remove PIN</button><button class="light" onclick="lockNow()">Lock Now</button></div>
-      <label>Theme</label><select id="setTheme" onchange="saveThemeNow()"><option value="light">Light Premium</option><option value="dark">Dark Premium</option></select>
-      <label>Bill Template</label><select id="setTemplate" onchange="saveThemeNow()"><option value="classic">Classic Clean</option><option value="modern">Modern Premium</option></select>
-      <label>Auto Backup Reminder</label><select id="setBackupReminder" onchange="saveThemeNow()"><option value="on">On</option><option value="off">Off</option></select>
-      <hr style="border:0;border-top:1px solid #e4e7ec;margin:14px 0">
-      <div class="row"><button class="secondary" onclick="exportData()">Export Backup</button><button class="light" onclick="importFile.click()">Import Backup</button><input id="importFile" class="hidden" type="file" accept="application/json" onchange="importData(event)"></div>
-      <details class="adminCloudDetails">
-        <summary>Admin Cloud & Security</summary>
-        <div class="adminLine">Only admin can manage cloud sync and password.</div>
-        <label>Firebase Config JSON</label><textarea id="setFirebaseConfig" placeholder='{"apiKey":"...","authDomain":"...","projectId":"..."}'></textarea>
-        <label>Cloud Doc ID</label><input id="setCloudDocId" placeholder="ekramul-main">
-        <label>Auto Cloud Sync</label><select id="setCloudAuto"><option value="off">Off</option><option value="on">On</option></select>
-        <input id="setOwnerUid" type="hidden">
-        <label>Change Admin Password</label><input id="adminNewPass" type="password" placeholder="New password">
-        <div class="row" style="margin-top:10px">
-          <button class="primary" onclick="saveCloudSettings()">Save Cloud</button>
-          <button class="light" onclick="changeAdminPassword()">Change Password</button>
-          <button class="light" onclick="testCloud()">Test</button>
-          <button class="light" onclick="cloudPush(true)">Push</button>
-          <button class="light" onclick="cloudPull()">Pull</button>
-          <button class="light" onclick="authLogout()">Logout</button>
-        </div>
-        <div id="cloudStatus" class="tiny" style="margin-top:8px">Cloud not configured.</div>
-      </details>
-      <div class="notice" style="margin-top:12px">QR add না হলে browser storage full হতে পারে। ছোট QR image ব্যবহার করুন।</div>
-    </div>
-  </div>
-</section>
-</main>
-
-<nav class="nav noPrint">
-  <button class="active" data-page="dashboard" onclick="navTo('dashboard')"><span>⌂</span>Home</button>
-  <button data-page="customers" onclick="navTo('customers')"><span>◉</span>Users</button>
-  <button data-page="bill" onclick="navTo('bill')"><span>▣</span>Bill</button>
-  <button data-page="payments" onclick="navTo('payments')"><span>₹</span>Pay</button>
-  <button data-page="history" onclick="navTo('history')"><span>◷</span>History</button>
-  <button data-page="reports" onclick="navTo('reports')"><span>▤</span>Reports</button>
-  <button data-page="ledger" onclick="navTo('ledger')"><span>☷</span>Ledger</button>
-  <button data-page="calculator" onclick="navTo('calculator')"><span>∑</span>Calc</button>
-  <button data-page="settings" onclick="navTo('settings')"><span>⚙</span>Set</button>
-</nav>
-
-<div id="paymentModal" class="modal">
-  <div class="modalBox">
-    <h2>Add Due Payment</h2><input id="payBillId" type="hidden">
-    <div id="payBillInfo" class="resultBox"></div>
-    <label>Payment Amount ₹</label><input id="modalPayAmount" type="number" step="0.01">
-    <label>Payment Mode</label><select id="modalPayMode"><option>Cash</option><option>Online</option><option>Cash + Online</option></select>
-    <label>Received In / Bank / UPI</label><input id="modalReceivedIn" placeholder="Cash / SBI / UPI">
-    <label>Note</label><textarea id="modalPayNote"></textarea>
-    <div class="row" style="margin-top:12px"><button class="primary" onclick="confirmPayment()">Save Payment</button><button class="light" onclick="closePaymentModal()">Cancel</button></div>
-  </div>
-</div>
+<div id="customerModal" class="loginScreen hidden noPrint"><div class="loginBox"><h2 id="customerFormTitle">Customer</h2><input type="hidden" id="custId"><label>Name</label><input id="custName"><label>Phone</label><input id="custPhone"><label>Village</label><input id="custVillage"><label>Address</label><textarea id="custAddress"></textarea><label>Opening Due</label><input id="custDue" type="number" value="0"><div class="actions"><button class="primary" onclick="saveCustomer()">Save</button><button class="light" onclick="closeCustomerForm()">Cancel</button></div></div></div>
 
 <script>
-const KEY="ashaMiniShallowEliteV13";
-const $=id=>document.getElementById(id);
-const money=n=>"₹"+(Number(n||0).toLocaleString("en-IN",{maximumFractionDigits:2}));
-const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
-const today=()=>new Date().toISOString().slice(0,10);
-const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
-let fbApp=null, fbDb=null, cloudTimer=null;
-function defaultState(){return{settings:{company:"আশা মিনি শ্যালো",owner:"SK EKRAMUL Haque",contact:"9564061920",address:"Raghunathpur, Chaklachipur, Ghatal, Paschim Medinipur, 721232",defaultRate:2200,upi:"8710065540@axl",payeeName:"SK ENAMUL HAQUE",qrMode:"dynamic",note:"ধন্যবাদ। সময়মতো বিল পরিশোধ করার জন্য অনুরোধ করা হচ্ছে।",qrImage:"",pin:"",theme:"light",template:"classic",backupReminder:"on",lastBackup:"",firebaseConfig:"",cloudDocId:"owner-main",cloudAutoSync:"off",ownerUid:"",seasonRates:{"খরা":2200,"বর্ষা":0,"বোরো":0,"আমন":0}},seasons:["খরা","বর্ষা","বোরো","আমন"],customers:[],bills:[]}}
-let state=loadState();let currentBillForPreview=null;
-function loadState(){
-  try{
-    let data=JSON.parse(localStorage.getItem(KEY));
-    if(data) return normalizeState(data);
-    const oldKeys=["ashaMiniShallowEliteV13","ashaMiniShallowProV12","ashaMiniShallowProV11","ashaMiniShallowProV10","ashaMiniShallowProV8","ashaMiniShallowProV7","ashaMiniShallowCloudV3","ashaMiniShallowV1"];
-    for(const k of oldKeys){ const old=JSON.parse(localStorage.getItem(k)||"null"); if(old) return normalizeState(old);}    
-    return defaultState();
-  }catch(e){return defaultState()}
-}
-function normalizeState(s){
-  const d=defaultState();
-  s=s||d; s.settings=Object.assign({},d.settings,s.settings||{});
-  s.settings.seasonRates=Object.assign({},d.settings.seasonRates,s.settings.seasonRates||{});
-  s.seasons=s.seasons||d.seasons; s.customers=s.customers||[]; s.bills=s.bills||[];
-  s.bills.forEach(b=>{if(!b.payments){b.payments=[]; if(b.paid>0)b.payments.push({id:uid(),date:b.date||today(),amount:+b.paid||0,mode:b.payMode||"Cash",receivedIn:b.receivedIn||"",note:"Migrated payment"});}});
-  return s;
-}
-function saveState(){localStorage.setItem(KEY,JSON.stringify(state));applyTheme();refreshAll();if(state.settings.cloudAutoSync==="on") scheduleCloudPush();}
-function navTo(page){document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));$(page).classList.add("active");document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));refreshAll(false); if(page==="ledger")renderLedger(); if(page==="customerChat")renderCustomerChat()}
-function refreshAll(recalc=true){$("headCompany").textContent=state.settings.company;fillSelects();loadSettings();renderDashboard();renderCustomers();renderHistory();renderPayments();renderReports();if(recalc)calcBill()}
-function fillSelects(){
-  $("dashSeason").innerHTML='<option>All</option>'+state.seasons.map(s=>`<option>${s}</option>`).join("");
-  const months=[...new Set(state.bills.map(b=>(b.date||"").slice(0,7)).filter(Boolean))].sort().reverse();
-  $("dashMonth").innerHTML='<option>All Months</option>'+months.map(m=>`<option>${m}</option>`).join("");
-  $("reportMonth").innerHTML='<option>All Months</option>'+months.map(m=>`<option>${m}</option>`).join("");
-  const old=$("billCustomer").value;
-  $("billCustomer").innerHTML='<option value="">-- Select Customer --</option>'+state.customers.map(c=>`<option value="${c.id}">${esc(c.name)} — ${esc(c.phone||"")}</option>`).join("");
-  if(old)$("billCustomer").value=old;
-  const ledOld=$("ledgerCustomer")?.value||"";
-  if($("ledgerCustomer")){$("ledgerCustomer").innerHTML='<option value="">-- Select Customer --</option>'+state.customers.map(c=>`<option value="${c.id}">${esc(c.name)} — ${esc(c.phone||"")}</option>`).join(""); if(ledOld)$("ledgerCustomer").value=ledOld;}
-  $("billSeason").innerHTML=state.seasons.map(s=>`<option>${s}</option>`).join("");
-  if(!$("ratePerBigha").value)$("ratePerBigha").value=state.settings.defaultRate||0;
-  if(!$("receivedIn").value)$("receivedIn").value="Cash";
-}
-$("dashSeason").addEventListener("change",renderDashboard);$("dashMonth").addEventListener("change",renderDashboard);
-function filteredBills(){const s=$("dashSeason").value||"All",m=$("dashMonth").value||"All Months";return state.bills.filter(b=>(s==="All"||b.season===s)&&(m==="All Months"||(b.date||"").startsWith(m)))}
-function sum(arr,key){return arr.reduce((a,b)=>a+(+b[key]||0),0)}
-function paymentsOf(b){return b.payments||[]}
-function billPaid(b){return paymentsOf(b).reduce((a,p)=>a+(+p.amount||0),0)}
-function billDue(b){return Math.max((+b.allTotal||0)-billPaid(b),0)}
-function billStatus(b){const due=billDue(b), paid=billPaid(b);return due<=0&&b.allTotal>0?"Paid":paid>0?"Partial":"Due"}
-function renderDashboard(){
-  const bs=filteredBills(),total=sum(bs,"allTotal"),paid=bs.reduce((a,b)=>a+billPaid(b),0),due=bs.reduce((a,b)=>a+billDue(b),0);
-  $("stTotal").textContent=money(total);$("stPaid").textContent=money(paid);$("stDue").textContent=money(due);$("stBills").textContent=bs.length;
-  $("bankSummary").innerHTML=listSummary(groupPayments("bank",bs),"No collection.");
-  $("villageSummary").innerHTML=listSummary(groupDue("village",bs),"No due.");
-  $("dueSummary").innerHTML=listSummary(groupDue("customerName",bs),"No due.");
-}
-function groupDue(field,bs){const o={};bs.forEach(b=>{const d=billDue(b);if(d>0)o[b[field]||"Unknown"]=(o[b[field]||"Unknown"]||0)+d});return o}
-function groupPayments(type,bs){const o={};bs.forEach(b=>paymentsOf(b).forEach(p=>{const k=p.receivedIn||p.mode||"Unknown";o[k]=(o[k]||0)+(+p.amount||0)}));return o}
-function listSummary(o,empty){const rows=Object.entries(o).sort((a,b)=>b[1]-a[1]);return rows.length?rows.slice(0,8).map(([k,v])=>`<div class="kv"><span>${esc(k)}</span><b>${money(v)}</b></div>`).join(""):`<p class="muted">${empty}</p>`}
-function saveCustomer(){
-  const c={id:$("custId").value||uid(),name:$("custName").value.trim(),phone:$("custPhone").value.trim(),village:$("custVillage").value.trim(),address:$("custAddress").value.trim(),openingDue:+$("custOpeningDue").value||0,note:$("custNote").value.trim()};
-  if(!c.name){alert("Customer name দিন");return}
-  const i=state.customers.findIndex(x=>x.id===c.id); if(i>=0)state.customers[i]=c; else state.customers.push(c);
-  clearCustomerForm(); saveState(); alert("Customer saved");
-}
-
-function resetBillForm(){
-  currentBillForPreview=null;
-  $("billCustomer").value="";
-  $("landAmount").value=0;
-  $("landUnit").value="bigha";
-  $("ratePerBigha").value=state.settings.defaultRate||0;
-  $("prevDue").value=0;
-  $("paidAmount").value=0;
-  $("payMode").value="Cash";
-  $("receivedIn").value="Cash";
-  $("billNote").value="";
-  calcBill();
-}
-function callCustomer(id){
-  const c=state.customers.find(x=>x.id===id);
-  if(!c || !c.phone){alert("এই customer-এর phone number নেই");return;}
-  const p=sanitizePhone(c.phone);
-  window.location.href="tel:+"+p;
-}
-function ownerDetailsText(){
-  const s=state.settings;
-  return `\n\n--\n${s.company}\nPro: ${s.owner}\nContact/WhatsApp: ${s.contact}\nAddress: ${s.address}\nUPI: ${s.upi}`;
-}
-function reminderText(c,due){
-  return `আসসালামু আলাইকুম ${c.name},\nআপনার ${state.settings.company} এর বর্তমান বাকি/Due: ${money(due)}\nঅনুগ্রহ করে সুবিধামতো পরিশোধ করুন।${ownerDetailsText()}`;
-}
-function whatsappCustomer(id){
-  const c=state.customers.find(x=>x.id===id);
-  if(!c || !c.phone){alert("এই customer-এর phone number নেই");return;}
-  const txt=reminderText(c,customerDue(id));
-  window.open("https://wa.me/"+sanitizePhone(c.phone)+"?text="+encodeURIComponent(txt),"_blank");
-}
-function smsCustomer(id){
-  const c=state.customers.find(x=>x.id===id);
-  if(!c || !c.phone){alert("এই customer-এর phone number নেই");return;}
-  const txt=reminderText(c,customerDue(id));
-  window.location.href="sms:+"+sanitizePhone(c.phone)+"?body="+encodeURIComponent(txt);
-}
-async function whatsappReminderImage(id){
-  const c=state.customers.find(x=>x.id===id);
-  if(!c || !c.phone){alert("এই customer-এর phone number নেই");return;}
-  quickBill(id);
-  await new Promise(r=>setTimeout(r,350));
-  const blob=await invoiceBlob();
-  const txt=reminderText(c,customerDue(id));
-  if(blob && navigator.canShare){
-    const file=new File([blob],"asha_due_bill.png",{type:"image/png"});
-    if(navigator.canShare({files:[file]})){
-      try{await navigator.share({files:[file],text:txt,title:"Asha Mini Shallow Bill"});return;}catch(e){}
-    }
-  }
-  if(blob) downloadBlob(blob,"asha_due_bill.png");
-  window.open("https://wa.me/"+sanitizePhone(c.phone)+"?text="+encodeURIComponent(txt+"\n\nBill image downloaded. Please attach/send the image."),"_blank");
-}
-
-function clearCustomerForm(){["custId","custName","custPhone","custVillage","custAddress","custNote"].forEach(id=>$(id).value="");$("custOpeningDue").value=0;$("custTitle").textContent="Add Customer"}
-function editCustomer(id){const c=state.customers.find(x=>x.id===id);if(!c)return;navTo("customers");$("custId").value=c.id;$("custName").value=c.name;$("custPhone").value=c.phone||"";$("custVillage").value=c.village||"";$("custAddress").value=c.address||"";$("custOpeningDue").value=c.openingDue||0;$("custNote").value=c.note||"";$("custTitle").textContent="Edit Customer"}
-function customerDue(id){const c=state.customers.find(x=>x.id===id);return (+c?.openingDue||0)+state.bills.filter(b=>b.customerId===id).reduce((a,b)=>a+billDue(b),0)}
-
-let activeChatCustomerId="";
-function customerInitials(name){return (name||"?").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase();}
-function openCustomerChat(id){
-  activeChatCustomerId=id;
-  const c=state.customers.find(x=>x.id===id); if(!c)return;
-  navTo("customerChat");
-  renderCustomerChat();
-}
-function renderCustomers(){
-  const q=($("customerSearch").value||"").toLowerCase();
-  const rows=state.customers.filter(c=>(c.name+c.phone+c.village+c.address).toLowerCase().includes(q));
-  $("customerList").innerHTML=rows.length?`<div class="customerChatList">`+rows.map(c=>{
-    const due=customerDue(c.id);
-    return `<div class="chatCustomer" onclick="openCustomerChat('${c.id}')">
-      <div class="chatAvatar">${esc(customerInitials(c.name))}</div>
-      <div class="chatMain"><div class="row" style="gap:8px"><div class="chatName">${esc(c.name)}</div><span class="${due>0?'chatDue':'chatDue chatPaid'} right">${due>0?money(due):'Paid'}</span></div>
-      <div class="chatSub">📞 ${esc(c.phone||"No phone")} • 📍 ${esc(c.village||"No village")}</div><div class="chatSub">${esc(c.address||"")}</div></div>
-    </div>`;
-  }).join("")+`</div>`:`<p class="muted">No customer yet.</p>`;
-}
-function renderCustomerChat(){
-  const c=state.customers.find(x=>x.id===activeChatCustomerId); if(!c)return;
-  $("chatAvatar").textContent=customerInitials(c.name);
-  $("chatName").textContent=c.name;
-  $("chatSub").textContent=(c.phone||"No phone")+" • "+(c.village||"No village")+" • Due "+money(customerDue(c.id));
-  $("chatCall").onclick=()=>callCustomer(c.id);
-  $("chatWaCall").onclick=()=>window.open("https://wa.me/"+sanitizePhone(c.phone),"_blank");
-  $("chatBillWA").onclick=()=>whatsappReminderImage(c.id);
-  $("chatEditBtn").onclick=()=>editCustomer(c.id);
-  $("chatDirectPayBtn").onclick=()=>directCustomerPayment(c.id);
-  $("chatSmsBtn").onclick=()=>smsCustomer(c.id);
-  $("chatLedgerBtn").onclick=()=>openLedger(c.id);
-  const bills=state.bills.filter(b=>b.customerId===c.id).sort((a,b)=>(a.date||"").localeCompare(b.date||""));
-  let lastDate="";
-  let out=[];
-  if(!bills.length && (+c.openingDue||0)>0){
-    out.push(`<div class="msgBubble msgDue">Opening Due: <b>${money(c.openingDue)}</b></div>`);
-  }
-  bills.forEach(b=>{
-    if(b.date!==lastDate){lastDate=b.date;out.push(`<div class="dayChip">${esc(b.date||"No date")}</div>`);}
-    out.push(`<div class="msgBubble msgBill"><b>${esc(b.billNo)}</b><br>Name: ${esc(b.customerName)}<br>Total: <b>${money(b.allTotal)}</b><br>Paid: <b>${money(billPaid(b))}</b><br>Due: <b>${money(billDue(b))}</b><div class="msgActions"><button class="light" onclick="viewBill('${b.id}')">View Bill</button><button class="light" onclick="openPayment('${b.id}')">Pay</button><button class="light" onclick="whatsappReminderImage('${c.id}')">Bill+WA</button></div><div class="msgMeta">${billStatus(b)}</div></div>`);
-    paymentsOf(b).forEach(p=>{
-      out.push(`<div class="msgBubble msgPay">Payment received<br><b>${money(p.amount)}</b><br>${esc(p.mode||"")} • ${esc(p.receivedIn||"")}<div class="msgMeta">${esc(p.date||"")}</div></div>`);
-    });
-  });
-  if(!out.length) out.push(`<div class="msgBubble msgDue">No bill/payment yet. Use ⋮ menu or New Bill.</div>`);
-  $("chatBody").innerHTML=out.join("");
-}
-function directCustomerPayment(id){
-  const c=state.customers.find(x=>x.id===id); if(!c)return;
-  const due=customerDue(id);
-  const amt=+(prompt("কত টাকা payment received?", due>0?due:"")||0);
-  if(!amt || amt<=0)return;
-  let remain=amt;
-  const bills=state.bills.filter(b=>b.customerId===id && billDue(b)>0).sort((a,b)=>(a.date||"").localeCompare(b.date||""));
-  for(const b of bills){
-    if(remain<=0)break;
-    const pay=Math.min(remain,billDue(b));
-    (b.payments=b.payments||[]).push({id:uid(),date:today(),amount:pay,mode:"Cash",receivedIn:"Cash",note:"Direct due payment"});
-    remain-=pay;
-  }
-  if(remain>0 && (+c.openingDue||0)>0){c.openingDue=Math.max((+c.openingDue||0)-remain,0);}
-  saveState(); activeChatCustomerId=id; renderCustomerChat(); alert("Payment saved");
-}
-async function changeAdminPassword(){
-  try{
-    if(!window.firebase || !firebase.auth || !firebase.auth().currentUser){alert("আগে login করুন");return;}
-    const np=$("adminNewPass").value;
-    if(!np || np.length<6){alert("Password minimum 6 characters দিন");return;}
-    await firebase.auth().currentUser.updatePassword(np);
-    $("adminNewPass").value="";
-    updateCloudStatus("Admin password changed.");
-    alert("Password changed");
-  }catch(e){alert("Password change failed: "+e.message);}
-}
-
-function deleteCustomer(id){if(confirm("Delete customer?")){state.customers=state.customers.filter(c=>c.id!==id);saveState()}}
-function quickBill(id){navTo("bill");$("billCustomer").value=id;fillCustomerBill()}
-function fillCustomerBill(){currentBillForPreview=null;const c=state.customers.find(x=>x.id===$("billCustomer").value);if(!c)return;$("prevDue").value=customerDue(c.id);calcBill()}
-function applySeasonRate(){const r=+(state.settings.seasonRates||{})[$("billSeason").value]||0;if(r>0)$("ratePerBigha").value=r}
-function unitLabel(u){return u==="bigha"?"বিঘা":u==="katha"?"কাঠা":"ডেসিমেল"}
-function calcValues(){const amt=+$("landAmount").value||0,rate=+$("ratePerBigha").value||0,prev=+$("prevDue").value||0,paid=+$("paidAmount").value||0;let bigha=amt;if($("landUnit").value==="katha")bigha=amt/20;if($("landUnit").value==="decimal")bigha=amt/40;const current=round(bigha*rate),allTotal=round(current+prev),due=round(Math.max(allTotal-paid,0));return{amt,rate,prev,paid,bigha:round(bigha),current,allTotal,due,status:due<=0&&allTotal>0?"Paid":paid>0?"Partial":"Due"}}
-function round(n){return Math.round((+n||0)*100)/100}
-function calcBill(){currentBillForPreview=null;$("calcBox").innerHTML="";const v=calcValues();$("calcBox").innerHTML=`Converted: <b>${v.bigha} বিঘা</b><br>Current: <b>${money(v.current)}</b> • Previous: <b>${money(v.prev)}</b><br>Total: <b>${money(v.allTotal)}</b> • Paid: <b>${money(v.paid)}</b> • Due: <b class="${v.due?'bad':'ok'}">${money(v.due)}</b>`;renderInvoice()}
-function nextBillNo(){return "ASHA-"+new Date().getFullYear()+"-"+String(state.bills.length+1).padStart(4,"0")}
-function makePreviewBill(realNo=false){const c=state.customers.find(x=>x.id===$("billCustomer").value)||{};const v=calcValues();return{id:uid(),billNo:realNo?nextBillNo():"Preview",date:today(),customerId:c.id||"",customerName:c.name||"Customer Name",phone:c.phone||"",address:c.address||"",village:c.village||"",season:$("billSeason").value,landAmount:v.amt,unit:$("landUnit").value,rate:v.rate,bigha:v.bigha,current:v.current,previousDue:v.prev,allTotal:v.allTotal,payMode:$("payMode").value,receivedIn:$("receivedIn").value.trim(),note:$("billNote").value.trim(),payments:v.paid>0?[{id:uid(),date:today(),amount:v.paid,mode:$("payMode").value,receivedIn:$("receivedIn").value.trim(),note:"Initial payment"}]:[],printMode:$("printMode").value}}
-function saveBill(){const c=state.customers.find(x=>x.id===$("billCustomer").value);if(!c){alert("Customer select করুন");return}const b=makePreviewBill(true);if(b.current<=0&&b.previousDue<=0){alert("Amount/rate ঠিক করুন");return}state.bills.push(b);currentBillForPreview=b;saveState();$("invoicePreview").innerHTML=invoiceHTML(b);alert("Bill saved: "+b.billNo)}
-function renderInvoice(b){b=b||makePreviewBill(false);$("invoicePreview").innerHTML=invoiceHTML(b)}
-
-function upiLink(amount, note){
-  const s=state.settings;
-  const pa=encodeURIComponent(s.upi||"");
-  const pn=encodeURIComponent(s.payeeName||s.owner||s.company||"");
-  const am=Number(amount||0).toFixed(2);
-  const tn=encodeURIComponent(note||"Asha Mini Shallow Bill Payment");
-  return `upi://pay?pa=${pa}&pn=${pn}&am=${am}&cu=INR&tn=${tn}`;
-}
-function qrImgSrcFor(amount, billNo){
-  const data=upiLink(amount, billNo?`Bill ${billNo}`:"Due Payment");
-  return `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(data)}`;
-}
-function dynamicQrBlock(amount,billNo){
-  const mode=state.settings.qrMode||"dynamic";
-  if(mode==="static"){
-    return state.settings.qrImage?`<img class="qr" src="${state.settings.qrImage}"><div class="dynamicQrLabel">Scan & Pay</div>`:`<div class="center tiny">Static QR not uploaded</div>`;
-  }
-  const src=qrImgSrcFor(amount,billNo);
-  return `<img class="qr" src="${src}" crossorigin="anonymous"><div class="dynamicQrLabel">Scan & Pay ${money(amount)}</div><div class="upiLine">${esc(state.settings.upi||"")}</div>`;
-}
-
-function invoiceHTML(b){
-  const s=state.settings;const pm=$("printMode").value;
-  const cls=pm==="a5slot"?"a5slot":pm==="a6slot"?"a6slot":pm==="a4half"?"a4half":pm==="a4quarter"?"a4quarter":pm==="a4side"?"a4side":pm==="a4landscape"?"a4landscape":"thermal";
-  const paid=billPaid(b),due=Math.max(b.allTotal-paid,0),status=due<=0?"Paid":paid>0?"Partial":"Due";
-  const tmpl=(state.settings.template||"classic")==="modern"?"templateModern":"";
-  const core=`<div class="invoice ${cls} ${tmpl}" id="billInvoice"><h1>${esc(s.company)}</h1><div class="sub">Pro: ${esc(s.owner)}</div><div class="sub">📞/WhatsApp: ${esc(s.contact)}</div><div class="sub">${esc(s.address)}</div><div class="dashline"></div><div class="billrow"><span>Bill No</span><b>${esc(b.billNo)}</b></div><div class="billrow"><span>Date</span><b>${esc(b.date)}</b></div><div class="dashline"></div><div><b>Name:</b> ${esc(b.customerName)}</div><div><b>Phone:</b> ${esc(b.phone||"")}</div><div><b>Address:</b> ${esc(b.address||"")}</div><div class="dashline"></div><div class="billrow"><span>Season</span><b>${esc(b.season)}</b></div><div class="billrow"><span>জমির পরিমাণ</span><b>${b.landAmount} ${unitLabel(b.unit)}</b></div><div class="billrow"><span>Converted</span><b>${b.bigha} বিঘা</b></div><div class="billrow"><span>Rate</span><b>${money(b.rate)}/বিঘা</b></div><div class="billrow"><span>Current Bill</span><b>${money(b.current)}</b></div><div class="billrow"><span>Previous Due</span><b>${money(b.previousDue)}</b></div><div class="billrow total"><span>All Total</span><b>${money(b.allTotal)}</b></div><div class="billrow"><span>Paid</span><b>${money(paid)}</b></div><div class="billrow total"><span>Due</span><b>${money(due)}</b></div><div class="billrow"><span>Status</span><b>${status}</b></div><div class="billrow"><span>Payment</span><b>${esc(b.payMode||"")}</b></div><div class="billrow"><span>Received</span><b>${esc(b.receivedIn||"")}</b></div><div class="dashline"></div><div class="center"><b>UPI:</b> ${esc(s.upi)}</div>${dynamicQrBlock(due>0?due:b.allTotal,b.billNo)}<div class="dashline"></div><div class="tiny">${esc(b.note||s.note||"")}</div><div class="sign">Sign: ${esc(s.owner)}</div><div class="center tiny">Thank you</div></div>`;
-  if(pm==="a5slot") return `<div class="pageMock two"><div class="slot a5">${core}</div></div>`;
-  if(pm==="a6slot") return `<div class="pageMock four"><div class="slot a6">${core}</div></div>`;
-  return core;
-}
-function setPrintMode(m){
-  document.body.classList.toggle("print-thermal",m==="thermal"||m==="thermalText");
-  document.body.classList.toggle("print-a4half",m==="a4half");
-  document.body.classList.toggle("print-a4quarter",m==="a4quarter");
-  document.body.classList.toggle("print-a4side",m==="a4side");
-  document.body.classList.toggle("print-a4landscape",m==="a4landscape");
-  document.body.classList.toggle("print-a5slot",m==="a5slot");
-  document.body.classList.toggle("print-a6slot",m==="a6slot");
-  const wrap=$("invoicePreview");
-  if(wrap){wrap.classList.toggle("sidePreview",m==="a4side"||m==="a4landscape");wrap.classList.toggle("slotPreview",m==="a5slot"||m==="a6slot");}
-}
-function smartPrint(){if($("printMode").value==="thermalText"){copyThermalText();return}window.print()}
-function renderHistory(){const q=($("historySearch").value||"").toLowerCase();const rows=state.bills.slice().reverse().filter(b=>(b.billNo+b.customerName+b.phone+b.village).toLowerCase().includes(q));$("historyList").innerHTML=rows.length?rows.map(b=>`<div class="listItem"><div class="row"><div><b>${b.billNo}</b><div class="muted">${b.date} • ${esc(b.customerName)} • ${esc(b.village||"")}</div></div><span class="chip ${billStatus(b)==='Paid'?'ok':billStatus(b)==='Partial'?'warn':'bad'} right">${billStatus(b)}</span></div><div class="row" style="margin-top:8px"><span>Total: <b>${money(b.allTotal)}</b></span><span>Paid: <b class="ok">${money(billPaid(b))}</b></span><span>Due: <b class="bad">${money(billDue(b))}</b></span></div><div class="row" style="margin-top:9px"><button class="light" onclick="viewBill('${b.id}')">View</button><button class="light" onclick="openPayment('${b.id}')">Add Payment</button><button class="light" onclick="receiptPDF('${b.id}')">Due Receipt</button><button class="danger" onclick="deleteBill('${b.id}')">Delete</button></div></div>`).join(""):`<p class="muted">No bills.</p>`}
-function viewBill(id){const b=state.bills.find(x=>x.id===id);if(!b)return;currentBillForPreview=b;navTo("bill");$("printMode").value=b.printMode||"thermal";setPrintMode($("printMode").value);$("invoicePreview").innerHTML=invoiceHTML(b)}
-function deleteBill(id){if(confirm("Delete bill?")){state.bills=state.bills.filter(b=>b.id!==id);saveState()}}
-function renderPayments(){const q=($("paymentSearch").value||"").toLowerCase();const rows=state.bills.filter(b=>billDue(b)>0).filter(b=>(b.billNo+b.customerName+b.phone).toLowerCase().includes(q));$("paymentList").innerHTML=rows.length?rows.map(b=>`<div class="listItem"><div class="row"><div><b>${b.billNo}</b><div class="muted">${esc(b.customerName)} • Due ${money(billDue(b))}</div></div><button class="light" onclick="callCustomer('${b.customerId}')"><span class="actionIcon callIcon">☎</span>Call</button><button class="primary right" onclick="openPayment('${b.id}')">Add Payment</button></div></div>`).join(""):`<p class="muted">No due bills.</p>`}
-function openPayment(id){const b=state.bills.find(x=>x.id===id);if(!b)return;$("payBillId").value=id;$("payBillInfo").innerHTML=`${b.billNo} — ${esc(b.customerName)}<br>Due: <b>${money(billDue(b))}</b>`;$("modalPayAmount").value=billDue(b);$("modalReceivedIn").value="Cash";$("paymentModal").classList.add("show")}
-function closePaymentModal(){$("paymentModal").classList.remove("show")}
-function confirmPayment(){const b=state.bills.find(x=>x.id===$("payBillId").value);if(!b)return;const amt=+$("modalPayAmount").value||0;if(amt<=0){alert("Amount দিন");return}(b.payments=b.payments||[]).push({id:uid(),date:today(),amount:amt,mode:$("modalPayMode").value,receivedIn:$("modalReceivedIn").value.trim(),note:$("modalPayNote").value.trim()});closePaymentModal();saveState();alert("Payment saved")}
-function renderReports(){const bs=state.bills;$("reportBox").innerHTML=`<div class="kv"><span>Total Bills</span><b>${bs.length}</b></div><div class="kv"><span>Total Amount</span><b>${money(sum(bs,"allTotal"))}</b></div><div class="kv"><span>Collected</span><b>${money(bs.reduce((a,b)=>a+billPaid(b),0))}</b></div><div class="kv"><span>Due</span><b>${money(bs.reduce((a,b)=>a+billDue(b),0))}</b></div>`;$("villageReport").innerHTML=listSummary(groupDue("village",bs),"No village due");$("bankReport").innerHTML=listSummary(groupPayments("bank",bs),"No collection");$("dueReport").innerHTML=listSummary(groupDue("customerName",bs),"No due")}
-function loadSettings(){const s=state.settings;s.seasonRates=s.seasonRates||{};$("setCompany").value=s.company;$("setOwner").value=s.owner;$("setContact").value=s.contact;$("setAddress").value=s.address;$("setRate").value=s.defaultRate;$("setUpi").value=s.upi;if($("setPayeeName"))$("setPayeeName").value=s.payeeName||s.owner||"";if($("setQrMode"))$("setQrMode").value=s.qrMode||"dynamic";$("setNote").value=s.note;$("rateKhora").value=s.seasonRates["খরা"]||0;$("rateBorsha").value=s.seasonRates["বর্ষা"]||0;$("rateBoro").value=s.seasonRates["বোরো"]||0;$("rateAman").value=s.seasonRates["আমন"]||0;if($("setTheme"))$("setTheme").value=s.theme||"light";if($("setTemplate"))$("setTemplate").value=s.template||"classic";if($("setBackupReminder"))$("setBackupReminder").value=s.backupReminder||"on";if($("setFirebaseConfig"))$("setFirebaseConfig").value=s.firebaseConfig||"";if($("setCloudDocId"))$("setCloudDocId").value=s.cloudDocId||"owner-main";if($("setCloudAuto"))$("setCloudAuto").value=s.cloudAutoSync||"off";if($("setOwnerUid"))$("setOwnerUid").value=s.ownerUid||"";$("qrPreviewBox").innerHTML=s.qrImage?`<img class="qr" src="${s.qrImage}">`:`<span class="tiny">No QR uploaded</span>`;updateCloudStatus(s.firebaseConfig?"Cloud config saved locally.":"Cloud not configured.")}
-function saveSettings(){Object.assign(state.settings,{company:$("setCompany").value.trim(),owner:$("setOwner").value.trim(),contact:$("setContact").value.trim(),address:$("setAddress").value.trim(),defaultRate:+$("setRate").value||0,upi:$("setUpi").value.trim(),payeeName:$("setPayeeName")?.value.trim()||state.settings.owner||"",qrMode:$("setQrMode")?.value||"dynamic",note:$("setNote").value.trim(),theme:$("setTheme")?.value||state.settings.theme||"light",template:$("setTemplate")?.value||state.settings.template||"classic",backupReminder:$("setBackupReminder")?.value||"on",firebaseConfig:$("setFirebaseConfig")?.value.trim()||state.settings.firebaseConfig||"",cloudDocId:$("setCloudDocId")?.value.trim()||"owner-main",cloudAutoSync:$("setCloudAuto")?.value||"off",ownerUid:$("setOwnerUid")?.value.trim()||state.settings.ownerUid||"",seasonRates:{"খরা":+$("rateKhora").value||0,"বর্ষা":+$("rateBorsha").value||0,"বোরো":+$("rateBoro").value||0,"আমন":+$("rateAman").value||0}});saveState();alert("Settings saved")}
-function saveCloudSettings(){state.settings.firebaseConfig=$("setFirebaseConfig").value.trim();state.settings.cloudDocId=$("setCloudDocId").value.trim()||"owner-main";state.settings.cloudAutoSync=$("setCloudAuto").value;state.settings.ownerUid=$("setOwnerUid")?.value.trim()||state.settings.ownerUid||"";localStorage.setItem(KEY,JSON.stringify(state));updateCloudStatus("Cloud settings saved locally.")}
-function uploadQR(e){const f=e.target.files[0];if(!f)return;if(f.size>700000){alert("QR image ছোট করুন, 700KB-এর নিচে দিন");return}const r=new FileReader();r.onload=()=>{state.settings.qrImage=r.result;saveState();alert("QR saved")};r.readAsDataURL(f)}
-function savePin(){const p=$("setPin").value.trim();if(p.length<4){alert("Minimum 4 digit PIN দিন");return}state.settings.pin=p;saveState();$("setPin").value="";alert("PIN saved")}
-function removePin(){state.settings.pin="";saveState();alert("PIN removed")}
-function lockNow(){if(!state.settings.pin){alert("PIN set করা নেই");return}$("lockScreen").classList.add("show")}
-function unlockApp(){if($("unlockPin").value===state.settings.pin){$("lockScreen").classList.remove("show");$("unlockPin").value="";$("lockMsg").textContent=""}else $("lockMsg").textContent="Wrong PIN"}
-function checkLock(){if(state.settings.pin)$("lockScreen").classList.add("show")}
-function sanitizePhone(p){p=String(p||"").replace(/\D/g,"");return p.length===10?"91"+p:p}
-function sendDueReminder(id){whatsappCustomer(id)}
-async function invoiceBlob(){const el=$("billInvoice");if(!el){alert("Bill preview নেই");return null}if(typeof html2canvas==="undefined"){alert("Internet অন করে reload করুন");return null}const canvas=await html2canvas(el,{backgroundColor:"#fff",scale:2,useCORS:true});return new Promise(res=>canvas.toBlob(res,"image/png",.98))}
-async function downloadBillImage(){const blob=await invoiceBlob();if(!blob)return;downloadBlob(blob,"asha_bill.png")}
-function downloadBlob(blob,name){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;a.click()}
-async function downloadBillPDF(){const blob=await invoiceBlob();if(!blob)return;if(!window.jspdf){alert("PDF library load হয়নি। Print > Save as PDF ব্যবহার করুন");return}const img=URL.createObjectURL(blob);const jsPDF=window.jspdf.jsPDF;const doc=new jsPDF("p","mm","a4");const w=80,h=140;doc.addImage(img,"PNG",10,10,w,h);doc.save("asha_bill.pdf")}
-async function shareBillImage(){const b=currentBillForPreview||makePreviewBill(false);const blob=await invoiceBlob();if(!blob)return;const file=new File([blob],"asha_bill.png",{type:"image/png"});const txt=`Asha Mini Shallow Bill\nName: ${b.customerName}\nTotal: ${money(b.allTotal)}\nPaid: ${money(billPaid(b))}\nDue: ${money(billDue(b))}`;if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],text:txt});return}catch(e){}}downloadBlob(blob,"asha_bill.png");window.open("https://wa.me/"+sanitizePhone(b.phone)+"?text="+encodeURIComponent(txt+"\nBill image downloaded, please attach it."),"_blank")}
-function thermalText(b){return`${state.settings.company}\nBill: ${b.billNo}\nName: ${b.customerName}\nTotal: ${money(b.allTotal)}\nPaid: ${money(billPaid(b))}\nDue: ${money(billDue(b))}\nUPI: ${state.settings.upi}`}
-function copyThermalText(){navigator.clipboard?.writeText(thermalText(currentBillForPreview||makePreviewBill(false)));alert("Thermal text copied")}
-function receiptPDF(id){const b=state.bills.find(x=>x.id===id);if(!b)return;const txt=`Due Payment Receipt\n${state.settings.company}\nBill: ${b.billNo}\nName: ${b.customerName}\nPaid: ${money(billPaid(b))}\nDue: ${money(billDue(b))}\nDate: ${today()}`;const blob=new Blob([txt],{type:"text/plain"});downloadBlob(blob,`receipt_${b.billNo}.txt`)}
-function csv(rows){return rows.map(r=>r.map(x=>`"${String(x??"").replace(/"/g,'""')}"`).join(",")).join("\n")}
-function exportBillsCSV(){const rows=[["Bill No","Date","Name","Phone","Village","Season","Total","Paid","Due","Status"]].concat(state.bills.map(b=>[b.billNo,b.date,b.customerName,b.phone,b.village,b.season,b.allTotal,billPaid(b),billDue(b),billStatus(b)]));downloadBlob(new Blob([csv(rows)],{type:"text/csv"}),"bills.csv")}
-function exportMonthlyCSV(){const m=$("reportMonth").value;const rows=state.bills.filter(b=>m==="All Months"||(b.date||"").startsWith(m));downloadBlob(new Blob([csv([["Bill No","Date","Name","Total","Paid","Due"]].concat(rows.map(b=>[b.billNo,b.date,b.customerName,b.allTotal,billPaid(b),billDue(b)])))],{type:"text/csv"}),`monthly_${m}.csv`)}
-function exportCustomersCSV(){downloadBlob(new Blob([csv([["Name","Phone","Village","Address","Due"]].concat(state.customers.map(c=>[c.name,c.phone,c.village,c.address,customerDue(c.id)])))],{type:"text/csv"}),"customers.csv")}
-function exportData(){state.settings.lastBackup=today();localStorage.setItem(KEY,JSON.stringify(state));downloadBlob(new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),`asha_backup_${today()}.json`);refreshAll(false)}
-function importData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{state=JSON.parse(r.result);saveState();alert("Backup imported")}catch(err){alert("Invalid backup")}};r.readAsText(f)}
-function runLandCalc(){let amt=+$("calcLand").value||0,rate=+$("calcRate").value||0,paid=+$("calcPaid").value||0,b=amt;if($("calcUnit").value==="katha")b=amt/20;if($("calcUnit").value==="decimal")b=amt/40;const total=round(b*rate),due=Math.max(total-paid,0);$("landCalcOut").innerHTML=`<div class="kv"><span>Bigha</span><b>${round(b)}</b></div><div class="kv"><span>Total</span><b>${money(total)}</b></div><div class="kv"><span>Due</span><b>${money(due)}</b></div>`}
-
-let fxVal="";
-function fxPress(v){
-  if(v==="C"){fxVal="";fxRender();return;}
-  if(v==="⌫"){fxVal=fxVal.slice(0,-1);fxRender();return;}
-  if(v==="="){try{fxVal=String(Function("return ("+fxVal.replace(/×/g,"*").replace(/÷/g,"/")+")")());}catch(e){fxVal="Error";}fxRender();return;}
-  if(fxVal==="Error") fxVal="";
-  fxVal+=v;fxRender();
-}
-function fxRender(){const el=$("fxScreen");if(el)el.textContent=fxVal||"0";}
-
-function runNormalCalc(){const ex=$("normalExpr").value.trim();if(!/^[0-9+\-*/().%\s]+$/.test(ex)){$("normalCalcOut").innerHTML='<span class="bad">Invalid</span>';return}try{$("normalCalcOut").innerHTML="Result: <b>"+money(Function("return ("+ex+")")())+"</b>"}catch(e){$("normalCalcOut").innerHTML='<span class="bad">Invalid</span>'}}
-
-
-
-function showAuth(){ $("authScreen").classList.add("show"); }
-function hideAuth(){ $("authScreen").classList.remove("show"); }
-function updateAuthStatus(){
-  const el=$("authStatus"); if(!el) return;
-  const u=(window.firebase && firebase.auth)?firebase.auth().currentUser:null;
-  el.textContent = u ? "Cloud Auth: logged in" : "Cloud Auth: not logged in";
-}
-function ensureAuth(){
-  if(!window.firebase || !firebase.auth){ updateCloudStatus("Firebase Auth SDK load হয়নি"); return false; }
-  if(!firebase.auth().currentUser){ showAuth(); updateCloudStatus("Cloud use করার আগে login করুন"); return false; }
-  return true;
-}
-async function authLogin(){
-  try{
-    if(!initFirebase()) return;
-    const email=$("authEmail").value.trim(), pass=$("authPass").value;
-    await firebase.auth().signInWithEmailAndPassword(email,pass);
-    state.settings.ownerUid=firebase.auth().currentUser.uid;
-    if($("setOwnerUid")) $("setOwnerUid").value=state.settings.ownerUid;
-    localStorage.setItem(KEY,JSON.stringify(state));
-    hideAuth(); updateAuthStatus(); updateCloudStatus("Login success.");
-  }catch(e){ $("authMsg").textContent=e.message; updateCloudStatus("Login failed: "+e.message); }
-}
-async function authSignup(){
-  try{
-    if(!initFirebase()) return;
-    const email=$("authEmail").value.trim(), pass=$("authPass").value;
-    await firebase.auth().createUserWithEmailAndPassword(email,pass);
-    state.settings.ownerUid=firebase.auth().currentUser.uid;
-    if($("setOwnerUid")) $("setOwnerUid").value=state.settings.ownerUid;
-    localStorage.setItem(KEY,JSON.stringify(state));
-    hideAuth(); updateAuthStatus(); updateCloudStatus("Login created.");
-  }catch(e){ $("authMsg").textContent=e.message; updateCloudStatus("Create login failed: "+e.message); }
-}
-async function authLogout(){sessionStorage.removeItem("ashaStrictLoginOK");
-  try{ if(window.firebase && firebase.auth) await firebase.auth().signOut(); updateAuthStatus(); updateCloudStatus("Logged out."); }
-  catch(e){ updateCloudStatus("Logout failed: "+e.message); }
-}
-
-
-function setSecureLocked(isLocked){
-  document.body.classList.toggle("secureLocked", !!isLocked);
-}
-function secureAuthAllowed(){
-  if(!state.settings || !state.settings.firebaseConfig) return false;
-  if(!window.firebase || !firebase.auth) return false;
-  const u=firebase.auth().currentUser;
-  if(!u) return false;
-  if(state.settings.ownerUid && u.uid !== state.settings.ownerUid) return false;
-  return true;
-}
-function updateSecureGate(){
-  if(secureAuthAllowed()){
-    setSecureLocked(false);
-    const g=$("secureGate"); if(g) g.style.display="none";
-  }else{
-    setSecureLocked(true);
-  }
-}
-async function gateLogin(){
-  try{
-    if(!initFirebase()) return;
-    const email=$("gateEmail").value.trim();
-    const pass=$("gatePass").value;
-    await firebase.auth().signInWithEmailAndPassword(email,pass);
-    if(state.settings.ownerUid && firebase.auth().currentUser.uid !== state.settings.ownerUid){
-      await firebase.auth().signOut();
-      $("gateMsg").textContent="এই email owner UID-এর সাথে match করছে না।";
-      updateSecureGate();
-      return;
-    }
-    state.settings.ownerUid=state.settings.ownerUid||firebase.auth().currentUser.uid;
-    localStorage.setItem(KEY,JSON.stringify(state));
-    updateSecureGate(); updateAuthStatus(); updateCloudStatus("Secure login success.");
-  }catch(e){ $("gateMsg").textContent=e.message; updateSecureGate(); }
-}
-async function gateCreate(){
-  try{
-    if(!initFirebase()) return;
-    const email=$("gateEmail").value.trim();
-    const pass=$("gatePass").value;
-    await firebase.auth().createUserWithEmailAndPassword(email,pass);
-    state.settings.ownerUid=firebase.auth().currentUser.uid;
-    localStorage.setItem(KEY,JSON.stringify(state));
-    updateSecureGate(); updateAuthStatus(); updateCloudStatus("Owner login created.");
-  }catch(e){ $("gateMsg").textContent=e.message; updateSecureGate(); }
-}
-
-function updateCloudStatus(msg){const el=$("cloudStatus"); if(el) el.textContent=msg;}
-
 const OWNER_UID="FZIhTAr0JEMoHCeQd3kr2t8cJKk2";
-function strictWallOn(){document.body.classList.add("authWall");}
-function strictWallOff(){document.body.classList.remove("authWall");const w=$("strictLoginWall");if(w)w.style.display="none";}
-function strictMsg(t){const el=$("strictMsg");if(el)el.textContent=t;}
-function strictUserOk(){
-  if(!state.settings || !state.settings.firebaseConfig) return false;
-  if(!window.firebase || !firebase.auth) return false;
-  const u=firebase.auth().currentUser;
-  return !!(u && u.uid===OWNER_UID && sessionStorage.getItem("ashaStrictLoginOK")==="yes");
-}
-function strictCheck(){ strictUserOk()?strictWallOff():strictWallOn(); }
-async function strictLogin(){
-  try{
-    if(!initFirebase()) return;
-    await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
-    const email=$("strictEmail").value.trim(), pass=$("strictPass").value;
-    const cred=await firebase.auth().signInWithEmailAndPassword(email,pass);
-    if(cred.user.uid!==OWNER_UID){
-      await firebase.auth().signOut(); sessionStorage.removeItem("ashaStrictLoginOK");
-      strictMsg("Only admin account allowed."); strictWallOn(); return;
-    }
-    state.settings.ownerUid=OWNER_UID; localStorage.setItem(KEY,JSON.stringify(state));
-    sessionStorage.setItem("ashaStrictLoginOK","yes");
-    updateAuthStatus(); updateCloudStatus("Strict login success."); strictWallOff();
-  }catch(e){strictMsg(e.message); strictWallOn();}
-}
-async function strictCreate(){
-  try{
-    if(!initFirebase()) return;
-    await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
-    const email=$("strictEmail").value.trim(), pass=$("strictPass").value;
-    const cred=await firebase.auth().createUserWithEmailAndPassword(email,pass);
-    if(cred.user.uid!==OWNER_UID){
-      strictMsg("নতুন UID আপনার locked UID নয়। আগের owner email দিয়ে Login করুন।"); return;
-    }
-    state.settings.ownerUid=OWNER_UID; localStorage.setItem(KEY,JSON.stringify(state));
-    sessionStorage.setItem("ashaStrictLoginOK","yes"); strictWallOff();
-  }catch(e){strictMsg(e.message);}
-}
-async function strictLogout(){
-  try{
-    sessionStorage.removeItem("ashaStrictLoginOK");
-    if(window.firebase && firebase.auth) await firebase.auth().signOut();
-    strictMsg("Logged out."); strictWallOn();
-  }catch(e){strictMsg(e.message); strictWallOn();}
-}
-
-function initFirebase(){
-  try{
-    const raw=state.settings.firebaseConfig||$("setFirebaseConfig")?.value||"";
-    if(!raw) throw new Error("Firebase config JSON দিন");
-    const cfg=JSON.parse(raw);
-    if(!cfg.apiKey || !cfg.projectId) throw new Error("apiKey/projectId missing");
-    if(!window.firebase) throw new Error("Firebase SDK load হয়নি");
-    if(!firebase.apps.length) fbApp=firebase.initializeApp(cfg); else fbApp=firebase.app();
-    fbDb=firebase.firestore();
-    if(firebase.auth){firebase.auth().onAuthStateChanged(u=>{if(u){state.settings.ownerUid=state.settings.ownerUid||u.uid;if($("setOwnerUid"))$("setOwnerUid").value=state.settings.ownerUid;localStorage.setItem(KEY,JSON.stringify(state));}updateAuthStatus();updateSecureGate();strictCheck();});}
-    updateCloudStatus("Firebase connected.");
-    return true;
-  }catch(e){updateCloudStatus("Cloud error: "+e.message);return false;}
-}
-async function testCloud(){ if(!initFirebase()) return; if(!ensureAuth()) return; try{ const docId=(state.settings.cloudDocId||"ekramul-main"); await fbDb.collection("ashaMiniShallow").doc(docId).get(); updateCloudStatus("Cloud test success."); }catch(e){ updateCloudStatus("Test failed: "+e.message);} }
-async function cloudPush(manual){ if(!initFirebase()) return; if(!ensureAuth()) return; try{ const docId=(state.settings.cloudDocId||"owner-main"); const payload={updatedAt:new Date().toISOString(), data:state}; await fbDb.collection("ashaMiniShallow").doc(docId).set(payload); updateCloudStatus((manual?"Manual":"Auto")+" cloud backup saved."); }catch(e){ updateCloudStatus("Push failed: "+e.message);} }
-async function cloudPull(){ if(!initFirebase()) return; if(!ensureAuth()) return; try{ const docId=(state.settings.cloudDocId||"owner-main"); const snap=await fbDb.collection("ashaMiniShallow").doc(docId).get(); if(!snap.exists){ updateCloudStatus("No cloud data found."); return;} state=normalizeState((snap.data()||{}).data||{}); localStorage.setItem(KEY,JSON.stringify(state)); refreshAll(); updateCloudStatus("Cloud data loaded."); }catch(e){ updateCloudStatus("Pull failed: "+e.message);} }
-function scheduleCloudPush(){ clearTimeout(cloudTimer); cloudTimer=setTimeout(()=>cloudPush(false),1200); }
-
-function installInfo(){alert("Mobile Chrome: menu ⋮ > Add to Home screen. Hosting করলে app-এর মতো install হবে। Firebase config দিলে cloud sync-ও হবে।")}
-function applyTheme(){
-  document.body.classList.toggle("dark",(state.settings.theme||"light")==="dark");
-  const last=state.settings.lastBackup||"Never";
-  const dueBackup=state.settings.backupReminder!=="off" && state.settings.lastBackup!==today();
-  if($("backupStatus")) $("backupStatus").innerHTML = dueBackup ? ` • <b style="color:#ffd599">Backup suggested</b>` : ` • Backup: ${last}`;
-}
-function saveThemeNow(){
-  state.settings.theme=$("setTheme")?.value||"light";
-  state.settings.template=$("setTemplate")?.value||"classic";
-  state.settings.backupReminder=$("setBackupReminder")?.value||"on";
-  saveState();
-}
-function openLedger(id){navTo("ledger");$("ledgerCustomer").value=id;renderLedger();}
-function renderLedger(){
-  const id=$("ledgerCustomer")?.value;
-  if(!id){$("ledgerBox").innerHTML='<p class="muted">Customer select করুন।</p>';return;}
-  const c=state.customers.find(x=>x.id===id);
-  if(!c){$("ledgerBox").innerHTML='<p class="muted">Customer not found.</p>';return;}
-  const bills=state.bills.filter(b=>b.customerId===id).sort((a,b)=>(a.date||"").localeCompare(b.date||""));
-  const total=bills.reduce((a,b)=>a+(+b.allTotal||0),0);
-  const paid=bills.reduce((a,b)=>a+billPaid(b),0);
-  const due=(+c.openingDue||0)+bills.reduce((a,b)=>a+billDue(b),0);
-  let rows=bills.map(b=>`<tr><td><b>${esc(b.billNo)}</b><br><span class="tiny">${esc(b.date)}</span></td><td>${esc(b.season||"")}</td><td>${money(b.allTotal)}</td><td class="ok">${money(billPaid(b))}</td><td class="bad">${money(billDue(b))}</td><td>${billStatus(b)}</td><td><button class="light" onclick="viewBill('${b.id}')">View</button> <button class="light" onclick="openPayment('${b.id}')">Pay</button></td></tr>`).join("");
-  const payRows=bills.flatMap(b=>paymentsOf(b).map(p=>`<tr><td>${esc(b.billNo)}</td><td>${esc(p.date)}</td><td>${esc(p.mode)}</td><td>${esc(p.receivedIn||"")}</td><td class="ok">${money(p.amount)}</td><td><button class="danger" onclick="deletePayment('${b.id}','${p.id}')">Delete</button></td></tr>`)).join("");
-  $("ledgerBox").innerHTML=`<div class="resultBox"><div class="kv"><span>Name</span><b>${esc(c.name)}</b></div><div class="kv"><span>Phone</span><b>${esc(c.phone||"")}</b></div><div class="kv"><span>Total Bill</span><b>${money(total)}</b></div><div class="kv"><span>Total Paid</span><b>${money(paid)}</b></div><div class="kv"><span>Current Due</span><b class="bad">${money(due)}</b></div></div>
-  <h3 style="margin-top:14px">Bills</h3><div style="overflow:auto"><table class="miniTable"><tr><th>Bill</th><th>Season</th><th>Total</th><th>Paid</th><th>Due</th><th>Status</th><th>Action</th></tr>${rows||'<tr><td colspan="7">No bills</td></tr>'}</table></div>
-  <h3 style="margin-top:14px">Payment History</h3><div style="overflow:auto"><table class="miniTable"><tr><th>Bill</th><th>Date</th><th>Mode</th><th>Bank/UPI</th><th>Amount</th><th>Action</th></tr>${payRows||'<tr><td colspan="6">No payments</td></tr>'}</table></div>`;
-}
-function deletePayment(billId,payId){
-  if(!confirm("Payment delete করবেন?"))return;
-  const b=state.bills.find(x=>x.id===billId); if(!b)return;
-  b.payments=(b.payments||[]).filter(p=>p.id!==payId);
-  saveState(); renderLedger();
-}
-function exportLedgerCSV(){
-  const id=$("ledgerCustomer")?.value; if(!id){alert("Customer select করুন");return;}
-  const c=state.customers.find(x=>x.id===id); const bills=state.bills.filter(b=>b.customerId===id);
-  const rows=[["Customer",c?.name||""],[],["Bill No","Date","Season","Total","Paid","Due","Status"]].concat(bills.map(b=>[b.billNo,b.date,b.season,b.allTotal,billPaid(b),billDue(b),billStatus(b)]));
-  downloadBlob(new Blob([csv(rows)],{type:"text/csv"}),`ledger_${(c?.name||"customer").replace(/\s+/g,'_')}.csv`);
-}
-
-function dataHealthCheck(){
-  const missingPhone=state.customers.filter(c=>!c.phone).length;
-  const missingVillage=state.customers.filter(c=>!c.village).length;
-  const dueBills=state.bills.filter(b=>billDue(b)>0).length;
-  alert(`Data Health\nCustomers: ${state.customers.length}\nBills: ${state.bills.length}\nMissing phone: ${missingPhone}\nMissing village: ${missingVillage}\nDue bills: ${dueBills}`);
-}
-function printReport(){navTo("reports");setTimeout(()=>window.print(),100)}
-
-function registerSW(){if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}}
-
-function init(){setPrintMode("thermal");applyTheme();refreshAll();runLandCalc();checkLock();registerSW();if(state.settings.firebaseConfig){initFirebase();updateCloudStatus("Cloud config available. Login করুন।");setTimeout(updateSecureGate,700);setTimeout(strictCheck,900)}else updateCloudStatus("Cloud not configured.");updateAuthStatus();}
-init();
+const firebaseConfig={apiKey:"AIzaSyCzC5aFnFbnsYBZ370MktK9XOrjwiLQk0E",authDomain:"asha-app-745be.firebaseapp.com",projectId:"asha-app-745be",storageBucket:"asha-app-745be.firebasestorage.app",messagingSenderId:"309162286021",appId:"1:309162286021:web:bc0d2a92a170c5f9c5c9ac",measurementId:"G-RRGVNEFGZQ"};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth(); const db=firebase.firestore(); auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+const DOC=db.collection("ashaMiniShallow").doc("ekramul-main");
+const KEY="asha_v23_clean";
+let state=JSON.parse(localStorage.getItem(KEY)||"null")||{settings:{company:"আশা মিনি শ্যালো",owner:"SK EKRAMUL Haque",contact:"9564061920",address:"Raghunathpur, Chaklachipur, Ghatal, Paschim Medinipur, 721232",upi:"8710065540@axl",payee:"SK ENAMUL HAQUE",qrMode:"dynamic",auto:"on"},customers:[],bills:[]};
+let currentBill=null,activeCustomer=null,deferredPrompt=null,fxVal="";
+function $(id){return document.getElementById(id)}function uid(){return Math.random().toString(36).slice(2)+Date.now().toString(36)}function today(){return new Date().toISOString().slice(0,10)}function money(n){return "₹"+Number(n||0).toLocaleString("en-IN",{maximumFractionDigits:2})}function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]))}function initials(n){return String(n||"?").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase()}function phone(p){return String(p||"").replace(/\D/g,"")}
+function saveLocal(){localStorage.setItem(KEY,JSON.stringify(state));renderAll();if(state.settings.auto==="on"&&auth.currentUser?.uid===OWNER_UID)pushCloud(false)}
+async function login(){try{const e=$("loginEmail").value.trim(),p=$("loginPass").value;const cred=await auth.signInWithEmailAndPassword(e,p);if(cred.user.uid!==OWNER_UID){await auth.signOut();$("loginMsg").textContent="Only admin account allowed.";return}$("loginScreen").classList.add("hidden");$("authChip").textContent="Cloud Auth: logged in";await pullCloud();}catch(err){$("loginMsg").textContent=err.message}}
+async function logout(){await auth.signOut();$("loginScreen").classList.remove("hidden");$("authChip").textContent="Cloud Auth: logged out"}
+auth.onAuthStateChanged(u=>{if(u&&u.uid===OWNER_UID){$("loginScreen").classList.add("hidden");$("authChip").textContent="Cloud Auth: logged in"}else{$("loginScreen").classList.remove("hidden");$("authChip").textContent="Cloud Auth: locked"}})
+async function pullCloud(){try{const snap=await DOC.get();if(snap.exists&&snap.data().data){state=snap.data().data;localStorage.setItem(KEY,JSON.stringify(state));$("cloudStatus").textContent="Cloud data loaded.";renderAll()}else $("cloudStatus").textContent="No cloud data yet."}catch(e){$("cloudStatus").textContent="Pull failed: "+e.message}}
+async function pushCloud(manual){try{await DOC.set({data:state,updatedAt:new Date().toISOString()},{merge:true});if(manual)$("cloudStatus").textContent="Cloud backup saved."}catch(e){$("cloudStatus").textContent="Push failed: "+e.message}}
+async function cloudTest(){try{await DOC.get();$("cloudStatus").textContent="Cloud test success."}catch(e){$("cloudStatus").textContent="Test failed: "+e.message}}
+async function changePassword(){try{const p=$("newPass").value;if(!p||p.length<6){alert("Minimum 6 characters");return}await auth.currentUser.updatePassword(p);$("newPass").value="";alert("Password changed")}catch(e){alert(e.message)}}
+function nav(p){document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));$(p).classList.add("active");document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));[...document.querySelectorAll(".nav button")].find(b=>b.textContent.toLowerCase().includes(p==="customers"?"users":p))?.classList.add("active");renderAll()}
+function renderAll(){renderDash();renderCustomers();fillSelectors();renderHistory();renderReports();loadSettings();landOut()}
+function renderDash(){let total=state.bills.reduce((s,b)=>s+(+b.current||0),0),paid=state.bills.reduce((s,b)=>s+billPaid(b),0),due=state.customers.reduce((s,c)=>s+customerDue(c.id),0);$("dashStats").innerHTML=`<div class="card"><div class="sub">Total Bill</div><div class="stat">${money(total)}</div></div><div class="card"><div class="sub">Collected</div><div class="stat ok">${money(paid)}</div></div><div class="card"><div class="sub">Due</div><div class="stat bad">${money(due)}</div></div><div class="card"><div class="sub">Bills</div><div class="stat">${state.bills.length}</div></div>`}
+function billPaid(b){return (b.payments||[]).reduce((s,p)=>s+(+p.amount||0),0)}function billDue(b){return Math.max((+b.allTotal||0)-billPaid(b),0)}function billStatus(b){return billDue(b)<=0?"Paid":billPaid(b)>0?"Partial":"Due"}function customerDue(id){let c=state.customers.find(x=>x.id===id);return (+c?.openingDue||0)+state.bills.filter(b=>b.customerId===id).reduce((s,b)=>s+billDue(b),0)}
+function renderCustomers(){const q=($("customerSearch")?.value||"").toLowerCase();let rows=state.customers.filter(c=>(c.name+c.phone+c.village+c.address).toLowerCase().includes(q));$("customerList").innerHTML=rows.length?rows.map(c=>{let due=customerDue(c.id);return `<div class="userRow" onclick="openChat('${c.id}')"><div class="avatar">${esc(initials(c.name))}</div><div class="uMain"><div class="row"><div class="uName">${esc(c.name)}</div><span class="pill ${due>0?'duePill':'paidPill'} right">${due>0?money(due):'Paid'}</span></div><div class="uSub">📞 ${esc(c.phone||"No phone")} • 📍 ${esc(c.village||"No village")}</div><div class="uSub">${esc(c.address||"")}</div></div></div>`}).join(""):`<div class="card muted">No customer yet</div>`}
+function openCustomerForm(id){let c=id?state.customers.find(x=>x.id===id):null;$("custId").value=c?.id||"";$("custName").value=c?.name||"";$("custPhone").value=c?.phone||"";$("custVillage").value=c?.village||"";$("custAddress").value=c?.address||"";$("custDue").value=c?.openingDue||0;$("customerModal").classList.remove("hidden")}function closeCustomerForm(){$("customerModal").classList.add("hidden")}
+function saveCustomer(){let id=$("custId").value||uid();let c={id,name:$("custName").value,phone:$("custPhone").value,village:$("custVillage").value,address:$("custAddress").value,openingDue:+$("custDue").value||0};let i=state.customers.findIndex(x=>x.id===id);if(i>=0)state.customers[i]=c;else state.customers.push(c);closeCustomerForm();saveLocal()}
+function openChat(id){activeCustomer=id;let c=state.customers.find(x=>x.id===id);if(!c)return;$("chat").classList.add("show");renderChat()}function closeChat(){$("chat").classList.remove("show")}function toggleChatMenu(){$("chatMenu").classList.toggle("open")}
+function renderChat(){let c=state.customers.find(x=>x.id===activeCustomer);if(!c)return;$("chatAv").textContent=initials(c.name);$("chatName").textContent=c.name;$("chatSub").textContent=(c.phone||"No phone")+" • "+(c.village||"No village")+" • Due "+money(customerDue(c.id));$("chatCall").onclick=()=>location.href="tel:"+phone(c.phone);$("chatWA").onclick=()=>open("https://wa.me/"+phone(c.phone),"_blank");$("chatBillWA").onclick=()=>shareCustomerBill(c.id);$("mEdit").onclick=()=>openCustomerForm(c.id);$("mPay").onclick=()=>directPay(c.id);$("mSMS").onclick=()=>smsCustomer(c.id);$("mLedger").onclick=()=>{closeChat();nav("ledger");$("ledgerCustomer").value=c.id;renderLedger()};let bills=state.bills.filter(b=>b.customerId===c.id).sort((a,b)=>(a.date||"").localeCompare(b.date||""));let last="",out=[];if((+c.openingDue||0)>0)out.push(`<div class="bubble centerB">Opening Due: <b>${money(c.openingDue)}</b></div>`);bills.forEach(b=>{if(b.date!==last){last=b.date;out.push(`<div class="day">${esc(b.date)}</div>`)}out.push(`<div class="bubble billB"><b>${esc(b.billNo)}</b><br>Name: ${esc(b.customerName)}<br>Total: <b>${money(b.allTotal)}</b><br>Paid: <b>${money(billPaid(b))}</b><br>Due: <b>${money(billDue(b))}</b><div class="bubbleActions"><button class="light" onclick="viewBill('${b.id}')">View</button><button class="light" onclick="openPayment('${b.id}')">Pay</button><button class="light" onclick="shareCustomerBill('${c.id}')">Bill+WA</button></div><div class="meta">${billStatus(b)}</div></div>`);(b.payments||[]).forEach(p=>out.push(`<div class="bubble payB">Payment received<br><b>${money(p.amount)}</b><br>${esc(p.mode)} • ${esc(p.receivedIn)}<div class="meta">${esc(p.date)}</div></div>`))});if(!out.length)out.push(`<div class="bubble centerB">No bill/payment yet.</div>`);$("chatBody").innerHTML=out.join("")}
+function directPay(id){let amt=+(prompt("কত টাকা payment received?",customerDue(id)||"")||0);if(!amt)return;let left=amt;state.bills.filter(b=>b.customerId===id&&billDue(b)>0).forEach(b=>{if(left<=0)return;let pay=Math.min(left,billDue(b));(b.payments=b.payments||[]).push({id:uid(),date:today(),amount:pay,mode:"Cash",receivedIn:"Cash"});left-=pay});let c=state.customers.find(x=>x.id===id);if(left>0&&c)c.openingDue=Math.max((+c.openingDue||0)-left,0);saveLocal();renderChat()}
+function smsCustomer(id){let c=state.customers.find(x=>x.id===id);location.href=`sms:${phone(c.phone)}?body=${encodeURIComponent(reminderText(c))}`}function reminderText(c){return `${state.settings.company}\nName: ${c.name}\nDue: ${money(customerDue(c.id))}\nContact: ${state.settings.contact}\nUPI: ${state.settings.upi}`}
+function fillSelectors(){let opts=state.customers.map(c=>`<option value="${c.id}">${esc(c.name)} - ${esc(c.phone)}</option>`).join("");$("billCustomer").innerHTML=opts;$("ledgerCustomer").innerHTML=opts;$("payBill").innerHTML=state.bills.map(b=>`<option value="${b.id}">${b.billNo} - ${esc(b.customerName)} - Due ${money(billDue(b))}</option>`).join("")}
+function landToBigha(v,u){v=+v||0;return u==="bigha"?v:u==="katha"?v/20:v/40}function nextBillNo(){return "ASHA-"+new Date().getFullYear()+"-"+String(state.bills.length+1).padStart(4,"0")}
+function makeBillFromForm(){let c=state.customers.find(x=>x.id===$("billCustomer").value);if(!c){alert("Add customer first");return null}let bigha=landToBigha($("billLand").value,$("billUnit").value),rate=+$("billRate").value||0,current=bigha*rate,prev=customerDue(c.id),paid=+$("billPaid").value||0;return {id:uid(),billNo:nextBillNo(),date:today(),customerId:c.id,customerName:c.name,phone:c.phone,address:c.address,village:c.village,season:$("billSeason").value,landAmount:+$("billLand").value||0,unit:$("billUnit").value,bigha,rate,current,previousDue:prev,allTotal:current+prev,note:$("billNote").value,payments:paid>0?[{id:uid(),date:today(),amount:paid,mode:$("billPayMode").value,receivedIn:$("billPayMode").value}]:[]}}
+function saveBill(){let b=makeBillFromForm();if(!b)return;state.bills.push(b);currentBill=b;renderInvoice(b);saveLocal();alert("Bill saved")}function previewBill(){let b=makeBillFromForm();if(b){currentBill=b;renderInvoice(b)}}function viewBill(id){let b=state.bills.find(x=>x.id===id);if(b){currentBill=b;renderInvoice(b);closeChat();nav("bill")}}function openPayment(id){nav("pay");$("payBill").value=id}
+function upiLink(amount,billNo){return `upi://pay?pa=${encodeURIComponent(state.settings.upi)}&pn=${encodeURIComponent(state.settings.payee||state.settings.owner)}&am=${Number(amount||0).toFixed(2)}&cu=INR&tn=${encodeURIComponent(billNo||"Asha Bill")}`}function qrSrc(amount,billNo){return `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiLink(amount,billNo))}`}
+function invoiceHTML(b){let due=billDue(b),paid=billPaid(b);return `<div class="invoice"><h3>${esc(state.settings.company)}</h3><div style="text-align:center;font-size:11px">${esc(state.settings.address)}</div><div class="line"></div><div class="item"><b>Bill No</b><b>${esc(b.billNo)}</b></div><div class="item"><span>Date</span><span>${esc(b.date)}</span></div><div class="line"></div><div class="item"><span>Name</span><b>${esc(b.customerName)}</b></div><div class="item"><span>Phone</span><span>${esc(b.phone)}</span></div><div class="item"><span>Address</span><span>${esc(b.address)}</span></div><div class="line"></div><div class="item"><b>Season</b><b>${esc(b.season)}</b></div><div class="item"><span>জমির পরিমাণ</span><b>${b.landAmount} ${esc(b.unit)}</b></div><div class="item"><span>Converted</span><span>${b.bigha.toFixed(2)} বিঘা</span></div><div class="item"><span>Rate</span><b>${money(b.rate)}/বিঘা</b></div><div class="item"><span>Current Bill</span><b>${money(b.current)}</b></div><div class="item"><span>Previous Due</span><b>${money(b.previousDue)}</b></div><div class="item"><b>All Total</b><b>${money(b.allTotal)}</b></div><div class="item"><span>Paid</span><b>${money(paid)}</b></div><div class="item"><b>Due</b><b>${money(due)}</b></div><div class="item"><span>Status</span><b>${billStatus(b)}</b></div><div class="line"></div><div style="text-align:center;font-size:11px">UPI: ${esc(state.settings.upi)}</div><img class="qr" src="${qrSrc(due>0?due:b.allTotal,b.billNo)}"><div style="text-align:center;font-size:11px"><b>Scan & Pay ${money(due>0?due:b.allTotal)}</b></div><div class="line"></div><div style="font-size:11px">Note: ${esc(b.note||"")}</div><div style="text-align:right;font-size:11px;margin-top:8px">Sign: ${esc(state.settings.owner)}</div></div>`}
+function renderInvoice(b){$("invoiceBox").innerHTML=invoiceHTML(b)}function printBill(){window.print()}async function invoiceBlob(){let node=$("invoiceBox");let canvas=await html2canvas(node,{scale:2,useCORS:true});return await new Promise(r=>canvas.toBlob(r,"image/png"))}async function shareBillImage(){if(!currentBill){alert("Preview/View bill first");return}let blob=await invoiceBlob();let file=new File([blob],"asha_bill.png",{type:"image/png"});let text=`Asha Mini Shallow Bill\nName: ${currentBill.customerName}\nTotal: ${money(currentBill.allTotal)}\nDue: ${money(billDue(currentBill))}`;if(navigator.canShare&&navigator.canShare({files:[file]}))await navigator.share({files:[file],text});else{let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="asha_bill.png";a.click();}}async function shareCustomerBill(id){let bills=state.bills.filter(b=>b.customerId===id).sort((a,b)=>(b.date||"").localeCompare(a.date||""));if(!bills.length){alert("No bill found");return}currentBill=bills[0];renderInvoice(currentBill);await shareBillImage()}
+async function downloadPDF(){if(!currentBill)return;let blob=await invoiceBlob(), img=URL.createObjectURL(blob);const {jsPDF}=window.jspdf;let pdf=new jsPDF({unit:"mm",format:"a4"});pdf.addImage(img,"PNG",20,10,80,0);pdf.save(currentBill.billNo+".pdf")}
+function savePayment(){let b=state.bills.find(x=>x.id===$("payBill").value);if(!b)return;(b.payments=b.payments||[]).push({id:uid(),date:today(),amount:+$("payAmount").value||0,mode:$("payMode").value,receivedIn:$("payIn").value});saveLocal();alert("Payment saved")}
+function renderHistory(){$("historyList").innerHTML=state.bills.slice().reverse().map(b=>`<div class="card"><div class="row"><b>${b.billNo}</b><span class="right">${money(billDue(b))}</span></div><div class="sub">${esc(b.customerName)} • ${esc(b.date)} • ${billStatus(b)}</div><div class="actions"><button class="light" onclick="viewBill('${b.id}')">View</button><button class="light" onclick="openPayment('${b.id}')">Pay</button></div></div>`).join("")||`<div class="card muted">No bills</div>`}
+function renderReports(){let total=state.bills.reduce((s,b)=>s+b.current,0),paid=state.bills.reduce((s,b)=>s+billPaid(b),0);$("reportBox").innerHTML=`Total Bill: <b>${money(total)}</b><br>Collected: <b>${money(paid)}</b><br>Due: <b>${money(state.customers.reduce((s,c)=>s+customerDue(c.id),0))}</b>`}
+function renderLedger(){let id=$("ledgerCustomer").value,c=state.customers.find(x=>x.id===id);if(!c){$("ledgerBox").innerHTML="";return}$("ledgerBox").innerHTML=`<h3>${esc(c.name)}</h3><p>Due: <b>${money(customerDue(id))}</b></p>`+state.bills.filter(b=>b.customerId===id).map(b=>`<div class="card">${b.billNo} | Total ${money(b.allTotal)} | Paid ${money(billPaid(b))} | Due ${money(billDue(b))}</div>`).join("")}
+function loadSettings(){let s=state.settings;$("setCompany").value=s.company;$("setOwner").value=s.owner;$("setContact").value=s.contact;$("setAddress").value=s.address;$("setUpi").value=s.upi;$("setPayee").value=s.payee;$("setQrMode").value=s.qrMode;$("setAuto").value=s.auto}
+function saveSettings(){Object.assign(state.settings,{company:$("setCompany").value,owner:$("setOwner").value,contact:$("setContact").value,address:$("setAddress").value,upi:$("setUpi").value,payee:$("setPayee").value,qrMode:$("setQrMode").value,auto:$("setAuto").value});saveLocal();alert("Settings saved")}
+function exportBackup(){let a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:"application/json"}));a.download="asha_backup_"+today()+".json";a.click()}function exportCSV(){let rows=["Bill,Date,Customer,Total,Paid,Due",...state.bills.map(b=>`${b.billNo},${b.date},${b.customerName},${b.allTotal},${billPaid(b)},${billDue(b)}`)];let a=document.createElement("a");a.href=URL.createObjectURL(new Blob([rows.join("\n")]));a.download="asha_report.csv";a.click()}
+function fx(v){if(v==="C")fxVal="";else if(v==="⌫")fxVal=fxVal.slice(0,-1);else if(v==="="){try{fxVal=String(Function("return ("+fxVal.replace(/×/g,"*").replace(/÷/g,"/")+")")())}catch(e){fxVal="Error"}}else{if(fxVal==="Error")fxVal="";fxVal+=v}$("fxScreen").textContent=fxVal||"0"}function landOut(){let b=landToBigha($("landCalc")?.value,$("landUnit")?.value),rate=+$("landRate")?.value||0;if($("landResult"))$("landResult").innerHTML=`Converted: <b>${b.toFixed(2)} বিঘা</b><br>Amount: <b>${money(b*rate)}</b>`}
+function installApp(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt=null}else alert("Browser menu থেকে Add to Home screen/Install চাপুন")}window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e});if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js");
+renderAll();
 </script>
-
-<div id="v21ChatPage" class="v21ChatPage noPrint">
-  <div class="v21ChatHead">
-    <button class="v21Back" onclick="v21CloseChat()">‹</button>
-    <div class="v21Avatar" id="v21ChatAvatar">?</div>
-    <div class="v21HeadTitle"><b id="v21ChatName">Customer</b><span id="v21ChatSub">Phone • Village</span></div>
-    <button class="v21TopBtn" id="v21BillWA">▣</button>
-    <button class="v21TopBtn" id="v21Phone">☎</button>
-    <button class="v21TopBtn" id="v21WA">☘</button>
-    <div class="v21Menu" id="v21Menu">
-      <button class="v21TopBtn" onclick="document.getElementById('v21Menu').classList.toggle('open')">⋮</button>
-      <div class="v21MenuPanel">
-        <button class="light" id="v21Edit">Edit User</button>
-        <button class="light" id="v21Pay">Receive Due</button>
-        <button class="light" id="v21SMS">SMS Reminder</button>
-        <button class="light" id="v21Ledger">Ledger</button>
-      </div>
-    </div>
-  </div>
-  <div class="v21ChatBody" id="v21ChatBody"></div>
-</div>
-
-
-<script>
-(function(){
-  const OWNER_UID="FZIhTAr0JEMoHCeQd3kr2t8cJKk2";
-  function q(id){return document.getElementById(id)}
-  function safeEsc(s){return String(s??"").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-  function initials(n){return String(n||"?").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase()}
-  function ensureCleanLogin(){
-    const wall=q("strictLoginWall");
-    if(wall){
-      const box=wall.querySelector(".strictLoginBox");
-      if(box){
-        box.innerHTML=`<div class="strictLoginLogo"><div class="miniLogo"></div><div><h2>Asha Billing</h2><div class="lockNote">Secure admin login</div></div></div>
-        <label>Email</label><input id="strictEmail" type="email" placeholder="Email" autocomplete="off">
-        <label>Password</label><input id="strictPass" type="password" placeholder="Password" autocomplete="off">
-        <div class="strictLoginActions"><button class="primary" onclick="strictLogin()">Login</button></div>
-        <div id="strictMsg" class="strictLoginStatus"></div>`;
-      }
-    }
-  }
-  window.v21CloseChat=function(){q("v21ChatPage").classList.remove("show")}
-  window.v21OpenChat=function(id){
-    window.v21ActiveCustomer=id;
-    const c=state.customers.find(x=>x.id===id); if(!c)return;
-    q("v21ChatPage").classList.add("show");
-    renderV21Chat();
-  }
-  window.renderV21Chat=function(){
-    const c=state.customers.find(x=>x.id===window.v21ActiveCustomer); if(!c)return;
-    q("v21ChatAvatar").textContent=initials(c.name);
-    q("v21ChatName").textContent=c.name;
-    q("v21ChatSub").textContent=(c.phone||"No phone")+" • "+(c.village||"No village")+" • Due "+money(customerDue(c.id));
-    q("v21Phone").onclick=()=>callCustomer(c.id);
-    q("v21WA").onclick=()=>window.open("https://wa.me/"+sanitizePhone(c.phone),"_blank");
-    q("v21BillWA").onclick=()=>whatsappReminderImage(c.id);
-    q("v21Edit").onclick=()=>editCustomer(c.id);
-    q("v21Pay").onclick=()=>v21DirectPayment(c.id);
-    q("v21SMS").onclick=()=>smsCustomer(c.id);
-    q("v21Ledger").onclick=()=>openLedger(c.id);
-    const bills=state.bills.filter(b=>b.customerId===c.id).sort((a,b)=>(a.date||"").localeCompare(b.date||""));
-    let last="", out=[];
-    if((+c.openingDue||0)>0) out.push(`<div class="v21Msg v21DueMsg">Opening Due: <b>${money(c.openingDue)}</b></div>`);
-    bills.forEach(b=>{
-      if(b.date!==last){last=b.date; out.push(`<div class="v21Day">${safeEsc(b.date||"No date")}</div>`)}
-      out.push(`<div class="v21Msg v21Bill"><b>${safeEsc(b.billNo)}</b><br>Name: ${safeEsc(b.customerName)}<br>Total: <b>${money(b.allTotal)}</b><br>Paid: <b>${money(billPaid(b))}</b><br>Due: <b>${money(billDue(b))}</b><div class="v21MsgActions"><button class="light" onclick="viewBill('${b.id}')">View</button><button class="light" onclick="openPayment('${b.id}')">Pay</button><button class="light" onclick="whatsappReminderImage('${c.id}')">Bill+WA</button></div><div class="v21Meta">${billStatus(b)}</div></div>`);
-      paymentsOf(b).forEach(p=>out.push(`<div class="v21Msg v21Pay">Payment received<br><b>${money(p.amount)}</b><br>${safeEsc(p.mode||"")} • ${safeEsc(p.receivedIn||"")}<div class="v21Meta">${safeEsc(p.date||"")}</div></div>`));
-    });
-    if(!out.length) out.push(`<div class="v21Msg v21DueMsg">No bill/payment yet.</div>`);
-    q("v21ChatBody").innerHTML=out.join("");
-  }
-  window.v21DirectPayment=function(id){
-    const c=state.customers.find(x=>x.id===id); if(!c)return;
-    const due=customerDue(id);
-    const amt=+(prompt("কত টাকা payment received?", due>0?due:"")||0);
-    if(!amt||amt<=0)return;
-    let remain=amt;
-    const bills=state.bills.filter(b=>b.customerId===id && billDue(b)>0).sort((a,b)=>(a.date||"").localeCompare(b.date||""));
-    for(const b of bills){ if(remain<=0)break; const pay=Math.min(remain,billDue(b)); (b.payments=b.payments||[]).push({id:uid(),date:today(),amount:pay,mode:"Cash",receivedIn:"Cash",note:"Direct due payment"}); remain-=pay; }
-    if(remain>0 && (+c.openingDue||0)>0) c.openingDue=Math.max((+c.openingDue||0)-remain,0);
-    saveState(); renderV21Chat(); alert("Payment saved");
-  }
-  const oldRefresh=window.refreshAll;
-  window.renderCustomers=function(){
-    const box=q("customerList"); if(!box || !window.state)return;
-    const search=q("customerSearch");
-    const filter=(search?search.value:"").toLowerCase();
-    const rows=state.customers.filter(c=>(c.name+c.phone+c.village+c.address).toLowerCase().includes(filter));
-    box.innerHTML=rows.length?`<div class="v21ChatList">`+rows.map(c=>{const due=customerDue(c.id);return `<div class="v21Row" onclick="v21OpenChat('${c.id}')"><div class="v21Avatar">${safeEsc(initials(c.name))}</div><div class="v21Main"><div class="row" style="gap:8px"><div class="v21Name">${safeEsc(c.name)}</div><span class="${due>0?'v21Due':'v21Due v21Paid'} right">${due>0?money(due):'Paid'}</span></div><div class="v21Sub">📞 ${safeEsc(c.phone||"No phone")} • 📍 ${safeEsc(c.village||"No village")}</div><div class="v21Sub">${safeEsc(c.address||"")}</div></div></div>`}).join("")+`</div>`:`<p class="muted">No customer yet.</p>`;
-  }
-  window.refreshAll=function(){ if(oldRefresh) oldRefresh(); try{renderCustomers()}catch(e){} }
-  const oldTest=window.testCloud;
-  window.testCloud=async function(){
-    if(!initFirebase()) return; if(!ensureAuth()) return;
-    try{ const docId=(state.settings.cloudDocId||"ekramul-main"); await fbDb.collection("ashaMiniShallow").doc(docId).get(); updateCloudStatus("Cloud test success."); }
-    catch(e){ updateCloudStatus("Test failed: "+e.message); }
-  }
-  const oldInit=window.init;
-  window.init=function(){ if(oldInit) oldInit(); setTimeout(()=>{ensureCleanLogin(); try{renderCustomers()}catch(e){}},600); }
-  document.addEventListener("DOMContentLoaded",()=>setTimeout(()=>{ensureCleanLogin(); try{renderCustomers()}catch(e){}},900));
-})();
-</script>
-
-
-<div id="v22Chat" class="noPrint">
-  <div class="v22Head">
-    <button class="v22Back" onclick="v22Close()">‹</button>
-    <div class="v22Avatar" id="v22Avatar">?</div>
-    <div class="v22Title"><b id="v22Name">Customer</b><span id="v22Sub">Phone • Village</span></div>
-    <button class="v22Top" id="v22BillWA">▣</button>
-    <button class="v22Top" id="v22Call">☎</button>
-    <button class="v22Top" id="v22WA">☘</button>
-    <div class="v22Menu" id="v22Menu">
-      <button class="v22Top" onclick="document.getElementById('v22Menu').classList.toggle('open')">⋮</button>
-      <div class="v22Panel">
-        <button class="light" id="v22Edit">Edit User</button>
-        <button class="light" id="v22Pay">Receive Due</button>
-        <button class="light" id="v22SMS">SMS Reminder</button>
-        <button class="light" id="v22Ledger">Ledger</button>
-      </div>
-    </div>
-  </div>
-  <div class="v22Body" id="v22Body"></div>
-</div>
-
-
-<script>
-(function(){
-  const OWNER_UID="FZIhTAr0JEMoHCeQd3kr2t8cJKk2";
-  const $id=(id)=>document.getElementById(id);
-  const esc2=(s)=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
-  const initials=(n)=>String(n||"?").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase();
-  function cleanLogin(){
-    const old1=$id("authScreen"), old2=$id("secureGate");
-    if(old1) old1.remove(); if(old2) old2.remove();
-    const wall=$id("strictLoginWall");
-    if(wall){
-      const box=wall.querySelector(".strictLoginBox");
-      if(box) box.innerHTML=`<div class="strictLoginLogo"><div class="miniLogo"></div><div><h2>Asha Billing</h2><div class="lockNote">Secure admin login</div></div></div>
-      <label>Email</label><input id="strictEmail" type="email" placeholder="Email" autocomplete="off">
-      <label>Password</label><input id="strictPass" type="password" placeholder="Password" autocomplete="off">
-      <div class="strictLoginActions"><button class="primary" onclick="strictLogin()">Login</button></div>
-      <div id="strictMsg" class="strictLoginStatus"></div>`;
-    }
-  }
-  window.v22Open=function(id){
-    window.v22Active=id;
-    const c=state.customers.find(x=>x.id===id); if(!c)return;
-    $id("v22Chat").classList.add("show");
-    renderV22();
-  }
-  window.v22Close=function(){$id("v22Chat").classList.remove("show")}
-  window.renderV22=function(){
-    const c=state.customers.find(x=>x.id===window.v22Active); if(!c)return;
-    $id("v22Avatar").textContent=initials(c.name);
-    $id("v22Name").textContent=c.name;
-    $id("v22Sub").textContent=(c.phone||"No phone")+" • "+(c.village||"No village")+" • Due "+money(customerDue(c.id));
-    $id("v22Call").onclick=()=>callCustomer(c.id);
-    $id("v22WA").onclick=()=>window.open("https://wa.me/"+sanitizePhone(c.phone),"_blank");
-    $id("v22BillWA").onclick=()=>whatsappReminderImage(c.id);
-    $id("v22Edit").onclick=()=>editCustomer(c.id);
-    $id("v22Pay").onclick=()=>v22DirectPay(c.id);
-    $id("v22SMS").onclick=()=>smsCustomer(c.id);
-    $id("v22Ledger").onclick=()=>openLedger(c.id);
-    const bills=state.bills.filter(b=>b.customerId===c.id).sort((a,b)=>(a.date||"").localeCompare(b.date||""));
-    let last="", out=[];
-    if((+c.openingDue||0)>0) out.push(`<div class="v22Msg v22Center">Opening Due: <b>${money(c.openingDue)}</b></div>`);
-    bills.forEach(b=>{
-      if(b.date!==last){last=b.date; out.push(`<div class="v22Day">${esc2(b.date||"No date")}</div>`);}
-      out.push(`<div class="v22Msg v22Bill"><b>${esc2(b.billNo)}</b><br>Name: ${esc2(b.customerName)}<br>Total: <b>${money(b.allTotal)}</b><br>Paid: <b>${money(billPaid(b))}</b><br>Due: <b>${money(billDue(b))}</b><div class="v22Actions"><button class="light" onclick="viewBill('${b.id}')">View</button><button class="light" onclick="openPayment('${b.id}')">Pay</button><button class="light" onclick="whatsappReminderImage('${c.id}')">Bill+WA</button></div><div class="v22Meta">${billStatus(b)}</div></div>`);
-      paymentsOf(b).forEach(p=>out.push(`<div class="v22Msg v22Pay">Payment received<br><b>${money(p.amount)}</b><br>${esc2(p.mode||"")} • ${esc2(p.receivedIn||"")}<div class="v22Meta">${esc2(p.date||"")}</div></div>`));
-    });
-    if(!out.length) out.push(`<div class="v22Msg v22Center">No bill/payment yet.</div>`);
-    $id("v22Body").innerHTML=out.join("");
-  }
-  window.v22DirectPay=function(id){
-    const c=state.customers.find(x=>x.id===id); if(!c)return;
-    const due=customerDue(id);
-    const amt=+(prompt("কত টাকা payment received?", due>0?due:"")||0);
-    if(!amt||amt<=0)return;
-    let remain=amt;
-    const bills=state.bills.filter(b=>b.customerId===id && billDue(b)>0).sort((a,b)=>(a.date||"").localeCompare(b.date||""));
-    for(const b of bills){if(remain<=0)break;const pay=Math.min(remain,billDue(b));(b.payments=b.payments||[]).push({id:uid(),date:today(),amount:pay,mode:"Cash",receivedIn:"Cash",note:"Direct due payment"});remain-=pay;}
-    if(remain>0 && (+c.openingDue||0)>0)c.openingDue=Math.max((+c.openingDue||0)-remain,0);
-    saveState(); renderV22(); alert("Payment saved");
-  }
-  window.renderCustomers=function(){
-    const box=$id("customerList"); if(!box || !window.state)return;
-    const sr=$id("customerSearch"); const q=(sr?sr.value:"").toLowerCase();
-    const rows=state.customers.filter(c=>(c.name+c.phone+c.village+c.address).toLowerCase().includes(q));
-    box.innerHTML=rows.length?`<div class="v22List">`+rows.map(c=>{const due=customerDue(c.id);return `<div class="v22User" onclick="v22Open('${c.id}')"><div class="v22Avatar">${esc2(initials(c.name))}</div><div class="v22Main"><div class="row" style="gap:8px"><div class="v22Name">${esc2(c.name)}</div><span class="${due>0?'v22Due':'v22Due v22Paid'} right">${due>0?money(due):'Paid'}</span></div><div class="v22Sub">📞 ${esc2(c.phone||"No phone")} • 📍 ${esc2(c.village||"No village")}</div><div class="v22Sub">${esc2(c.address||"")}</div></div></div>`}).join("")+`</div>`:`<p class="muted">No customer yet.</p>`;
-  }
-  const rf=window.refreshAll;
-  window.refreshAll=function(){if(rf)rf();setTimeout(()=>{try{renderCustomers()}catch(e){console.warn(e)}},50);}
-  window.testCloud=async function(){
-    if(!initFirebase())return;if(!ensureAuth())return;
-    try{const docId=(state.settings.cloudDocId||"ekramul-main");await fbDb.collection("ashaMiniShallow").doc(docId).get();updateCloudStatus("Cloud test success.");}
-    catch(e){updateCloudStatus("Test failed: "+e.message);}
-  }
-  const oldInit=window.init;
-  window.init=function(){if(oldInit)oldInit();setTimeout(()=>{cleanLogin();try{renderCustomers()}catch(e){console.warn(e)}},700);}
-  document.addEventListener("DOMContentLoaded",()=>setTimeout(()=>{cleanLogin();try{renderCustomers()}catch(e){console.warn(e)}},900));
-})();
-</script>
-
 </body>
 </html>

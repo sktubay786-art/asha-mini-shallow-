@@ -1,13 +1,19 @@
-Asha Mini Shallow Elite V22 Stable Clean
+Asha Mini Shallow V23 Clean Rebuilt
 
-Fixes:
-- Duplicate login boxes fully hidden/removed at runtime.
-- Only one clean Email + Password login.
-- Customer list is forced into WhatsApp-style list.
-- Tap any customer to open chat-style ledger screen.
-- Top icons: Bill+WA, phone call, WhatsApp.
-- 3-dot menu: Edit, Receive Due, SMS reminder, Ledger.
-- Cloud Test fixed for locked rules.
+This is a fresh clean rebuild to remove all old duplicate login/auth layers.
 
-Important:
-After uploading V22, clear site data/service worker if old UI still appears.
+Features:
+- Single clean Email + Password admin login
+- Built-in Firebase config
+- UID locked to owner
+- WhatsApp-style customer list
+- Tap customer to open chat-style ledger
+- Bill+WA, phone call, WhatsApp, SMS reminder
+- Direct due payment without new bill
+- Dynamic UPI QR based on due amount
+- Bill print, share image, PDF download
+- Payment, history, reports, ledger
+- Premium calculator and land calculator
+- PWA install
+
+Upload these files to GitHub and clear site data/cache after upload.

@@ -1,11 +1,11 @@
 {
-  "name": "Asha Mini Shallow Elite",
+  "name": "Asha Mini Shallow Billing",
   "short_name": "Asha Billing",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#eef4f0",
-  "theme_color": "#0b4b2f",
+  "background_color": "#edf5ef",
+  "theme_color": "#075c39",
   "icons": [
     {
       "src": "./icon-192.png",
