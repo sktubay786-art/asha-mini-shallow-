@@ -1,11 +1,9 @@
-Asha Mini Shallow V31 Bill Design Pro
+Asha Mini Shallow V32 Dynamic QR Fix
 
-Changes:
-- Bill Design / Billing Mode moved into Bill tab prominently.
-- Changing billing mode in Bill tab gives live preview immediately.
-- Bill design redesigned like a proper official bill, not notebook ruled lines.
-- Customer name, phone and address are grouped as a clean Customer Details block.
-- Added multiple bill design modes:
-  Classic Official Bill, Premium Green Bill, Boxed Modern Bill, Bengali Heavy Bill,
-  QR Focused Bill, Standard Clean Bill, Normal Black Bill, Thermal Compact Bill, Compact A6 Bill.
-- Settings still keeps default template, but primary selection is now in Bill tab.
+Fixes:
+- Dynamic QR is now generated inside the app using QRCode.js canvas.
+- QR fallback image is available if QR library fails.
+- Dynamic QR amount uses due amount when due exists, otherwise total amount.
+- Static QR still works if selected and uploaded.
+- If static QR is selected but no image exists, app automatically switches to dynamic QR.
+- Share bill waits for QR render before capturing bill image.

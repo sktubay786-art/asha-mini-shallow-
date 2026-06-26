@@ -342,3 +342,99 @@ ready(function(){
   renderAll(true);
 });
 })();
+
+
+/* ===== V32 DYNAMIC QR FIX ===== */
+(function(){
+function ready(fn){if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>setTimeout(fn,150));else setTimeout(fn,150)}
+ready(function(){
+  if(document.querySelector(".hero-chips span:last-child"))document.querySelector(".hero-chips span:last-child").textContent="V32 Dynamic QR Fix";
+
+  window.makeUpiLink=function(amount,billNo){
+    let pa=(state.settings.upi||"").trim();
+    let pn=(state.settings.owner||state.settings.payee||state.settings.company||"Asha Mini Shallow").trim();
+    let am=Number(amount||0).toFixed(2);
+    let tn=billNo||"Asha Bill";
+    return `upi://pay?pa=${encodeURIComponent(pa)}&pn=${encodeURIComponent(pn)}&am=${am}&cu=INR&tn=${encodeURIComponent(tn)}`;
+  };
+
+  window.renderQRCodes=function(){
+    document.querySelectorAll(".qr-live").forEach(el=>{
+      let data=el.getAttribute("data-qr")||"";
+      let fallback=el.getAttribute("data-fallback")||"";
+      el.innerHTML="";
+      if(window.QRCode){
+        try{
+          new QRCode(el,{text:data,width:106,height:106,correctLevel:QRCode.CorrectLevel.M});
+          return;
+        }catch(e){}
+      }
+      let img=document.createElement("img");
+      img.crossOrigin="anonymous";
+      img.alt="QR";
+      img.src=fallback || `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(data)}`;
+      el.appendChild(img);
+    });
+  };
+
+  const oldRenderInvoice=window.renderInvoice;
+  window.renderInvoice=function(b){
+    oldRenderInvoice(b);
+    setTimeout(renderQRCodes,50);
+  };
+
+  window.invoiceHTML=function(b,cls){
+    let due=billDue(b),paid=billPaid(b),tpl=document.getElementById("template")?.value||state.settings.template||"classic";
+    let payAmount=due>0?due:b.allTotal;
+    let upi=makeUpiLink(payAmount,b.billNo);
+    let fallback=`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upi)}`;
+    let rowsTop=[["Bill No",b.billNo],["Date",b.date]];
+    let landRows=[["Season",b.season],["জমির পরিমাণ",`${b.landAmount} ${b.unit}`],["Converted",`${b.bigha.toFixed(2)} বিঘা`],["Rate",`${money(b.rate)}/বিঘা`]];
+    let amountRows=[["Current Bill",money(b.current)],["Previous Due",money(b.previousDue)],["All Total",money(b.allTotal)],["Paid / Adjusted",money(paid)],["Due",money(due)],["Status",billStatus(b)],["Payment",b.payments?.[0]?.mode||"-"],["Received",b.payments?.[0]?.receivedIn||"-"]];
+    let row=(l,v,cls2="")=>`<div class="v31-row ${cls2}"><span>${esc(l)}</span><b>${esc(v)}</b></div>`;
+    let section=(title,html,extra="")=>`<div class="v31-section ${extra}"><div class="v31-section-title">${title}</div>${html}</div>`;
+    let customerBlock=`<div class="customer-lines"><b>Name:</b> ${esc(b.customerName)}<br><b>Phone:</b> ${esc(b.phone||"")}<br><b>Address:</b> ${esc(b.address||b.village||"")}</div>`;
+    let noteBlock=b.note?section("Note / Remarks",`<div class="customer-lines">${esc(b.note)}</div>`):"";
+    let qrBlock="";
+    if(state.settings.qrMode==="static" && state.settings.qrImage){
+      qrBlock=`<img class="qr" src="${state.settings.qrImage}">`;
+    }else{
+      qrBlock=`<div class="qr-live" data-qr="${esc(upi)}" data-fallback="${esc(fallback)}"></div><div class="qr-status">Dynamic QR • Amount ${money(payAmount)}</div>`;
+    }
+    return `<div class="invoice v31bill ${cls} ${tpl}">
+      <div class="v31-head"><h3>${esc(state.settings.company)}</h3><div class="subline">Pro: ${esc(state.settings.owner)}<br>☎/WhatsApp: ${esc(state.settings.contact)}<br>${esc(state.settings.address)}</div></div>
+      ${section("Bill Details",rowsTop.map(x=>row(x[0],x[1])).join(""))}
+      ${section("Customer Details",customerBlock)}
+      ${section("Land / Season",landRows.map(x=>row(x[0],x[1])).join(""))}
+      ${section("Amount Summary",amountRows.map((x,i)=>row(x[0],x[1],i>=2?"v31-total":"")).join(""))}
+      <div class="v31-section v31-pay-section"><div class="v31-section-title">Payment QR</div><div class="head-small">UPI: ${esc(state.settings.upi)}</div>${qrBlock}<div class="head-small"><b>Scan & Pay ${money(payAmount)}</b></div></div>
+      ${noteBlock}
+      <div class="footer-note">ধন্যবাদ। সময়মতো বিল পরিশোধ করার জন্য অনুরোধ করা হচ্ছে।</div>
+      <div style="text-align:right;font-size:11px;margin-top:8px">Sign: ${esc(state.settings.owner)}</div>
+      <div style="text-align:center;font-size:11px;color:#777">Thank you</div>
+    </div>`;
+  };
+
+  const oldShareBill=window.shareBill;
+  window.shareBill=async function(){
+    if(!currentBill)return alert("Preview bill first");
+    renderQRCodes();
+    await new Promise(r=>setTimeout(r,200));
+    return oldShareBill();
+  };
+
+  // Force dynamic mode when user selects dynamic in settings and make it visible.
+  const qrMode=document.getElementById("setQrMode");
+  if(qrMode){
+    qrMode.onchange=()=>{state.settings.qrMode=qrMode.value;saveState(false);previewBill();};
+  }
+
+  // If no static QR exists, keep dynamic mode.
+  if(state.settings.qrMode==="static" && !state.settings.qrImage){
+    state.settings.qrMode="dynamic";
+    saveState(false);
+  }
+
+  setTimeout(()=>{previewBill();renderQRCodes();},300);
+});
+})();

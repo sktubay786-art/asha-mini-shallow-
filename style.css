@@ -54,3 +54,35 @@ main{max-width:1180px;margin:auto}.page{display:none;padding:18px}.page.active{d
 .invoice.v31bill.thermal .v31-head{padding:8px 6px;border-radius:7px}
 .invoice.v31bill.thermal .v31-head h3{font-size:16px}
 .invoice.v31bill.thermal .v31-section{padding:6px;border-radius:8px}
+
+/* V32 dynamic QR fix */
+.qr-live{
+  width:116px;
+  height:116px;
+  margin:8px auto;
+  display:grid;
+  place-items:center;
+  background:#fff;
+  border:2px solid #075c39;
+  border-radius:12px;
+  padding:5px;
+}
+.qr-live canvas,.qr-live img{
+  width:100%!important;
+  height:100%!important;
+  display:block;
+}
+.invoice.v31bill.qrfirst .qr-live{
+  width:138px;
+  height:138px;
+}
+.invoice.v31bill.thermal .qr-live{
+  width:92px;
+  height:92px;
+}
+.qr-status{
+  font-size:10px;
+  color:#075c39;
+  text-align:center;
+  font-weight:800;
+}
