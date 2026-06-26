@@ -245,6 +245,33 @@ body.dark .secureGateBox{background:#101c18;border-color:#2e3b36}
   padding:6px 10px;font-size:12px;font-weight:950;margin-bottom:8px;
 }
 
+
+/* Elite V18 Strict Login Wall */
+body.authWall main,
+body.authWall .nav,
+body.authWall .appbar,
+body.authWall .page,
+body.authWall #lockScreen{
+  display:none !important;
+}
+body.authWall #strictLoginWall{display:flex !important}
+.strictLoginWall{
+  position:fixed;inset:0;z-index:999;display:none;align-items:center;justify-content:center;
+  padding:18px;background:linear-gradient(145deg,rgba(4,33,22,.94),rgba(9,93,57,.92)),url("./app-bg.jpg") center/cover no-repeat;
+}
+.strictLoginBox{
+  width:100%;max-width:440px;background:rgba(255,255,255,.96);border-radius:30px;padding:22px;
+  box-shadow:0 32px 90px rgba(0,0,0,.36);border:1px solid rgba(255,255,255,.55);
+}
+.strictLoginLogo{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.strictLoginLogo .miniLogo{width:54px;height:54px;border-radius:18px;background:url("./icon-192.png") center/cover no-repeat;border:2px solid #0b4b2f}
+.strictLoginBox h2{font-size:24px;margin:0}
+.strictLoginBox .lockNote{font-size:13px;color:#475467;line-height:1.45;margin:8px 0 14px}
+.strictWarning{background:#fff4e5;border:1px solid #fedf89;color:#93370d;padding:10px;border-radius:16px;font-size:12px;margin:10px 0}
+.strictLoginActions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+.strictLoginActions button{flex:1;min-width:120px}
+.strictLoginStatus{font-size:12px;margin-top:8px;color:#475467}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -257,6 +284,25 @@ body.dark .secureGateBox{background:#101c18;border-color:#2e3b36}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 </head>
 <body class="print-thermal">
+
+<div id="strictLoginWall" class="strictLoginWall noPrint">
+  <div class="strictLoginBox">
+    <div class="strictLoginLogo">
+      <div class="miniLogo"></div>
+      <div><h2>Asha Billing Login</h2><div class="lockNote">Email + Password ছাড়া app open হবে না।</div></div>
+    </div>
+    <div class="strictWarning">App link public হলেও owner login ছাড়া dashboard/data দেখা যাবে না।</div>
+    <label>Email</label><input id="strictEmail" type="email" placeholder="আপনার Gmail">
+    <label>Password</label><input id="strictPass" type="password" placeholder="Password">
+    <div class="strictLoginActions">
+      <button class="primary" onclick="strictLogin()">Login</button>
+      <button class="light" onclick="strictCreate()">Create Owner Login</button>
+      <button class="light" onclick="strictLogout()">Logout</button>
+    </div>
+    <div id="strictMsg" class="strictLoginStatus">Owner UID: FZIhTAr0JEMoHCeQd3kr2t8cJKk2</div>
+  </div>
+</div>
+
 
 <div id="secureGate" class="secureGate noPrint">
   <div class="secureGateBox">
@@ -765,7 +811,7 @@ async function authSignup(){
     hideAuth(); updateAuthStatus(); updateCloudStatus("Login created.");
   }catch(e){ $("authMsg").textContent=e.message; updateCloudStatus("Create login failed: "+e.message); }
 }
-async function authLogout(){
+async function authLogout(){sessionStorage.removeItem("ashaStrictLoginOK");
   try{ if(window.firebase && firebase.auth) await firebase.auth().signOut(); updateAuthStatus(); updateCloudStatus("Logged out."); }
   catch(e){ updateCloudStatus("Logout failed: "+e.message); }
 }
@@ -820,6 +866,54 @@ async function gateCreate(){
 }
 
 function updateCloudStatus(msg){const el=$("cloudStatus"); if(el) el.textContent=msg;}
+
+const OWNER_UID="FZIhTAr0JEMoHCeQd3kr2t8cJKk2";
+function strictWallOn(){document.body.classList.add("authWall");}
+function strictWallOff(){document.body.classList.remove("authWall");const w=$("strictLoginWall");if(w)w.style.display="none";}
+function strictMsg(t){const el=$("strictMsg");if(el)el.textContent=t;}
+function strictUserOk(){
+  if(!state.settings || !state.settings.firebaseConfig) return false;
+  if(!window.firebase || !firebase.auth) return false;
+  const u=firebase.auth().currentUser;
+  return !!(u && u.uid===OWNER_UID && sessionStorage.getItem("ashaStrictLoginOK")==="yes");
+}
+function strictCheck(){ strictUserOk()?strictWallOff():strictWallOn(); }
+async function strictLogin(){
+  try{
+    if(!initFirebase()) return;
+    await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
+    const email=$("strictEmail").value.trim(), pass=$("strictPass").value;
+    const cred=await firebase.auth().signInWithEmailAndPassword(email,pass);
+    if(cred.user.uid!==OWNER_UID){
+      await firebase.auth().signOut(); sessionStorage.removeItem("ashaStrictLoginOK");
+      strictMsg("এই email owner account নয়। Access denied."); strictWallOn(); return;
+    }
+    state.settings.ownerUid=OWNER_UID; localStorage.setItem(KEY,JSON.stringify(state));
+    sessionStorage.setItem("ashaStrictLoginOK","yes");
+    updateAuthStatus(); updateCloudStatus("Strict login success."); strictWallOff();
+  }catch(e){strictMsg(e.message); strictWallOn();}
+}
+async function strictCreate(){
+  try{
+    if(!initFirebase()) return;
+    await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
+    const email=$("strictEmail").value.trim(), pass=$("strictPass").value;
+    const cred=await firebase.auth().createUserWithEmailAndPassword(email,pass);
+    if(cred.user.uid!==OWNER_UID){
+      strictMsg("নতুন UID আপনার locked UID নয়। আগের owner email দিয়ে Login করুন।"); return;
+    }
+    state.settings.ownerUid=OWNER_UID; localStorage.setItem(KEY,JSON.stringify(state));
+    sessionStorage.setItem("ashaStrictLoginOK","yes"); strictWallOff();
+  }catch(e){strictMsg(e.message);}
+}
+async function strictLogout(){
+  try{
+    sessionStorage.removeItem("ashaStrictLoginOK");
+    if(window.firebase && firebase.auth) await firebase.auth().signOut();
+    strictMsg("Logged out."); strictWallOn();
+  }catch(e){strictMsg(e.message); strictWallOn();}
+}
+
 function initFirebase(){
   try{
     const raw=state.settings.firebaseConfig||$("setFirebaseConfig")?.value||"";
@@ -829,7 +923,7 @@ function initFirebase(){
     if(!window.firebase) throw new Error("Firebase SDK load হয়নি");
     if(!firebase.apps.length) fbApp=firebase.initializeApp(cfg); else fbApp=firebase.app();
     fbDb=firebase.firestore();
-    if(firebase.auth){firebase.auth().onAuthStateChanged(u=>{if(u){state.settings.ownerUid=state.settings.ownerUid||u.uid;if($("setOwnerUid"))$("setOwnerUid").value=state.settings.ownerUid;localStorage.setItem(KEY,JSON.stringify(state));}updateAuthStatus();updateSecureGate();});}
+    if(firebase.auth){firebase.auth().onAuthStateChanged(u=>{if(u){state.settings.ownerUid=state.settings.ownerUid||u.uid;if($("setOwnerUid"))$("setOwnerUid").value=state.settings.ownerUid;localStorage.setItem(KEY,JSON.stringify(state));}updateAuthStatus();updateSecureGate();strictCheck();});}
     updateCloudStatus("Firebase connected.");
     return true;
   }catch(e){updateCloudStatus("Cloud error: "+e.message);return false;}
@@ -891,7 +985,7 @@ function printReport(){navTo("reports");setTimeout(()=>window.print(),100)}
 
 function registerSW(){if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}}
 
-function init(){setPrintMode("thermal");applyTheme();refreshAll();runLandCalc();checkLock();registerSW();if(state.settings.firebaseConfig){initFirebase();updateCloudStatus("Cloud config available. Login করুন।");setTimeout(updateSecureGate,700)}else updateCloudStatus("Cloud not configured.");updateAuthStatus();}
+function init(){setPrintMode("thermal");applyTheme();refreshAll();runLandCalc();checkLock();registerSW();if(state.settings.firebaseConfig){initFirebase();updateCloudStatus("Cloud config available. Login করুন।");setTimeout(updateSecureGate,700);setTimeout(strictCheck,900)}else updateCloudStatus("Cloud not configured.");updateAuthStatus();}
 init();
 </script>
 </body>
