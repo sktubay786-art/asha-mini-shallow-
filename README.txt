@@ -7,3 +7,38 @@ Fixes:
 - Static QR still works if selected and uploaded.
 - If static QR is selected but no image exists, app automatically switches to dynamic QR.
 - Share bill waits for QR render before capturing bill image.
+
+
+V33 fixes:
+- WhatsApp number now auto adds country code for 10-digit phones.
+- Chat header buttons enlarged and made more touch-friendly.
+- Reminder+Bill button calls native share after rendering latest bill.
+- Added new bill template: Phone View Compact.
+- Added new print mode: Phone View Image.
+- Compact bill combines status/payment/received to save space.
+
+
+V34:
+- Premium chat header/buttons
+- Specific bill Reminder+Bill shares the selected bill
+- Phone View Compact bill template + phoneview print mode
+- More menu upgraded to quick action sheet
+- WhatsApp fallback improved with country code handling
+
+
+V35:
+- Ultra premium customer list
+- Better chat summary and quick actions
+- Direct Pay / Settle modal
+- Mini compact bill template
+- Better WhatsApp country code handling
+- Pay page auto-fill from chat
+
+
+V36:
+- Chat buttons fixed (View/Pay/Reminder+Bill/Call/WhatsApp/More)
+- WhatsApp auto country code handling
+- Better chat UI and quick summary
+- Direct Pay / Settle modal
+- Better customer list info
+- Compact bill layout for phone view / mini templates

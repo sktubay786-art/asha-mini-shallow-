@@ -86,3 +86,104 @@ main{max-width:1180px;margin:auto}.page{display:none;padding:18px}.page.active{d
   text-align:center;
   font-weight:800;
 }
+
+/* V33 UX + compact bill */
+.chat-head button,.bubble-actions button,.entry-tools button,.chat-actions button{cursor:pointer;touch-action:manipulation}
+.chat-head button{min-width:46px;min-height:46px;border-radius:50%;font-size:18px;font-weight:800}
+.bubble-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.bubble-actions button,.entry-tools button{min-height:38px;padding:0 14px;border-radius:18px}
+.billB{max-width:min(92vw,430px)}
+.invoice.phone,.invoice.compact{max-width:430px;margin:0 auto}
+.invoice.phone .v31-row,.invoice.compact .v31-row{padding:6px 0}
+.invoice.phone .v31-section,.invoice.compact .v31-section{padding:10px 12px;margin:8px 0}
+.invoice.phone .v31-head h3,.invoice.compact .v31-head h3{font-size:22px}
+.invoice.phone .subline,.invoice.compact .subline{font-size:12px}
+.invoice.phone .compact-grid,.invoice.compact .compact-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.invoice.phone .compact-chip,.invoice.compact .compact-chip{background:#f6f8f7;border:1px solid #d8e5dd;border-radius:12px;padding:8px 10px;font-size:12px}
+.invoice.phone .customer-lines,.invoice.compact .customer-lines{line-height:1.55}
+@media print {
+  body.printPhone #billPreviewWrap,.printPhone #billPreviewWrap{max-width:420px!important;margin:0 auto!important}
+  body.printPhone .invoice{width:82mm!important;max-width:82mm!important}
+}
+
+
+/* ===== V34 premium chat + compact bill ===== */
+.chat-head{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.95);backdrop-filter:blur(14px);box-shadow:0 4px 18px rgba(0,0,0,.06)}
+.chat-head .avatar{background:linear-gradient(135deg,var(--accent),#31d7c2);color:#fff;box-shadow:0 6px 18px rgba(7,92,57,.22)}
+.chat-head button{border:1px solid rgba(7,92,57,.14);background:linear-gradient(180deg,#fff,#f4f7f5);box-shadow:0 6px 16px rgba(0,0,0,.06)}
+.chat-head button#chatBack{font-size:28px;line-height:1}
+.chat-actions{position:sticky;bottom:0;background:rgba(255,255,255,.96);backdrop-filter:blur(14px);padding-bottom:max(10px,env(safe-area-inset-bottom))}
+.chat-actions button{box-shadow:0 4px 14px rgba(0,0,0,.05)}
+.customer-row{transition:.18s transform,.18s box-shadow,.18s background}
+.customer-row:hover,.customer-row:active{transform:translateY(-1px);box-shadow:0 10px 26px rgba(0,0,0,.06);background:#fff}
+.billB{border-radius:18px;background:linear-gradient(180deg,#dff6cb,#d8f0c1)}
+.payB,.setB{border-radius:16px}
+.bubble-actions button,.entry-tools button{background:#fff;border:1px solid #e7e7e7}
+.bubble-actions button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.chat-topnote{font-size:11px;color:#6d7772;margin-top:2px}
+.invoice.phone .v31-head,.invoice.compact .v31-head{padding:14px 14px 10px}
+.invoice.phone .v31-section,.invoice.compact .v31-section{padding:10px 12px;margin:7px 0}
+.invoice.phone .v31-row,.invoice.compact .v31-row{padding:5px 0}
+.invoice.phone .qr-live,.invoice.compact .qr-live{transform:scale(.92);transform-origin:center top}
+.invoice.phone .head-small,.invoice.compact .head-small{font-size:11px}
+.invoice.phone .v31-head h3,.invoice.compact .v31-head h3{font-size:20px}
+.invoice.phone .subline,.invoice.compact .subline{font-size:11px;line-height:1.45}
+.invoice.phone .compact-grid,.invoice.compact .compact-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.invoice.phone .compact-chip,.invoice.compact .compact-chip{background:#f7fbf8;border:1px solid #d9e9de;border-radius:12px;padding:8px 10px;font-size:12px;line-height:1.35}
+.action-sheet{display:grid;gap:10px}
+.action-sheet .btn{justify-content:flex-start;text-align:left;border-radius:14px}
+.more-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.more-grid .btn{display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px}
+.bill-design-hint{margin-top:7px;font-size:11px;color:#5d6b65}
+
+
+/* ===== V35 ultra premium ===== */
+.chat-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0 14px}
+.chat-summary .sum-card{background:rgba(255,255,255,.72);backdrop-filter:blur(10px);border:1px solid rgba(8,92,57,.10);border-radius:16px;padding:10px 12px;box-shadow:0 8px 20px rgba(0,0,0,.04)}
+.chat-summary .sum-card small{display:block;color:#6b756f;font-size:11px}
+.chat-summary .sum-card b{display:block;margin-top:4px;font-size:15px}
+.chat-stack{display:grid;gap:10px}
+.day{position:sticky;top:86px;z-index:2}
+.billB .bubble-actions,.setB .entry-tools,.payB .entry-tools{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.billB .bubble-actions button,.setB .entry-tools button,.payB .entry-tools button{min-height:38px;padding:0 12px;border-radius:12px}
+.more-grid{grid-template-columns:1fr 1fr}
+.more-grid .btn{font-size:14px;font-weight:700}
+.preview-wrap{background:linear-gradient(180deg,#f9fbfa,#f2f5f4)}
+.invoice.phone .compact-grid,.invoice.compact .compact-grid,.invoice.mini .compact-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.invoice.mini{max-width:430px;margin:0 auto;border-radius:18px;overflow:hidden;background:#fff;box-shadow:0 12px 32px rgba(0,0,0,.08)}
+.invoice.mini .v31-head{padding:14px 14px 10px}
+.invoice.mini .subline,.invoice.mini .head-small{font-size:11px;line-height:1.4}
+.invoice.mini .v31-section{padding:10px 12px;margin:7px 0}
+.invoice.mini .v31-row{padding:4px 0}
+.invoice.mini .v31-head h3{font-size:19px}
+.invoice.mini .compact-chip{background:#f6faf7;border:1px solid #ddebe1;border-radius:12px;padding:8px 9px;font-size:11px;line-height:1.35}
+.invoice.mini .footer-note{font-size:11px;line-height:1.5;margin-top:8px}
+.customer-row .cust-mini{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.customer-row .mini-chip{background:#f7f9f8;border:1px solid #e5ece8;border-radius:999px;padding:3px 8px;font-size:11px;color:#51605a}
+.customer-row .mini-chip.red{color:#b52323;background:#fff4f4;border-color:#ffdede}
+.customer-row .mini-chip.green{color:#117545;background:#f0fff7;border-color:#d7f5e5}
+.action-sheet label{font-size:12px;color:#66726d;font-weight:700;margin:4px 0 2px;display:block}
+.action-sheet input,.action-sheet select{margin-bottom:6px}
+
+
+/* ==== V36 patch ==== */
+.chat-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 14px}
+.chat-summary .sum-card{background:rgba(255,255,255,.80);backdrop-filter:blur(12px);border:1px solid rgba(7,92,57,.10);border-radius:16px;padding:10px 12px;box-shadow:0 8px 18px rgba(0,0,0,.04)}
+.chat-summary .sum-card small{display:block;color:#708078;font-size:11px}.chat-summary .sum-card b{display:block;margin-top:4px;font-size:15px}
+.bubble.billB .bubble-actions,.bubble.payB .entry-tools,.bubble.setB .entry-tools{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.bubble.billB .bubble-actions button,.bubble.payB .entry-tools button,.bubble.setB .entry-tools button{min-height:38px;padding:0 12px;border-radius:12px}
+.more-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.customer-row .cust-mini{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.customer-row .mini-chip{background:#f7f9f8;border:1px solid #e5ece8;border-radius:999px;padding:3px 8px;font-size:11px;color:#52615a}
+.customer-row .mini-chip.red{color:#ae2b2b;background:#fff4f4;border-color:#ffd6d6}.customer-row .mini-chip.green{color:#177447;background:#f1fff6;border-color:#d8f3e4}
+.invoice.v36compact{max-width:440px;margin:0 auto;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 12px 28px rgba(0,0,0,.08)}
+.invoice.v36compact .v36-head{background:linear-gradient(135deg,var(--accent),#1aa567);color:#fff;padding:16px 16px 12px;text-align:center}
+.invoice.v36compact .v36-head h3{margin:0 0 6px;font-size:20px}.invoice.v36compact .v36-head .sub{font-size:11px;line-height:1.45;opacity:.97}
+.invoice.v36compact .v36-sec{padding:12px 14px;border-bottom:1px dashed #dce6df}.invoice.v36compact .row{display:flex;justify-content:space-between;gap:12px;padding:4px 0;font-size:13px}
+.invoice.v36compact .row b:last-child{text-align:right}.invoice.v36compact .row.total{font-size:18px;font-weight:800;padding-top:8px}
+.invoice.v36compact .customer-box{background:#f7fbf8;border:1px solid #e5eee8;border-radius:14px;padding:10px 12px;line-height:1.55;font-size:13px}
+.invoice.v36compact .chips{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.invoice.v36compact .chip{background:#f7fbf8;border:1px solid #e1ece5;border-radius:12px;padding:8px 9px;font-size:11px;line-height:1.4}
+.invoice.v36compact .qrbox{text-align:center;padding:10px 0}.invoice.v36compact .qrbox img{width:124px;height:124px;object-fit:contain;border:2px solid #e4eee8;border-radius:12px;padding:6px;background:#fff}
+.invoice.v36compact .foot{padding:12px 14px 16px;text-align:center;font-size:11px;color:#55645d;line-height:1.55}
+body.printPhone .invoice.v36compact{max-width:420px}
+.bill-layout-note{font-size:12px;color:#5a6a63;margin-top:8px}

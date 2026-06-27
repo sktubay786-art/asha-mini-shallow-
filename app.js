@@ -438,3 +438,617 @@ ready(function(){
   setTimeout(()=>{previewBill();renderQRCodes();},300);
 });
 })();
+
+
+/* ===== V33 CHAT + WA + COMPACT BILL FIX ===== */
+(function(){
+function ccDigits(){return String(state.settings.country||'+91').replace(/\D/g,'')||'91'}
+window.phoneDigits=function(raw){
+  let d=String(raw||'').replace(/\D/g,'');
+  if(!d) return '';
+  if(d.length===10) return ccDigits()+d;
+  if(d.length>10 && d.startsWith(ccDigits())) return d;
+  if(d.length>10) return d;
+  return ccDigits()+d;
+}
+window.safePhoneLabel=function(raw){let d=phoneDigits(raw);return d?('+'+d):''}
+window.openWhatsApp=function(raw,text=''){
+  const d=phoneDigits(raw);
+  if(!d || d.length<12) return alert('Valid phone number নেই। Customer phone-এ 10 digit number দিন, country code auto add হবে।');
+  const url='https://wa.me/'+d+(text?('?text='+encodeURIComponent(text)):'');
+  window.open(url,'_blank');
+}
+window.waText=function(){if(!currentBill)return alert('Preview bill first');openWhatsApp(currentBill.phone, reminderTextByBill(currentBill));}
+window.waCustomerText=function(id){let c=state.customers.find(x=>x.id===id);if(!c)return;openWhatsApp(c.phone, customerReminderText(c));}
+window.smsReminder=function(id){let c=state.customers.find(x=>x.id===id);if(!c)return;location.href='sms:'+phoneDigits(c.phone)+'?body='+encodeURIComponent(customerReminderText(c))}
+
+const oldRenderCustomers=window.renderCustomers||renderCustomers;
+window.renderCustomers=function(){ oldRenderCustomers(); document.querySelectorAll('.customer-row').forEach(r=>r.style.cursor='pointer'); }
+
+window.customerReminderText=function(c){
+  return `${state.settings.company}\nName: ${c.name}\nPhone: ${safePhoneLabel(c.phone)}\nDue: ${money(customerDue(c.id))}\nContact: ${state.settings.contact}\nUPI: ${state.settings.upi}`
+}
+
+window.shareCustomerBill=async function(id){
+  let bills=state.bills.filter(b=>b.customerId===id).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  if(!bills.length) return alert('No bill found');
+  currentBill=bills[0];
+  renderInvoice(currentBill);
+  setTimeout(async()=>{
+    try{await shareBill()}catch(e){console.warn(e); alert('Reminder + Bill share failed. আবার try করুন।')}
+  },220);
+}
+
+window.compactBillExtras=function(b){
+  return `<div class="compact-grid">
+    <div class="compact-chip"><b>Status</b><br>${esc(billStatus(b))}</div>
+    <div class="compact-chip"><b>Payment</b><br>${esc(b.payments?.[0]?.mode||'-')}</div>
+    <div class="compact-chip"><b>Received</b><br>${esc(b.payments?.[0]?.receivedIn||'-')}</div>
+    <div class="compact-chip"><b>Note</b><br>${esc(b.note||'-')}</div>
+  </div>`
+}
+
+window.invoiceHTML=function(b,cls){
+  let due=billDue(b), paid=billPaid(b), tpl=(document.getElementById('template')?.value||state.settings.template||'classic');
+  let payAmount=due>0?due:b.allTotal;
+  let upi=makeUpiLink(payAmount,b.billNo);
+  let fallback=`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upi)}`;
+  let row=(l,v,cls2='')=>`<div class="v31-row ${cls2}"><span>${esc(l)}</span><b>${esc(v)}</b></div>`;
+  let section=(title,html,extra='')=>`<div class="v31-section ${extra}"><div class="v31-section-title">${title}</div>${html}</div>`;
+  let rowsTop=[['Bill No',b.billNo],['Date',b.date]];
+  let landRows=[['Season',b.season],['জমির পরিমাণ',`${b.landAmount} ${b.unit}`],['Converted',`${Number(b.bigha||0).toFixed(2)} বিঘা`],['Rate',`${money(b.rate)}/বিঘা`]];
+  let amountRows=[['Current Bill',money(b.current)],['Previous Due',money(b.previousDue)],['All Total',money(b.allTotal)],['Paid / Adjusted',money(paid)],['Due',money(due)]];
+  let customerBlock=`<div class="customer-lines"><b>Name:</b> ${esc(b.customerName)}<br><b>Phone:</b> ${esc(safePhoneLabel(b.phone)||b.phone||'')}<br><b>Address:</b> ${esc(b.address||b.village||'')}</div>`;
+  let noteBlock=b.note?section('Note / Remarks',`<div class="customer-lines">${esc(b.note)}</div>`):'';
+  let qrBlock=(state.settings.qrMode==='static' && state.settings.qrImage)
+    ? `<img class="qr" src="${state.settings.qrImage}">`
+    : `<div class="qr-live" data-qr="${esc(upi)}" data-fallback="${esc(fallback)}"></div><div class="qr-status">Dynamic QR • Amount ${money(payAmount)}</div>`;
+  let compact = tpl==='phone' || tpl==='compact' || cls==='phoneview';
+  let extraCompact = compact ? compactBillExtras(b) : section('Payment Details', [
+      ['Status',billStatus(b)],['Payment',b.payments?.[0]?.mode||'-'],['Received',b.payments?.[0]?.receivedIn||'-']
+    ].map((x,i)=>row(x[0],x[1],i===0?'v31-total':'' )).join(''));
+  return `<div class="invoice v31bill ${cls} ${tpl}">
+      <div class="v31-head"><h3>${esc(state.settings.company)}</h3><div class="subline">Pro: ${esc(state.settings.owner)}<br>☎/WhatsApp: ${esc(state.settings.contact)}<br>${esc(state.settings.address)}</div></div>
+      ${section('Bill Details',rowsTop.map(x=>row(x[0],x[1])).join(''))}
+      ${section('Customer Details',customerBlock)}
+      ${section('Land / Season',landRows.map(x=>row(x[0],x[1])).join(''))}
+      ${section('Amount Summary',amountRows.map((x,i)=>row(x[0],x[1],i>=2?'v31-total':'' )).join(''))}
+      ${extraCompact}
+      <div class="v31-section v31-pay-section"><div class="v31-section-title">Payment QR</div><div class="head-small">UPI: ${esc(state.settings.upi)}</div>${qrBlock}<div class="head-small"><b>Scan & Pay ${money(payAmount)}</b></div></div>
+      ${noteBlock}
+      <div class="footer-note">ধন্যবাদ। সময়মতো বিল পরিশোধ করার জন্য অনুরোধ করা হচ্ছে।</div>
+      <div style="text-align:right;font-size:11px;margin-top:8px">Sign: ${esc(state.settings.owner)}</div>
+      <div style="text-align:center;font-size:11px;color:#777">Thank you</div>
+    </div>`;
+  }
+
+window.printBill=function(){
+  let m=(document.getElementById('printMode')?.value||'');
+  document.body.classList.toggle('printThermal',m==='thermal80');
+  document.body.classList.toggle('printPhone',m==='phoneview');
+  window.print();
+  setTimeout(()=>{document.body.classList.remove('printThermal');document.body.classList.remove('printPhone')},400);
+}
+
+window.renderChat=function(){
+  let c=state.customers.find(x=>x.id===activeCustomer); if(!c) return;
+  chatAvatar.textContent=initials(c.name); chatName.textContent=c.name;
+  chatSub.textContent=(safePhoneLabel(c.phone)||'No phone')+' • '+(c.village||'No village')+' • Due '+money(customerDue(c.id));
+  chatCall.onclick=()=>{let d=phoneDigits(c.phone); if(!d) return alert('Phone number নেই'); location.href='tel:+'+d;};
+  chatWhats.onclick=()=>openWhatsApp(c.phone, customerReminderText(c));
+  chatShare.onclick=()=>shareCustomerBill(c.id);
+  chatBill.onclick=()=>{closeChat();showPage('billPage');billCustomer.value=c.id;toggleManual();previewBill()};
+  chatPay.onclick=()=>directPay(c.id,false); chatSettle.onclick=()=>directPay(c.id,true); chatLedger.onclick=()=>renderChatLedger(c.id); chatEdit.onclick=()=>openCustomer(c.id);
+  if(chatMore) chatMore.onclick=()=>openMoreMenu(c.id);
+  let bills=state.bills.filter(b=>b.customerId===c.id).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  let out=[];
+  if((+c.openingDue||0)>0) out.push(`<div class="bubble setB">Opening Due: <b>${money(c.openingDue)}</b></div>`);
+  bills.forEach(b=>{
+    out.push(`<div class="day">${esc(b.date)}</div><div class="bubble billB"><b>${esc(b.billNo)}</b><br>Total ${money(b.allTotal)}<br>Paid/Adjusted ${money(billPaid(b))}<br>Due <b>${money(billDue(b))}</b>${b.note?`<br><small>Note: ${esc(b.note)}</small>`:''}<div class="bubble-actions"><button type="button" onclick="event.stopPropagation();viewBill('${b.id}')">View</button><button type="button" onclick="event.stopPropagation();openPayment('${b.id}')">Pay</button><button type="button" onclick="event.stopPropagation();shareCustomerBill('${c.id}')">Reminder + Bill</button><button type="button" onclick="event.stopPropagation();deleteBill('${b.id}')">Delete</button></div></div>`);
+    (b.payments||[]).forEach(p=>out.push(`<div class="bubble ${(p.mode||'').includes('Settlement')?'setB':'payB'}">${esc(p.mode)}<br><b>${money(p.amount)}</b><br>${esc(p.receivedIn)}<br><small>${esc(p.note||'')}</small><div class="entry-tools"><button type="button" onclick="event.stopPropagation();editEntry('${p.id}')">Edit</button><button type="button" onclick="event.stopPropagation();editEntry('${p.id}')">Undo/Delete</button></div></div>`))
+  });
+  chatBody.innerHTML=out.join('')||`<div class="bubble setB">No bill yet</div>`;
+}
+
+window.renderActionSheetHint=function(){
+  if(document.querySelector('.chat-head')) document.querySelectorAll('.chat-head button').forEach(b=>b.title=b.textContent==='W'?'WhatsApp':(b.textContent==='✆'?'Call':'Share Bill'));
+}
+setTimeout(renderActionSheetHint,500)
+})();
+
+
+/* ===== V34 ULTRA PATCH ===== */
+(function(){
+function ready(fn){if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,180));else setTimeout(fn,180)}
+ready(function(){
+  const versionChip=document.querySelector('.hero-chips span:last-child');
+  if(versionChip) versionChip.textContent='V34 Premium Chat + Compact';
+
+  function templateOptions(){
+    return '<option value="classic">Classic Official Bill</option><option value="premium">Premium Green Bill</option><option value="boxed">Boxed Modern Bill</option><option value="bengali">Bengali Heavy Bill</option><option value="qrfirst">QR Focused Bill</option><option value="standard">Standard Clean Bill</option><option value="normal">Normal Black Bill</option><option value="thermal">Thermal Compact Bill</option><option value="compact">Compact A6 Bill</option><option value="phone">Phone View Compact</option>';
+  }
+  const oldFill=window.fillSelects;
+  window.fillSelects=function(){
+    if(oldFill) oldFill();
+    const t=document.getElementById('template');
+    const st=document.getElementById('setTemplate');
+    const current=state.settings.template||'premium';
+    if(t){t.innerHTML=templateOptions(); t.value=current; t.onchange=()=>{state.settings.template=t.value; previewBill();};}
+    if(st){st.innerHTML=templateOptions(); st.value=current;}
+    const cm=document.getElementById('chatMore'); if(cm) cm.textContent='⋯';
+    const sh=document.getElementById('chatShare'); if(sh) {sh.textContent='⇪'; sh.title='Share bill image';}
+    const ca=document.getElementById('chatCall'); if(ca) {ca.textContent='☎'; ca.title='Phone call';}
+    const wa=document.getElementById('chatWhats'); if(wa) {wa.textContent='Ⓦ'; wa.title='WhatsApp';}
+  }
+
+  window.normalPhone=function(raw){
+    raw=String(raw||'').trim(); if(!raw) return '';
+    let d=raw.replace(/\D/g,''); let cc='+'+(String(state.settings.country||'+91').replace(/\D/g,'')||'91');
+    if(raw.startsWith('+')) return raw;
+    if(d.length===10) return cc+' '+d;
+    if(d.length===12 && d.startsWith(cc.replace(/\D/g,''))) return '+'+d.slice(0,2)+' '+d.slice(2);
+    if(d.length>10) return '+'+d;
+    return cc+' '+d;
+  }
+
+  window.shareBill=async function(){
+    if(!currentBill) return alert('Preview bill first');
+    renderInvoice(currentBill); if(window.renderQRCodes) renderQRCodes();
+    await new Promise(r=>setTimeout(r,280));
+    const blob=await invoiceBlob();
+    const file=new File([blob],`${currentBill.billNo}.png`,{type:'image/png'});
+    const text=reminderTextByBill(currentBill);
+    if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file],text,title:'Asha Bill Reminder'});
+      return;
+    }
+    if(navigator.share){
+      await navigator.share({text:`${text}
+
+Bill image auto-download হবে, না হলে নিচের download ব্যবহার করুন।`,title:'Asha Bill Reminder'}).catch(()=>{});
+    }
+    downloadBlob(blob,`${currentBill.billNo}.png`);
+    try{ openWhatsApp(currentBill.phone,text); }catch(e){}
+    alert('এই browser direct image attach support না করলে bill image download হবে এবং WhatsApp text open হবে।');
+  }
+
+  window.shareCustomerBill=async function(customerId,billId){
+    let target=null;
+    if(billId) target=state.bills.find(b=>b.id===billId && b.customerId===customerId);
+    if(!target){
+      let bills=state.bills.filter(b=>b.customerId===customerId).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+      target=bills[0];
+    }
+    if(!target) return alert('No bill found');
+    currentBill=target;
+    renderInvoice(currentBill); if(window.renderQRCodes) renderQRCodes();
+    return shareBill();
+  }
+
+  window.openMoreMenu=function(id){
+    const c=state.customers.find(x=>x.id===id); if(!c) return;
+    actionContext={type:'more',customerId:id};
+    document.getElementById('actionTitle').textContent='User Quick Actions';
+    document.getElementById('actionBody').innerHTML=`
+      <div class="action-sheet">
+        <div class="more-grid">
+          <button class="btn" onclick="openCustomer('${id}');closeAction()">✏ Edit User</button>
+          <button class="btn" onclick="renderChatLedger('${id}');closeAction()">📒 Ledger</button>
+          <button class="btn" onclick="waCustomerText('${id}');closeAction()">Ⓦ WhatsApp</button>
+          <button class="btn" onclick="smsReminder('${id}');closeAction()">✉ SMS</button>
+          <button class="btn" onclick="directPay('${id}',false);closeAction()">₹ Receive</button>
+          <button class="btn" onclick="directPay('${id}',true);closeAction()">✓ Settle</button>
+        </div>
+        <button class="btn danger" onclick="deleteCustomer('${id}')">🗑 Delete User</button>
+      </div>`;
+    document.getElementById('actionSave').classList.add('hidden');
+    document.getElementById('actionDelete').classList.add('hidden');
+    document.getElementById('actionModal').classList.remove('hidden');
+  }
+
+  window.renderChat=function(){
+    let c=state.customers.find(x=>x.id===activeCustomer); if(!c) return;
+    chatAvatar.textContent=initials(c.name); chatName.textContent=c.name;
+    chatSub.textContent=(safePhoneLabel(c.phone)||'No phone')+' • '+(c.village||'No village')+' • Due '+money(customerDue(c.id));
+    chatCall.onclick=()=>{let d=phoneDigits(c.phone); if(!d) return alert('Phone number নেই'); location.href='tel:+'+d;};
+    chatWhats.onclick=()=>openWhatsApp(c.phone, customerReminderText(c));
+    chatShare.onclick=()=>shareCustomerBill(c.id);
+    chatBill.onclick=()=>{closeChat();showPage('billPage');billCustomer.value=c.id;toggleManual();previewBill()};
+    chatPay.onclick=()=>directPay(c.id,false);
+    chatSettle.onclick=()=>directPay(c.id,true);
+    chatLedger.onclick=()=>renderChatLedger(c.id);
+    chatEdit.onclick=()=>openCustomer(c.id);
+    if(chatMore) chatMore.onclick=()=>openMoreMenu(c.id);
+
+    let bills=state.bills.filter(b=>b.customerId===c.id).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+    let out=[];
+    if((+c.openingDue||0)>0){
+      out.push(`<div class="bubble setB"><b>Opening Due</b><div class="chat-topnote">আগের বাকি</div><b>${money(c.openingDue)}</b></div>`);
+    }
+    bills.forEach(b=>{
+      out.push(`<div class="day">${esc(b.date)}</div>
+        <div class="bubble billB">
+          <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><div><b>${esc(b.billNo)}</b><div class="chat-topnote">${esc(b.customerName)}</div></div><div style="text-align:right"><div><b>${money(billDue(b))}</b></div><div class="chat-topnote">Due</div></div></div>
+          <div style="margin-top:8px;line-height:1.55">Total ${money(b.allTotal)}<br>Paid/Adjusted ${money(billPaid(b))}${b.note?`<br><small>Note: ${esc(b.note)}</small>`:''}</div>
+          <div class="bubble-actions">
+            <button type="button" onclick="viewBill('${b.id}')">View</button>
+            <button type="button" class="primary" onclick="openPayment('${b.id}')">Pay</button>
+            <button type="button" onclick="shareCustomerBill('${c.id}','${b.id}')">Reminder + Bill</button>
+            <button type="button" onclick="deleteBill('${b.id}')">Delete</button>
+          </div>
+        </div>`);
+      (b.payments||[]).forEach(p=>out.push(`<div class="bubble ${(p.mode||'').toLowerCase().includes('settle')?'setB':'payB'}"><b>${esc(p.mode)}</b><br><b>${money(p.amount)}</b><br>${esc(p.receivedIn||'')}<br><small>${esc(p.note||'')}</small><div class="entry-tools"><button type="button" onclick="editEntry('${p.id}')">Edit</button><button type="button" onclick="editEntry('${p.id}')">Undo/Delete</button></div></div>`));
+    });
+    chatBody.innerHTML=out.join('')||`<div class="bubble setB">No bill yet</div>`;
+  }
+
+  const baseInvoice=window.invoiceHTML;
+  window.invoiceHTML=function(b,cls){
+    let tpl=(document.getElementById('template')?.value||state.settings.template||'premium');
+    // let previous template engine render most variants except compact phone ones
+    if(!(tpl==='phone' || tpl==='compact' || cls==='phoneview')) return baseInvoice(b,cls);
+    let due=billDue(b), paid=billPaid(b), payAmount=due>0?due:b.allTotal;
+    let upi=makeUpiLink(payAmount,b.billNo);
+    let fallback=`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upi)}`;
+    let customerLine=`<div class="customer-lines"><b>${esc(b.customerName)}</b><br>${esc(safePhoneLabel(b.phone)||b.phone||'')}<br>${esc(b.address||b.village||'')}</div>`;
+    return `<div class="invoice v31bill phone ${cls} ${tpl}">
+      <div class="v31-head"><h3>${esc(state.settings.company)}</h3><div class="subline">Pro: ${esc(state.settings.owner)}<br>☎/WhatsApp: ${esc(state.settings.contact)}<br>${esc(state.settings.address)}</div></div>
+      <div class="v31-section"><div class="v31-row"><span>Bill No</span><b>${esc(b.billNo)}</b></div><div class="v31-row"><span>Date</span><b>${esc(b.date)}</b></div></div>
+      <div class="v31-section"><div class="v31-section-title">Customer</div>${customerLine}</div>
+      <div class="v31-section"><div class="v31-row"><span>Season</span><b>${esc(b.season)}</b></div><div class="v31-row"><span>Land</span><b>${esc(b.landAmount)} ${esc(b.unit)}</b></div><div class="v31-row"><span>Converted</span><b>${Number(b.bigha||0).toFixed(2)} বিঘা</b></div><div class="v31-row"><span>Rate</span><b>${money(b.rate)}/বিঘা</b></div></div>
+      <div class="v31-section"><div class="v31-row"><span>Current Bill</span><b>${money(b.current)}</b></div><div class="v31-row"><span>Previous Due</span><b>${money(b.previousDue)}</b></div><div class="v31-row v31-total"><span>All Total</span><b>${money(b.allTotal)}</b></div><div class="v31-row"><span>Paid</span><b>${money(paid)}</b></div><div class="v31-row v31-total"><span>Due</span><b>${money(due)}</b></div></div>
+      <div class="compact-grid"><div class="compact-chip"><b>Status</b><br>${esc(billStatus(b))}</div><div class="compact-chip"><b>Mode</b><br>${esc(b.payments?.[0]?.mode||'-')}</div><div class="compact-chip"><b>Received</b><br>${esc(b.payments?.[0]?.receivedIn||'-')}</div><div class="compact-chip"><b>Note</b><br>${esc(b.note||'-')}</div></div>
+      <div class="v31-section v31-pay-section"><div class="v31-section-title">Payment QR</div><div class="head-small">UPI: ${esc(state.settings.upi)}</div><div class="qr-live" data-qr="${esc(upi)}" data-fallback="${esc(fallback)}"></div><div class="head-small"><b>Scan & Pay ${money(payAmount)}</b></div></div>
+      <div class="footer-note">ধন্যবাদ। সময়মতো বিল পরিশোধ করার জন্য অনুরোধ করা হচ্ছে।</div>
+      <div style="text-align:right;font-size:11px;margin-top:8px">Sign: ${esc(state.settings.owner)}</div>
+    </div>`;
+  }
+
+  const oldRenderInv=window.renderInvoice;
+  window.renderInvoice=function(b){
+    let mode=document.getElementById('printMode')?.value||'thermal80';
+    if(mode==='phoneview'){
+      document.getElementById('billPreview').innerHTML=window.invoiceHTML(b,'phoneview');
+      if(window.renderQRCodes) setTimeout(renderQRCodes,60);
+      return;
+    }
+    oldRenderInv(b); if(window.renderQRCodes) setTimeout(renderQRCodes,60);
+  }
+
+  const oldLoad=window.loadSettings;
+  window.loadSettings=function(){
+    if(oldLoad) oldLoad();
+    if(document.getElementById('setCountry')) document.getElementById('setCountry').value='+91';
+    if(document.getElementById('setPayee')) document.getElementById('setPayee').value=state.settings.owner||state.settings.payee||'';
+  }
+
+  const oldSave=window.saveSettings;
+  window.saveSettings=function(){
+    if(document.getElementById('setPayee')) document.getElementById('setPayee').value=document.getElementById('setOwner').value;
+    return oldSave();
+  }
+
+  fillSelects(); loadSettings(); renderAll(true);
+});
+})();
+
+
+
+/* ===== V35 ULTRA PREMIUM PATCH ===== */
+(function(){
+function ready(fn){if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,220));else setTimeout(fn,220)}
+ready(function(){
+  function fmtPhone(raw){
+    let d=String(raw||'').replace(/\D/g,'');
+    let cc=String(state.settings.country||'+91').replace(/\D/g,'')||'91';
+    if(!d) return '';
+    if(d.length===10) return '+'+cc+' '+d;
+    if(d.length===11 && d.startsWith('0')) return '+'+cc+' '+d.slice(1);
+    if(d.startswith){} // harmless no-op
+    if(d.length>10 && d.startsWith(cc)) return '+'+cc+' '+d.slice(cc.length);
+    if(d.length>10) return '+'+d;
+    return '+'+cc+' '+d;
+  }
+  window.safePhoneLabel=function(raw){return fmtPhone(raw)};
+  window.phoneDigits=function(raw){return fmtPhone(raw).replace(/\D/g,'')};
+  window.openWhatsApp=function(raw,text=''){
+    const d=phoneDigits(raw);
+    if(!d || d.length<12) return alert('Valid phone number নেই। 10 digit phone দিন, country code auto +91 হবে।');
+    const url='https://wa.me/'+d+(text?('?text='+encodeURIComponent(text)):'');
+    window.open(url,'_blank');
+  };
+
+  window.openPayment=function(id){
+    showPage('payPage');
+    $('payBill').value=id;
+    updatePayInfo();
+    const b=state.bills.find(x=>x.id===id); if(b) $('payAmount').value=Math.max(0,billDue(b));
+    setTimeout(()=>$('payAmount').focus(),60);
+  };
+
+  window.renderCustomers=function(){
+    let q=$('customerSearch').value.toLowerCase().trim();
+    let rows=state.customers.filter(c=>(c.name+c.phone+c.village+c.address).toLowerCase().includes(q));
+    $('customerList').innerHTML=rows.length?rows.map(c=>{
+      let due=customerDue(c.id);
+      let bills=state.bills.filter(b=>b.customerId===c.id);
+      let last=(bills.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0]||{}).date||'-';
+      return `<div class="customer-row" onclick="openChat('${c.id}')"><div class="avatar">${esc(initials(c.name))}</div><div class="cust-main"><div class="cust-name">${esc(c.name)}</div><div class="cust-sub">📞 ${esc(safePhoneLabel(c.phone)||'No phone')} • 📍 ${esc(c.village||'No village')}</div><div class="cust-mini"><span class="mini-chip">Bills ${bills.length}</span><span class="mini-chip">Last ${esc(last)}</span><span class="mini-chip ${due>0?'red':'green'}">${due>0?('Due '+money(due)):'Paid'}</span></div></div><span class="pill ${due>0?'due':'paid'}">${due>0?money(due):'Paid'}</span></div>`;
+    }).join(''):`<div class="card muted">No customer yet</div>`;
+  };
+
+  window.directPay=function(id,settle=false){
+    const c=state.customers.find(x=>x.id===id); if(!c) return;
+    actionContext={type:'directpay',customerId:id,settle};
+    $('actionTitle').textContent=settle?'Settle Due':'Receive Payment';
+    $('actionBody').innerHTML=`<div class="action-sheet"><div class="info-box">${esc(c.name)} • Live Due <b>${money(customerDue(id))}</b></div><label>Amount</label><input id="dpAmount" type="number" value="${customerDue(id)||0}"><div class="two"><div><label>Mode</label><select id="dpMode"><option>Cash</option><option>UPI</option><option>Bank</option><option>Online</option><option>Settlement</option></select></div><div><label>Received In</label><input id="dpReceived" value="${settle?'Settled':'Cash'}"></div></div><label>Note</label><input id="dpNote" value="${settle?'Settled from user chat':'Direct due payment'}"></div>`;
+    $('actionSave').classList.remove('hidden'); $('actionDelete').classList.add('hidden'); $('actionModal').classList.remove('hidden');
+    $('dpMode').value=settle?'Settlement':'Cash';
+  };
+
+  const _saveAction=window.saveAction;
+  window.saveAction=function(){
+    if(actionContext && actionContext.type==='directpay'){
+      let id=actionContext.customerId, settle=!!actionContext.settle;
+      let amt=+($('dpAmount').value||0); if(!amt) return alert('Amount দিন');
+      let mode=$('dpMode').value|| (settle?'Settlement':'Cash');
+      let received=$('dpReceived').value|| (settle?'Settled':'Cash');
+      let note=$('dpNote').value|| (settle?'Settled from user chat':'Direct due payment');
+      let left=amt;
+      state.bills.filter(b=>b.customerId===id && billDue(b)>0).forEach(b=>{
+        if(left<=0) return;
+        let pay=Math.min(left,billDue(b));
+        (b.payments=b.payments||[]).push({id:uid(),date:today(),amount:pay,mode,receivedIn:received,note});
+        left-=pay;
+      });
+      let c=state.customers.find(x=>x.id===id);
+      if(left>0 && c) c.openingDue=Math.max((+c.openingDue||0)-left,0);
+      saveState(); if(activeCustomer) renderChat(); closeAction(); return;
+    }
+    return _saveAction ? _saveAction() : undefined;
+  };
+
+  window.openMoreMenu=function(id){
+    const c=state.customers.find(x=>x.id===id); if(!c) return;
+    actionContext={type:'more',customerId:id};
+    $('actionTitle').textContent='User Quick Actions';
+    $('actionBody').innerHTML=`<div class="action-sheet"><div class="info-box"><b>${esc(c.name)}</b><br>${esc(safePhoneLabel(c.phone)||'No phone')} • ${esc(c.village||'No village')}<br>Live Due <b>${money(customerDue(id))}</b></div><div class="more-grid"><button class="btn" onclick="openCustomer('${id}');closeAction()">✏ Edit</button><button class="btn" onclick="renderChatLedger('${id}');closeAction()">📒 Ledger</button><button class="btn" onclick="directPay('${id}',false);closeAction()">₹ Receive</button><button class="btn" onclick="directPay('${id}',true);closeAction()">✓ Settle</button><button class="btn" onclick="waCustomerText('${id}');closeAction()">Ⓦ WhatsApp</button><button class="btn" onclick="smsReminder('${id}');closeAction()">✉ SMS</button></div><button class="btn danger" onclick="deleteCustomer('${id}')">🗑 Delete User</button></div>`;
+    $('actionSave').classList.add('hidden'); $('actionDelete').classList.add('hidden'); $('actionModal').classList.remove('hidden');
+  };
+
+  window.renderChatLedger=function(id){
+    let c=state.customers.find(x=>x.id===id); if(!c) return;
+    let entries=[];
+    state.bills.filter(b=>b.customerId===id).sort((a,b)=>(a.date||'').localeCompare(b.date||'')).forEach(b=>{
+      entries.push(`<div class="bubble billB"><b>${esc(b.billNo)}</b><div class="chat-topnote">${esc(b.date)} • Bill raised</div><div><b>+${money(b.allTotal)}</b></div></div>`);
+      (b.payments||[]).forEach(p=>entries.push(`<div class="bubble ${(String(p.mode).toLowerCase().includes('settle'))?'setB':'payB'}"><b>${esc(p.mode)}</b><div class="chat-topnote">${esc(p.date)} • ${esc(p.receivedIn||'')}</div><div><b>-${money(p.amount)}</b></div><small>${esc(p.note||'')}</small><div class="entry-tools"><button type="button" onclick="editEntry('${p.id}')">Edit</button><button type="button" onclick="editEntry('${p.id}')">Undo/Delete</button></div></div>`));
+    });
+    $('chatBody').innerHTML=`<div class="chat-summary"><div class="sum-card"><small>Live Due</small><b>${money(customerDue(id))}</b></div><div class="sum-card"><small>Total Bills</small><b>${state.bills.filter(b=>b.customerId===id).length}</b></div><div class="sum-card"><small>Customer</small><b>${esc(c.village||'-')}</b></div></div><div class="chat-stack">${entries.join('')||'<div class="bubble setB">No ledger entry yet</div>'}</div>`;
+  };
+
+  window.renderChat=function(){
+    let c=state.customers.find(x=>x.id===activeCustomer); if(!c) return;
+    chatAvatar.textContent=initials(c.name); chatName.textContent=c.name;
+    chatSub.textContent=(safePhoneLabel(c.phone)||'No phone')+' • '+(c.village||'No village')+' • Due '+money(customerDue(c.id));
+    chatCall.onclick=()=>{let d=phoneDigits(c.phone); if(!d) return alert('Phone number নেই'); location.href='tel:+'+d;};
+    chatWhats.onclick=()=>openWhatsApp(c.phone, customerReminderText(c));
+    chatShare.onclick=()=>shareCustomerBill(c.id);
+    chatBill.onclick=()=>{closeChat();showPage('billPage');billCustomer.value=c.id;toggleManual();previewBill();};
+    chatPay.onclick=()=>directPay(c.id,false);
+    chatSettle.onclick=()=>directPay(c.id,true);
+    chatLedger.onclick=()=>renderChatLedger(c.id);
+    chatEdit.onclick=()=>openCustomer(c.id);
+    if(chatMore) chatMore.onclick=()=>openMoreMenu(c.id);
+    let bills=state.bills.filter(b=>b.customerId===c.id).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+    let paidTotal=bills.reduce((s,b)=>s+billPaid(b),0), totalTotal=bills.reduce((s,b)=>s+(+b.allTotal||0),0);
+    let out=[`<div class="chat-summary"><div class="sum-card"><small>Live Due</small><b>${money(customerDue(c.id))}</b></div><div class="sum-card"><small>Total Bill</small><b>${money(totalTotal)}</b></div><div class="sum-card"><small>Collected</small><b>${money(paidTotal)}</b></div></div><div class="chat-stack">`];
+    if((+c.openingDue||0)>0){out.push(`<div class="bubble setB"><b>Opening Due</b><div class="chat-topnote">আগের বাকি</div><b>${money(c.openingDue)}</b></div>`);}    
+    bills.forEach(b=>{
+      out.push(`<div class="day">${esc(b.date)}</div><div class="bubble billB"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><div><b>${esc(b.billNo)}</b><div class="chat-topnote">${esc(b.season)} • ${esc(b.landAmount)} ${esc(b.unit)}</div></div><div style="text-align:right"><div><b>${money(billDue(b))}</b></div><div class="chat-topnote">Due</div></div></div><div style="margin-top:8px;line-height:1.6">Total ${money(b.allTotal)}<br>Paid/Adjusted ${money(billPaid(b))}${b.note?`<br><small>Note: ${esc(b.note)}</small>`:''}</div><div class="bubble-actions"><button type="button" onclick="viewBill('${b.id}')">View</button><button type="button" class="primary" onclick="openPayment('${b.id}')">Pay</button><button type="button" onclick="shareCustomerBill('${c.id}','${b.id}')">Reminder + Bill</button><button type="button" onclick="deleteBill('${b.id}')">Delete</button></div></div>`);
+      (b.payments||[]).forEach(p=>out.push(`<div class="bubble ${(String(p.mode).toLowerCase().includes('settle'))?'setB':'payB'}"><b>${esc(p.mode)}</b><div class="chat-topnote">${esc(p.date)} • ${esc(p.receivedIn||'')}</div><div><b>${money(p.amount)}</b></div><small>${esc(p.note||'')}</small><div class="entry-tools"><button type="button" onclick="editEntry('${p.id}')">Edit</button><button type="button" onclick="editEntry('${p.id}')">Undo/Delete</button></div></div>`));
+    });
+    out.push('</div>');
+    chatBody.innerHTML=out.join('')||`<div class="bubble setB">No bill yet</div>`;
+  };
+
+  const originalInvoiceHTML=window.invoiceHTML;
+  window.invoiceHTML=function(b,cls){
+    let tpl=(document.getElementById('template')?.value||state.settings.template||'premium');
+    if(!(tpl==='mini' || tpl==='phone' || tpl==='compact')) return originalInvoiceHTML(b,cls);
+    let due=billDue(b), paid=billPaid(b), payAmount=due>0?due:b.allTotal;
+    let upi=makeUpiLink(payAmount,b.billNo);
+    let fallback=`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upi)}`;
+    return `<div class="invoice mini ${cls} ${tpl}"><div class="v31-head"><h3>${esc(state.settings.company)}</h3><div class="subline">Pro: ${esc(state.settings.owner)}<br>☎/WhatsApp: ${esc(state.settings.contact)}<br>${esc(state.settings.address)}</div></div><div class="v31-section"><div class="v31-row"><span>Bill No</span><b>${esc(b.billNo)}</b></div><div class="v31-row"><span>Date</span><b>${esc(b.date)}</b></div></div><div class="v31-section"><div class="v31-section-title">Customer</div><div class="customer-lines"><b>${esc(b.customerName)}</b><br>${esc(safePhoneLabel(b.phone)||b.phone||'')}<br>${esc(b.address||b.village||'')}</div></div><div class="v31-section"><div class="v31-row"><span>Season</span><b>${esc(b.season)}</b></div><div class="v31-row"><span>Land</span><b>${esc(b.landAmount)} ${esc(b.unit)}</b></div><div class="v31-row"><span>Rate</span><b>${money(b.rate)}/বিঘা</b></div><div class="v31-row"><span>Current</span><b>${money(b.current)}</b></div><div class="v31-row"><span>Previous</span><b>${money(b.previousDue)}</b></div><div class="v31-row v31-total"><span>All Total</span><b>${money(b.allTotal)}</b></div><div class="v31-row"><span>Paid</span><b>${money(paid)}</b></div><div class="v31-row v31-total"><span>Due</span><b>${money(due)}</b></div></div><div class="compact-grid"><div class="compact-chip"><b>Status</b><br>${esc(billStatus(b))}</div><div class="compact-chip"><b>Payment</b><br>${esc(b.payments?.[0]?.mode||'-')}</div><div class="compact-chip"><b>Received</b><br>${esc(b.payments?.[0]?.receivedIn||'-')}</div><div class="compact-chip"><b>Note</b><br>${esc((b.note||'-').slice(0,28))}</div></div><div class="v31-section v31-pay-section"><div class="v31-section-title">Payment QR</div><div class="head-small">UPI: ${esc(state.settings.upi)}</div><div class="qr-live" data-qr="${esc(upi)}" data-fallback="${esc(fallback)}"></div><div class="head-small"><b>Scan & Pay ${money(payAmount)}</b></div></div><div class="footer-note">ধন্যবাদ। সময়মতো বিল পরিশোধ করার জন্য অনুরোধ করা হচ্ছে।</div><div style="text-align:right;font-size:11px;margin:8px 12px 12px">Sign: ${esc(state.settings.owner)}</div></div>`;
+  };
+
+  const oldFillSelects=window.fillSelects;
+  window.fillSelects=function(){
+    if(oldFillSelects) oldFillSelects();
+    const t=document.getElementById('template');
+    const st=document.getElementById('setTemplate');
+    const opts=`<option value="classic">Classic Official Bill</option><option value="premium">Premium Green Bill</option><option value="boxed">Boxed Modern Bill</option><option value="bengali">Bengali Heavy Bill</option><option value="qrfirst">QR Focused Bill</option><option value="standard">Standard Clean Bill</option><option value="normal">Normal Black Bill</option><option value="thermal">Thermal Compact Bill</option><option value="compact">Compact A6 Bill</option><option value="phone">Phone View Compact</option><option value="mini">Mini Compact Bill</option>`;
+    const cur=state.settings.template||'premium';
+    if(t){t.innerHTML=opts; if(!Array.from(t.options).some(o=>o.value===cur)) t.value='premium'; else t.value=cur; t.onchange=()=>{state.settings.template=t.value; previewBill();};}
+    if(st){st.innerHTML=opts; st.value=cur;}
+  };
+
+  const oldRenderInvoice=window.renderInvoice;
+  window.renderInvoice=function(b){ oldRenderInvoice(b); if(window.renderQRCodes) setTimeout(renderQRCodes,80); };
+  const oldViewBill=window.viewBill;
+  window.viewBill=function(id){ oldViewBill(id); if(window.renderQRCodes) setTimeout(renderQRCodes,80); };
+
+  fillSelects(); renderCustomers(); if(activeCustomer) renderChat(); previewBill();
+});
+})();
+
+
+
+/* ==== V36 premium patch ==== */
+(function(){
+function v36Ready(fn){if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,160));else setTimeout(fn,160)}
+v36Ready(function(){
+  function normalizePhone(raw){
+    let d=String(raw||'').replace(/\D/g,'');
+    let cc=String((state.settings.country||'+91')).replace(/\D/g,'') || '91';
+    if(!d) return '';
+    if(d.length===10) return cc+d;
+    if(d.length===11 && d.startsWith('0')) return cc+d.slice(1);
+        if(d.length===12 && d.startsWith(cc)) return d;
+    if(d.length>10 && d.startsWith(cc)) return d;
+    if(d.length>10 && d.startsWith('91')) return d;
+    return cc+d.slice(-10);
+  }
+  window.phoneDigitsV36 = normalizePhone;
+  window.safePhoneLabel = function(raw){ let d=normalizePhone(raw); return d?('+'+d.slice(0,d.length-10)+' '+d.slice(-10)):''; };
+  window.openWhatsApp = function(raw,text=''){
+    const d = normalizePhone(raw);
+    if(!d || d.length < 12) return alert('WhatsApp এর জন্য valid 10 digit phone number দিন। Country code auto +91 ধরা হবে।');
+    const url = 'https://wa.me/'+d+(text?('?text='+encodeURIComponent(text)):'');
+    window.open(url,'_blank');
+  };
+  window.smsReminder = function(id){ const c=state.customers.find(x=>x.id===id); if(!c) return; const d=normalizePhone(c.phone); if(!d) return alert('Phone number নেই'); location.href='sms:+'+d+'?body='+encodeURIComponent(customerReminderText(c)); };
+  window.waCustomerText = function(id){ const c=state.customers.find(x=>x.id===id); if(!c) return; openWhatsApp(c.phone, customerReminderText(c)); };
+  window.waText = function(){ if(!currentBill) return alert('Preview bill first'); openWhatsApp(currentBill.phone, reminderTextByBill(currentBill)); };
+
+  window.chatViewBill = function(id){ closeChat(); viewBill(id); };
+  window.chatOpenPay = function(id){ closeChat(); openPayment(id); setTimeout(()=>{ if(document.getElementById('payAmount')) document.getElementById('payAmount').focus(); },80); };
+  window.chatDeleteBill = function(id){ if(!confirm('Delete this bill?')) return; deleteBill(id); };
+
+  window.renderCustomers = function(){
+    let q=(document.getElementById('customerSearch').value||'').toLowerCase().trim();
+    let rows=state.customers.filter(c=>(c.name+c.phone+c.village+c.address).toLowerCase().includes(q));
+    document.getElementById('customerList').innerHTML = rows.length ? rows.map(c=>{
+      let due=customerDue(c.id); let bills=state.bills.filter(b=>b.customerId===c.id);
+      let last=(bills.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0]||{}).date||'-';
+      return `<div class="customer-row" onclick="openChat('${c.id}')"><div class="avatar">${esc(initials(c.name))}</div><div class="cust-main"><div class="cust-name">${esc(c.name)}</div><div class="cust-sub">📞 ${esc(safePhoneLabel(c.phone)||'No phone')} • 📍 ${esc(c.village||'No village')}</div><div class="cust-mini"><span class="mini-chip">Bills ${bills.length}</span><span class="mini-chip">Last ${esc(last)}</span><span class="mini-chip ${due>0?'red':'green'}">${due>0?('Due '+money(due)):'Paid'}</span></div></div><span class="pill ${due>0?'due':'paid'}">${due>0?money(due):'Paid'}</span></div>`;
+    }).join('') : `<div class="card muted">No customer yet</div>`;
+  };
+
+  window.openPayment = function(id){
+    showPage('payPage'); document.getElementById('payBill').value=id; updatePayInfo();
+    const b=state.bills.find(x=>x.id===id); if(b) document.getElementById('payAmount').value = Math.max(0,billDue(b));
+  };
+
+  window.directPay = function(id,settle=false){
+    let c=state.customers.find(x=>x.id===id); if(!c) return;
+    actionContext={type:'v36directpay',customerId:id,settle:settle};
+    document.getElementById('actionTitle').textContent = settle?'Settle Due':'Receive Payment';
+    document.getElementById('actionBody').innerHTML = `<div class="action-sheet"><div class="info-box"><b>${esc(c.name)}</b><br>${esc(safePhoneLabel(c.phone)||'No phone')} • ${esc(c.village||'No village')}<br>Live Due <b>${money(customerDue(id))}</b></div><label>Amount</label><input id="v36Amount" type="number" value="${customerDue(id)||0}"><div class="two"><div><label>Mode</label><select id="v36Mode"><option>${settle?'Settlement':'Cash'}</option><option>UPI</option><option>Bank</option><option>Online</option><option>Cash</option><option>Settlement</option></select></div><div><label>Received In</label><input id="v36Received" value="${settle?'Settled':'Cash'}"></div></div><label>Note</label><input id="v36Note" value="${settle?'Settled from user chat':'Direct due payment'}"></div>`;
+    document.getElementById('actionSave').classList.remove('hidden');
+    document.getElementById('actionDelete').classList.add('hidden');
+    document.getElementById('actionModal').classList.remove('hidden');
+  };
+
+  const oldSaveActionV36 = window.saveAction;
+  window.saveAction = function(){
+    if(actionContext && actionContext.type==='v36directpay'){
+      let id=actionContext.customerId, settle=!!actionContext.settle;
+      let amt=+(document.getElementById('v36Amount').value||0); if(!amt) return alert('Amount দিন');
+      let mode=document.getElementById('v36Mode').value || (settle?'Settlement':'Cash');
+      let received=document.getElementById('v36Received').value || (settle?'Settled':'Cash');
+      let note=document.getElementById('v36Note').value || (settle?'Settled from user chat':'Direct due payment');
+      let left=amt;
+      state.bills.filter(b=>b.customerId===id && billDue(b)>0).forEach(b=>{
+        if(left<=0) return;
+        let pay=Math.min(left,billDue(b));
+        (b.payments=b.payments||[]).push({id:uid(),date:today(),amount:pay,mode,receivedIn:received,note});
+        left-=pay;
+      });
+      let c=state.customers.find(x=>x.id===id); if(left>0 && c) c.openingDue=Math.max((+c.openingDue||0)-left,0);
+      saveState(); if(activeCustomer) renderChat(); closeAction(); return;
+    }
+    return oldSaveActionV36 ? oldSaveActionV36() : undefined;
+  };
+
+  window.renderChatLedger = function(id){
+    let c=state.customers.find(x=>x.id===id); if(!c) return;
+    let entries=[];
+    state.bills.filter(b=>b.customerId===id).sort((a,b)=>(a.date||'').localeCompare(b.date||'')).forEach(b=>{
+      entries.push(`<div class="bubble billB"><b>${esc(b.billNo)}</b><div class="chat-topnote">${esc(b.date)} • Bill raised</div><div><b>+${money(b.allTotal)}</b></div></div>`);
+      (b.payments||[]).forEach(p=>entries.push(`<div class="bubble ${(String(p.mode).toLowerCase().includes('settle'))?'setB':'payB'}"><b>${esc(p.mode)}</b><div class="chat-topnote">${esc(p.date)} • ${esc(p.receivedIn||'')}</div><div><b>-${money(p.amount)}</b></div><small>${esc(p.note||'')}</small><div class="entry-tools"><button type="button" onclick="editEntry('${p.id}')">Edit</button><button type="button" onclick="editEntry('${p.id}')">Undo/Delete</button></div></div>`));
+    });
+    document.getElementById('chatBody').innerHTML = `<div class="chat-summary"><div class="sum-card"><small>Live Due</small><b>${money(customerDue(id))}</b></div><div class="sum-card"><small>Total Bills</small><b>${state.bills.filter(b=>b.customerId===id).length}</b></div><div class="sum-card"><small>Village</small><b>${esc(c.village||'-')}</b></div></div><div class="chat-stack">${entries.join('')||'<div class="bubble setB">No ledger entry yet</div>'}</div>`;
+  };
+
+  window.renderChat = function(){
+    let c=state.customers.find(x=>x.id===activeCustomer); if(!c) return;
+    chatAvatar.textContent=initials(c.name);
+    chatName.textContent=c.name;
+    chatSub.textContent=(safePhoneLabel(c.phone)||'No phone')+' • '+(c.village||'No village')+' • Due '+money(customerDue(c.id));
+    chatCall.onclick=()=>{ const d=normalizePhone(c.phone); if(!d) return alert('Phone number নেই'); location.href='tel:+'+d; };
+    chatWhats.onclick=()=>openWhatsApp(c.phone, customerReminderText(c));
+    chatShare.onclick=()=>shareCustomerBill(c.id);
+    chatBill.onclick=()=>{ closeChat(); showPage('billPage'); billCustomer.value=c.id; toggleManual(); previewBill(); };
+    chatPay.onclick=()=>directPay(c.id,false);
+    chatSettle.onclick=()=>directPay(c.id,true);
+    chatLedger.onclick=()=>renderChatLedger(c.id);
+    chatEdit.onclick=()=>openCustomer(c.id);
+    if(chatMore) chatMore.onclick=()=>openMoreMenu(c.id);
+
+    let bills=state.bills.filter(b=>b.customerId===c.id).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+    let totalBill=bills.reduce((s,b)=>s+(+b.allTotal||0),0), totalPaid=bills.reduce((s,b)=>s+billPaid(b),0);
+    let out=[`<div class="chat-summary"><div class="sum-card"><small>Live Due</small><b>${money(customerDue(c.id))}</b></div><div class="sum-card"><small>Total Bill</small><b>${money(totalBill)}</b></div><div class="sum-card"><small>Collected</small><b>${money(totalPaid)}</b></div></div><div class="chat-stack">`];
+    if((+c.openingDue||0)>0) out.push(`<div class="bubble setB"><b>Opening Due</b><div class="chat-topnote">আগের বাকি</div><b>${money(c.openingDue)}</b></div>`);
+    bills.forEach(b=>{
+      out.push(`<div class="day">${esc(b.date)}</div><div class="bubble billB"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><div><b>${esc(b.billNo)}</b><div class="chat-topnote">${esc(b.season||'-')} • ${esc(String(b.landAmount||''))} ${esc(b.unit||'')}</div></div><div style="text-align:right"><div><b>${money(billDue(b))}</b></div><div class="chat-topnote">Due</div></div></div><div style="margin-top:8px;line-height:1.58">Total ${money(b.allTotal)}<br>Paid/Adjusted ${money(billPaid(b))}${b.note?`<br><small>Note: ${esc(b.note)}</small>`:''}</div><div class="bubble-actions"><button type="button" onclick="chatViewBill('${b.id}')">View</button><button type="button" class="primary" onclick="chatOpenPay('${b.id}')">Pay</button><button type="button" onclick="shareCustomerBill('${c.id}','${b.id}')">Reminder + Bill</button><button type="button" onclick="chatDeleteBill('${b.id}')">Delete</button></div></div>`);
+      (b.payments||[]).forEach(p=>out.push(`<div class="bubble ${(String(p.mode).toLowerCase().includes('settle'))?'setB':'payB'}"><b>${esc(p.mode)}</b><div class="chat-topnote">${esc(p.date)} • ${esc(p.receivedIn||'')}</div><div><b>${money(p.amount)}</b></div><small>${esc(p.note||'')}</small><div class="entry-tools"><button type="button" onclick="editEntry('${p.id}')">Edit</button><button type="button" onclick="editEntry('${p.id}')">Undo/Delete</button></div></div>`));
+    });
+    out.push('</div>');
+    chatBody.innerHTML = out.join('') || `<div class="bubble setB">No bill yet</div>`;
+    const cm=document.getElementById('chatMore'); if(cm){ cm.textContent='⋯'; cm.title='More'; }
+    const sh=document.getElementById('chatShare'); if(sh){ sh.textContent='⇪'; sh.title='Share bill image'; }
+    const ca=document.getElementById('chatCall'); if(ca){ ca.textContent='✆'; ca.title='Call'; }
+    const wa=document.getElementById('chatWhats'); if(wa){ wa.textContent='Ⓦ'; wa.title='WhatsApp'; }
+  };
+
+  window.shareCustomerBill = async function(customerId,billId){
+    let bills=state.bills.filter(b=>b.customerId===customerId).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+    if(!bills.length) return alert('No bill found');
+    currentBill = billId ? (state.bills.find(b=>b.id===billId) || bills[0]) : bills[0];
+    renderInvoice(currentBill); if(window.renderQRCodes) renderQRCodes();
+    const blob = await invoiceBlob();
+    const file = new File([blob], `${currentBill.billNo}.png`, {type:'image/png'});
+    const text = reminderTextByBill(currentBill);
+    try{
+      if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+        await navigator.share({title:'Asha Bill Reminder', text, files:[file]});
+      }else if(navigator.share){
+        await navigator.share({title:'Asha Bill Reminder', text});
+        downloadBlob(blob, `${currentBill.billNo}.png`);
+      }else{
+        downloadBlob(blob, `${currentBill.billNo}.png`);
+        openWhatsApp(currentBill.phone, text);
+      }
+    }catch(e){ console.warn(e); }
+  };
+
+  const prevInvoiceHTML = window.invoiceHTML;
+  window.invoiceHTML = function(b, cls){
+    const tpl=(document.getElementById('template')?.value || state.settings.template || 'premium');
+    const isCompact = (cls==='phoneview' || tpl==='mini' || tpl==='phone' || tpl==='compact');
+    if(!isCompact) return prevInvoiceHTML(b, cls);
+    let due=billDue(b), paid=billPaid(b), payAmount=due>0?due:b.allTotal;
+    let upi=makeUpiLink(payAmount,b.billNo);
+    let fallback=`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upi)}`;
+    return `<div class="invoice v36compact ${esc(cls||'')} ${esc(tpl)}"><div class="v36-head"><h3>${esc(state.settings.company)}</h3><div class="sub">Pro: ${esc(state.settings.owner)}<br>☎/WhatsApp: ${esc(state.settings.contact)}<br>${esc(state.settings.address)}</div></div><div class="v36-sec"><div class="row"><span>Bill No</span><b>${esc(b.billNo)}</b></div><div class="row"><span>Date</span><b>${esc(b.date)}</b></div></div><div class="v36-sec"><div class="customer-box"><b>${esc(b.customerName)}</b><br>${esc(safePhoneLabel(b.phone)||b.phone||'')}<br>${esc(b.address||b.village||'')}</div></div><div class="v36-sec"><div class="row"><span>Season</span><b>${esc(b.season)}</b></div><div class="row"><span>Land</span><b>${esc(b.landAmount)} ${esc(b.unit)}</b></div><div class="row"><span>Rate</span><b>${money(b.rate)}/বিঘা</b></div><div class="row"><span>Current</span><b>${money(b.current)}</b></div><div class="row"><span>Previous</span><b>${money(b.previousDue)}</b></div><div class="row total"><span>Due</span><b>${money(due)}</b></div></div><div class="v36-sec"><div class="chips"><div class="chip"><b>All Total</b><br>${money(b.allTotal)}</div><div class="chip"><b>Paid</b><br>${money(paid)}</div><div class="chip"><b>Status</b><br>${esc(billStatus(b))}</div><div class="chip"><b>Note</b><br>${esc((b.note||'-').slice(0,24))}</div></div></div><div class="v36-sec"><div class="qrbox"><div style="font-size:11px;margin-bottom:6px">UPI: ${esc(state.settings.upi)}</div><div class="qr-live" data-qr="${esc(upi)}" data-fallback="${esc(fallback)}"></div><div style="font-size:12px;margin-top:6px"><b>Scan & Pay ${money(payAmount)}</b></div></div></div><div class="foot">ধন্যবাদ। সময়মতো বিল পরিশোধ করার জন্য অনুরোধ করা হচ্ছে।<br>Sign: ${esc(state.settings.owner)}</div></div>`;
+  };
+
+  const prevRenderInvoice = window.renderInvoice;
+  window.renderInvoice = function(b){ prevRenderInvoice(b); if(window.renderQRCodes) setTimeout(renderQRCodes,70); };
+  const prevViewBill = window.viewBill;
+  window.viewBill = function(id){ prevViewBill(id); if(window.renderQRCodes) setTimeout(renderQRCodes,70); };
+
+  const oldFillSelects = window.fillSelects;
+  window.fillSelects = function(){
+    if(oldFillSelects) oldFillSelects();
+    const t=document.getElementById('template');
+    const st=document.getElementById('setTemplate');
+    const opts=`<option value="classic">Classic Official Bill</option><option value="premium">Premium Green Bill</option><option value="boxed">Boxed Modern Bill</option><option value="bengali">Bengali Heavy Bill</option><option value="qrfirst">QR Focused Bill</option><option value="standard">Standard Clean Bill</option><option value="normal">Normal Black Bill</option><option value="thermal">Thermal Compact Bill</option><option value="compact">Compact A6 Bill</option><option value="phone">Phone View Compact</option><option value="mini">Mini Compact Bill</option>`;
+    const cur=state.settings.template || 'premium';
+    if(t){ t.innerHTML=opts; t.value=cur; }
+    if(st){ st.innerHTML=opts; st.value=cur; }
+  };
+
+  fillSelects(); renderCustomers(); if(activeCustomer) renderChat(); previewBill();
+});
+})();

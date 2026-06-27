@@ -44,7 +44,7 @@
       </div>
       <div class="hero-chips">
         <span id="cloudChip">Cloud: checking</span>
-        <span>V32 Dynamic QR Fix</span>
+        <span>V36 Premium Chat & Bill</span>
       </div>
     </header>
 
@@ -116,14 +116,16 @@
 <option value="normal">Normal Black Bill</option>
 <option value="thermal">Thermal Compact Bill</option>
 <option value="compact">Compact A6 Bill</option>
+<option value="phone">Phone View Compact</option>
 </select></div>
-            <div><label>Print Size</label><select id="printMode"><option value="thermal80">Thermal 80mm</option><option value="a4two">2 Bills on A4 (A5)</option><option value="a4four">4 Bills on A4 (A6)</option><option value="a4side">A4 Side Half</option><option value="a4land">A4 Landscape Half</option><option value="a4half">A4 Half</option><option value="a4quarter">A4 Quarter</option></select></div>
+            <div><label>Print Size</label><select id="printMode"><option value="thermal80">Thermal 80mm</option><option value="a4two">2 Bills on A4 (A5)</option><option value="a4four">4 Bills on A4 (A6)</option><option value="a4side">A4 Side Half</option><option value="a4land">A4 Landscape Half</option><option value="a4half">A4 Half</option><option value="a4quarter">A4 Quarter</option><option value="phoneview">Phone View Image</option></select></div>
           </div>
 
           <div class="action-bar">
             <button class="btn primary" id="saveBillBtn">Save Bill</button>
             <button class="btn" id="previewBtn">Preview</button>
           </div>
+          <div id="billDesignHint" class="bill-design-hint">Bill Design এবং Print Size এখান থেকেই preview করে বেছে নিতে পারবেন।</div>
         </div>
 
         <div class="preview-panel">
@@ -261,7 +263,7 @@
       <button id="chatSettle">Settle</button>
       <button id="chatLedger">Ledger</button>
       <button id="chatEdit">Edit</button>
-      <button id="chatMore">More</button>
+      <button id="chatMore">⋯</button>
     </div>
   </div>
 
