@@ -1236,3 +1236,268 @@ Thank you: ${state.settings.owner} (owner)`;
   document.addEventListener('DOMContentLoaded',()=>{ setTimeout(()=>{ loadSettings(); fillSelects(); setAppFonts(); updateRateByUnit(true); enhanceChatIcons(); if(activeCustomer) renderChat(); },120); });
   setTimeout(()=>{ loadSettings(); fillSelects(); setAppFonts(); updateRateByUnit(true); enhanceChatIcons(); if(activeCustomer) renderChat(); },180);
 })();
+
+/* ==== V38 RESEARCH ULTRA UPDATE ==== */
+(function(){
+function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,220)); else setTimeout(fn,220); }
+
+ready(function(){
+  state.settings = Object.assign({
+    reminderTemplate: "আপনাকে পুরো বিল শীঘ্রই পরিশোধের জন্য বলা হচ্ছে",
+    defaultBillNote: "",
+    showCompactMeta: true,
+    rateBigha: 2200,
+    rateKatha: 110,
+    rateDecimal: 55,
+    autoBackup: true,
+    appFont: "Inter",
+    billFont: "Hind Siliguri"
+  }, state.settings || {});
+
+  const chip = document.querySelector('.hero-chips span:last-child');
+  if(chip) chip.textContent = 'V38 Research Ultra';
+
+  function ensureSettingsV38(){
+    const card = document.querySelector('#settingsPage .card');
+    if(!card || document.getElementById('setReminderTemplate')) return;
+    const block = document.createElement('div');
+    block.innerHTML = `
+      <label>WhatsApp / SMS Reminder Message</label>
+      <textarea id="setReminderTemplate" class="template-area"></textarea>
+      <label>Default Bill Note</label>
+      <input id="setDefaultBillNote" placeholder="যেমন: নির্দিষ্ট সময়ের মধ্যে বিল পরিশোধ করুন">
+      <div class="two">
+        <div><label>Rate per বিঘা</label><input id="setRateBigha" type="number"></div>
+        <div><label>Rate per কাঠা</label><input id="setRateKatha" type="number"></div>
+        <div><label>Rate per ডেসিমেল</label><input id="setRateDecimal" type="number"></div>
+        <div><label>Compact Bill Meta</label><select id="setShowCompactMeta"><option value="yes">Show</option><option value="no">Hide</option></select></div>
+      </div>
+      <div class="two">
+        <div><label>App Font</label><select id="setAppFont"><option>Inter</option><option>Poppins</option><option>Nunito</option><option>System</option></select></div>
+        <div><label>Bill Font</label><select id="setBillFont"><option>Hind Siliguri</option><option>Inter</option><option>Poppins</option><option>Nunito</option></select></div>
+      </div>
+      <div class="settings-tools">
+        <button class="btn" id="toolDuplicate">Clean duplicate phones</button>
+        <button class="btn" id="toolDueCSV">Export due list CSV</button>
+        <button class="btn" id="toolTodayCSV">Export today collection</button>
+        <button class="btn" id="toolBackupNow">Instant backup JSON</button>
+      </div>
+    `;
+    const actionBar = card.querySelector('.action-bar');
+    card.insertBefore(block, actionBar);
+  }
+  ensureSettingsV38();
+
+  function loadSettingsV38Only(){
+    if(document.getElementById('setReminderTemplate')) document.getElementById('setReminderTemplate').value = state.settings.reminderTemplate || "";
+    if(document.getElementById('setDefaultBillNote')) document.getElementById('setDefaultBillNote').value = state.settings.defaultBillNote || "";
+    if(document.getElementById('setRateBigha')) document.getElementById('setRateBigha').value = state.settings.rateBigha || 2200;
+    if(document.getElementById('setRateKatha')) document.getElementById('setRateKatha').value = state.settings.rateKatha || 110;
+    if(document.getElementById('setRateDecimal')) document.getElementById('setRateDecimal').value = state.settings.rateDecimal || 55;
+    if(document.getElementById('setShowCompactMeta')) document.getElementById('setShowCompactMeta').value = state.settings.showCompactMeta ? "yes" : "no";
+    if(document.getElementById('setAppFont')) document.getElementById('setAppFont').value = state.settings.appFont || "Inter";
+    if(document.getElementById('setBillFont')) document.getElementById('setBillFont').value = state.settings.billFont || "Hind Siliguri";
+  }
+
+  const prevLoad = window.loadSettings;
+  window.loadSettings = function(){
+    if(prevLoad) prevLoad();
+    ensureSettingsV38();
+    loadSettingsV38Only();
+  };
+
+  const prevSave = window.saveSettings;
+  window.saveSettings = function(){
+    state.settings.reminderTemplate = document.getElementById('setReminderTemplate')?.value || state.settings.reminderTemplate;
+    state.settings.defaultBillNote = document.getElementById('setDefaultBillNote')?.value || "";
+    state.settings.rateBigha = +(document.getElementById('setRateBigha')?.value || state.settings.rateBigha || 2200);
+    state.settings.rateKatha = +(document.getElementById('setRateKatha')?.value || state.settings.rateKatha || 110);
+    state.settings.rateDecimal = +(document.getElementById('setRateDecimal')?.value || state.settings.rateDecimal || 55);
+    state.settings.showCompactMeta = (document.getElementById('setShowCompactMeta')?.value || "yes") === "yes";
+    state.settings.appFont = document.getElementById('setAppFont')?.value || state.settings.appFont || "Inter";
+    state.settings.billFont = document.getElementById('setBillFont')?.value || state.settings.billFont || "Hind Siliguri";
+    if(prevSave) prevSave(); else saveState();
+    applyFontV38();
+  };
+
+  function applyFontV38(){
+    const appMap={Inter:'"Inter",system-ui,sans-serif',Poppins:'"Poppins",system-ui,sans-serif',Nunito:'"Nunito",system-ui,sans-serif',System:'system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif'};
+    const billMap={'Hind Siliguri':'"Hind Siliguri",system-ui,sans-serif',Inter:'"Inter",system-ui,sans-serif',Poppins:'"Poppins",system-ui,sans-serif',Nunito:'"Nunito",system-ui,sans-serif'};
+    document.documentElement.style.setProperty('--app-font', appMap[state.settings.appFont]||appMap.Inter);
+    document.documentElement.style.setProperty('--bill-font', billMap[state.settings.billFont]||billMap['Hind Siliguri']);
+  }
+  applyFontV38();
+
+  function autoRate(unit){
+    if(unit==='katha') return +(state.settings.rateKatha || 110);
+    if(unit==='decimal') return +(state.settings.rateDecimal || 55);
+    return +(state.settings.rateBigha || 2200);
+  }
+
+  function updateRateV38(force=false){
+    const unit = document.getElementById('landUnit')?.value || 'bigha';
+    const rate = document.getElementById('rate');
+    if(!rate) return;
+    const label = rate.closest('div')?.querySelector('label');
+    if(label) label.textContent = unit==='katha' ? 'Rate / কাঠা' : unit==='decimal' ? 'Rate / ডেসিমেল' : 'Rate / বিঘা';
+    if(force || rate.dataset.auto !== '0') {
+      rate.value = autoRate(unit);
+      rate.dataset.auto = '1';
+    }
+  }
+  window.updateRateV38 = updateRateV38;
+  document.getElementById('landUnit')?.addEventListener('change',()=>{updateRateV38(true);previewBill();});
+  document.getElementById('rate')?.addEventListener('input',()=>{document.getElementById('rate').dataset.auto='0';});
+  updateRateV38();
+
+  const prevMakeBill = window.makeBillFromForm;
+  window.makeBillFromForm = function(){
+    const b = prevMakeBill ? prevMakeBill() : null;
+    if(b && !b.note && state.settings.defaultBillNote) b.note = state.settings.defaultBillNote;
+    return b;
+  };
+
+  function unitLabel(unit){ return unit==='katha' ? 'কাঠা' : unit==='decimal' ? 'ডেসিমেল' : 'বিঘা'; }
+  function rateSuffix(unit){ return unit==='katha' ? '/কাঠা' : unit==='decimal' ? '/ডেসিমেল' : '/বিঘা'; }
+  function reminderLine(){ return state.settings.reminderTemplate || "আপনাকে পুরো বিল শীঘ্রই পরিশোধের জন্য বলা হচ্ছে"; }
+
+  window.reminderTextByBill = function(b){
+    return `${state.settings.company}
+Bill No: ${b.billNo}
+Name: ${b.customerName}
+জমির পরিমাণ: ${b.landAmount} ${unitLabel(b.unit)}
+All Total: ${money(b.allTotal)}
+Paid/Adjusted: ${money(billPaid(b))}
+Due: ${money(billDue(b))}
+${reminderLine()}
+Thank you: ${state.settings.owner} (owner)
+Contact: ${state.settings.contact}
+UPI: ${state.settings.upi}`;
+  };
+
+  window.customerReminderText = function(c){
+    const bills = state.bills.filter(b=>b.customerId===c.id).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+    if(bills[0]) return reminderTextByBill(bills[0]);
+    return `${state.settings.company}
+Name: ${c.name}
+Current Due: ${money(customerDue(c.id))}
+${reminderLine()}
+Thank you: ${state.settings.owner} (owner)`;
+  };
+
+  function ensureSmartPanel(){
+    const home=document.getElementById('homePage');
+    if(!home || document.getElementById('smartPanel')) return;
+    const box=document.createElement('div');
+    box.id='smartPanel';
+    home.appendChild(box);
+  }
+
+  function todayCollected(){
+    const d=today();
+    let sum=0;
+    state.bills.forEach(b=>(b.payments||[]).forEach(p=>{ if((p.date||'')===d) sum += +p.amount||0; }));
+    return sum;
+  }
+
+  function villageDueRows(){
+    const m={};
+    state.customers.forEach(c=>{ const k=c.village||'Unknown'; m[k]=(m[k]||0)+customerDue(c.id); });
+    return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  }
+
+  const prevRenderDash=window.renderDash;
+  window.renderDash=function(){
+    if(prevRenderDash) prevRenderDash();
+    ensureSmartPanel();
+    const panel=document.getElementById('smartPanel');
+    if(!panel) return;
+    const dueCustomers=state.customers.map(c=>({c,due:customerDue(c.id)})).filter(x=>x.due>0).sort((a,b)=>b.due-a.due).slice(0,5);
+    panel.innerHTML = `
+      <div class="card">
+        <h2>Smart Business Summary</h2>
+        <div class="research-grid">
+          <div class="research-card"><b>${money(todayCollected())}</b><small>Today collection</small></div>
+          <div class="research-card"><b>${dueCustomers.length}</b><small>Top due customers shown below</small></div>
+          <div class="research-card"><b>${villageDueRows().length}</b><small>Village groups with due</small></div>
+          <div class="research-card"><b>${state.bills.length}</b><small>Total bills saved</small></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Village-wise Due</h3>
+        <div class="village-pills">${villageDueRows().map(([v,d])=>`<button type="button">${esc(v)} • ${money(d)}</button>`).join('') || '<span class="muted">No due</span>'}</div>
+        <h3>Top Due Customers</h3>
+        <div class="smart-list">${dueCustomers.map(x=>`<div class="smart-row" onclick="openChat('${x.c.id}')"><div class="left"><b>${esc(x.c.name)}</b><small>${esc(x.c.village||'No village')} • ${esc(safePhoneLabel(x.c.phone)||x.c.phone||'No phone')}</small></div><b class="small-danger">${money(x.due)}</b></div>`).join('') || '<div class="muted">No pending due</div>'}</div>
+      </div>`;
+  };
+
+  window.exportDueCSVV38=function(){
+    const rows=["Customer,Phone,Village,Due",...state.customers.map(c=>`${c.name},${safePhoneLabel(c.phone)||c.phone||''},${c.village||''},${customerDue(c.id)}`).filter(r=>!r.endsWith(",0"))];
+    downloadBlob(new Blob([rows.join("\n")],{type:"text/csv"}),"asha_due_list.csv");
+  };
+  window.exportTodayCSVV38=function(){
+    const d=today(); const rows=["Bill,Customer,Date,Amount,Mode,Received"];
+    state.bills.forEach(b=>(b.payments||[]).forEach(p=>{if((p.date||'')===d) rows.push(`${b.billNo},${b.customerName},${p.date},${p.amount},${p.mode},${p.receivedIn}`)}));
+    downloadBlob(new Blob([rows.join("\n")],{type:"text/csv"}),"asha_today_collection.csv");
+  };
+  window.cleanDuplicatePhonesV38=function(){
+    const seen=new Set(); let removed=0;
+    state.customers=state.customers.filter(c=>{ const k=(safePhoneLabel(c.phone)||c.phone||c.name).toLowerCase(); if(seen.has(k)){removed++; return false;} seen.add(k); return true; });
+    saveState(); alert(`Removed ${removed} duplicate customer(s)`);
+  };
+
+  document.getElementById('toolDuplicate')?.addEventListener('click',cleanDuplicatePhonesV38);
+  document.getElementById('toolDueCSV')?.addEventListener('click',exportDueCSVV38);
+  document.getElementById('toolTodayCSV')?.addEventListener('click',exportTodayCSVV38);
+  document.getElementById('toolBackupNow')?.addEventListener('click',backup);
+
+  const prevInvoice=window.invoiceHTML;
+  window.invoiceHTML=function(b,cls){
+    const tpl=(document.getElementById('template')?.value||state.settings.template||'premium');
+    const compact = ['mini','phone','compact'].includes(tpl) || cls==='phoneview';
+    if(!compact) return prevInvoice ? prevInvoice(b,cls) : '';
+    const due=billDue(b), paid=billPaid(b), payAmount=due>0?due:b.allTotal;
+    const upi = makeUpiLink ? makeUpiLink(payAmount,b.billNo) : `upi://pay?pa=${encodeURIComponent(state.settings.upi)}&pn=${encodeURIComponent(state.settings.owner)}&am=${Number(payAmount).toFixed(2)}&cu=INR&tn=${encodeURIComponent(b.billNo)}`;
+    const fallback=`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upi)}`;
+    const meta = state.settings.showCompactMeta ? `<div class="chips"><div class="chip"><b>${money(b.allTotal)}</b>All Total</div><div class="chip"><b>${money(paid)}</b>Paid</div><div class="chip"><b>${billStatus(b)}</b>Status</div></div>` : "";
+    return `<div class="invoice v38smart ${esc(cls||'')} ${esc(tpl)}">
+      <div class="head"><h3>${esc(state.settings.company)}</h3><div class="sub">Pro: ${esc(state.settings.owner)}<br>☎ / WhatsApp: ${esc(state.settings.contact)}<br>${esc(state.settings.address)}</div></div>
+      <div class="sec"><div class="line"><span>Bill No</span><b>${esc(b.billNo)}</b></div><div class="line"><span>Date</span><b>${esc(b.date)}</b></div></div>
+      <div class="sec"><span class="label">Customer Details</span><div class="cust"><b>${esc(b.customerName)}</b><br>${esc(safePhoneLabel(b.phone)||b.phone||'')}<br>${esc(b.address||b.village||'')}</div></div>
+      <div class="sec"><div class="line"><span>Season</span><b>${esc(b.season)}</b></div><div class="line"><span>জমির পরিমাণ</span><b>${esc(b.landAmount)} ${unitLabel(b.unit)} (${Number(b.bigha||0).toFixed(2)} বিঘা)</b></div><div class="line"><span>Rate</span><b>${money(b.rate)} ${rateSuffix(b.unit)}</b></div><div class="line"><span>Current Bill</span><b>${money(b.current)}</b></div><div class="line"><span>Previous Due</span><b>${money(b.previousDue)}</b></div>${meta}<div class="totalLine"><small>Payable Due</small><b>${money(due)}</b></div>${b.note?`<div class="mutedline">Note: ${esc(b.note)}</div>`:''}</div>
+      <div class="sec qrbox"><div style="font-size:11px;margin-bottom:6px">UPI: ${esc(state.settings.upi)}</div><div class="qr-live" data-qr="${esc(upi)}" data-fallback="${esc(fallback)}"></div><div class="mutedline"><b>Scan & Pay ${money(payAmount)}</b></div></div>
+      <div class="foot">${esc(reminderLine())}<br>Thank you: ${esc(state.settings.owner)} (owner)</div>
+    </div>`;
+  };
+
+  window.shareBill=async function(){
+    if(!currentBill) return alert('Preview bill first');
+    const t=document.getElementById('template'); const old=t?t.value:null;
+    if(t && !['mini','phone','compact'].includes(t.value)) t.value='mini';
+    renderInvoice(currentBill); if(window.renderQRCodes) renderQRCodes();
+    await new Promise(r=>setTimeout(r,280));
+    const blob=await invoiceBlob();
+    const file=new File([blob],`${currentBill.billNo}.png`,{type:'image/png'});
+    const text=reminderTextByBill(currentBill);
+    try{
+      if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+        await navigator.share({title:'Asha Bill Reminder',text,files:[file]});
+      }else if(navigator.share){
+        await navigator.share({title:'Asha Bill Reminder',text});
+        downloadBlob(blob,`${currentBill.billNo}.png`);
+      }else{
+        downloadBlob(blob,`${currentBill.billNo}.png`);
+        openWhatsApp(currentBill.phone,text);
+      }
+    }catch(e){ console.warn(e); }
+    if(t && old){ t.value=old; renderInvoice(currentBill); if(window.renderQRCodes) setTimeout(renderQRCodes,60); }
+  };
+
+  loadSettings();
+  fillSelects();
+  renderDash();
+  updateRateV38(true);
+  applyFontV38();
+  previewBill();
+});
+})();

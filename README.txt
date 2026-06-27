@@ -51,3 +51,18 @@ V37:
 - Rate per বিঘা and rate per কাঠা in settings
 - App font and bill font settings
 - Improved land wording on bills
+
+
+V38 Research Ultra:
+- Smart dashboard with today collection, village-wise due, top due customers.
+- Reminder template setting.
+- Default bill note setting.
+- Rate per বিঘা / কাঠা / ডেসিমেল settings.
+- App font and bill font settings.
+- Compact bill meta show/hide.
+- Due list CSV export.
+- Today collection CSV export.
+- Duplicate phone cleanup.
+- Reminder + Bill uses compact/mini bill automatically for sharing.
+- Improved compact bill wording and land amount line.
+- Better WhatsApp/SMS reminder text with owner thank-you line.

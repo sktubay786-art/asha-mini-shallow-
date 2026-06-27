@@ -1,7 +1,7 @@
 {
-  "name": "Asha Mini Shallow V37 Premium Reminder & Compact Bill",
-  "short_name": "Asha Billing V37",
-  "start_url": "./index.html?v=37",
+  "name": "Asha Mini Shallow V38 Research Ultra",
+  "short_name": "Asha Billing V38",
+  "start_url": "./index.html?v=38",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f4f7fb",
