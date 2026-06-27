@@ -1052,3 +1052,187 @@ v36Ready(function(){
   fillSelects(); renderCustomers(); if(activeCustomer) renderChat(); previewBill();
 });
 })();
+
+
+/* ==== V37 ultra polish patch ==== */
+(function(){
+  const fontLink=document.createElement('link');
+  fontLink.rel='stylesheet';
+  fontLink.href='https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap';
+  document.head.appendChild(fontLink);
+  state.settings = Object.assign({rateBigha:2200,rateKatha:110,appFont:'Inter',billFont:'Hind Siliguri'}, state.settings||{});
+
+  function setAppFonts(){
+    const appMap={Inter:'"Inter",system-ui,sans-serif',Poppins:'"Poppins",system-ui,sans-serif',Nunito:'"Nunito",system-ui,sans-serif',System:'system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif'};
+    const billMap={'Hind Siliguri':'"Hind Siliguri",system-ui,sans-serif',Inter:'"Inter",system-ui,sans-serif',Poppins:'"Poppins",system-ui,sans-serif',Nunito:'"Nunito",system-ui,sans-serif'};
+    document.documentElement.style.setProperty('--app-font', appMap[state.settings.appFont]||appMap.Inter);
+    document.documentElement.style.setProperty('--bill-font', billMap[state.settings.billFont]||billMap['Hind Siliguri']);
+  }
+
+  const prevApplyThemeV37 = window.applyTheme;
+  window.applyTheme = function(){ if(prevApplyThemeV37) prevApplyThemeV37(); setAppFonts(); };
+
+  function injectV37Settings(){
+    const settingsCard=document.querySelector('#settingsPage .card');
+    if(!settingsCard || document.getElementById('setRateBigha')) return;
+    const block=document.createElement('div');
+    block.innerHTML=`
+      <div class="settings-inline-note">V37 premium controls: default rate, font, compact bill style.</div>
+      <div class="two">
+        <div><label>Rate per বিঘা</label><input id="setRateBigha" type="number"></div>
+        <div><label>Rate per কাঠা</label><input id="setRateKatha" type="number"></div>
+      </div>
+      <div class="font-grid">
+        <div><label>App Font</label><select id="setAppFont"><option>Inter</option><option>Poppins</option><option>Nunito</option><option>System</option></select></div>
+        <div><label>Bill Font</label><select id="setBillFont"><option>Hind Siliguri</option><option>Inter</option><option>Poppins</option><option>Nunito</option></select></div>
+      </div>`;
+    const actionBar=settingsCard.querySelector('.action-bar');
+    settingsCard.insertBefore(block, actionBar);
+  }
+  injectV37Settings();
+
+  const prevLoadSettingsV37 = window.loadSettings;
+  window.loadSettings = function(){
+    if(prevLoadSettingsV37) prevLoadSettingsV37();
+    injectV37Settings();
+    if(document.getElementById('setRateBigha')) document.getElementById('setRateBigha').value = state.settings.rateBigha ?? 2200;
+    if(document.getElementById('setRateKatha')) document.getElementById('setRateKatha').value = state.settings.rateKatha ?? 110;
+    if(document.getElementById('setAppFont')) document.getElementById('setAppFont').value = state.settings.appFont || 'Inter';
+    if(document.getElementById('setBillFont')) document.getElementById('setBillFont').value = state.settings.billFont || 'Hind Siliguri';
+  };
+
+  const prevSaveSettingsV37 = window.saveSettings;
+  window.saveSettings = function(){
+    state.settings.rateBigha = +(document.getElementById('setRateBigha')?.value || state.settings.rateBigha || 2200);
+    state.settings.rateKatha = +(document.getElementById('setRateKatha')?.value || state.settings.rateKatha || 110);
+    state.settings.appFont = document.getElementById('setAppFont')?.value || state.settings.appFont || 'Inter';
+    state.settings.billFont = document.getElementById('setBillFont')?.value || state.settings.billFont || 'Hind Siliguri';
+    if(prevSaveSettingsV37) prevSaveSettingsV37();
+    setAppFonts();
+    updateRateByUnit();
+  };
+
+  function rateByUnit(unit){
+    if(unit==='katha') return +(state.settings.rateKatha || ((state.settings.rateBigha||2200)/20));
+    if(unit==='decimal') return +(((state.settings.rateBigha||2200)/40).toFixed(2));
+    return +(state.settings.rateBigha || 2200);
+  }
+  window.rateByUnit = rateByUnit;
+  function rateLabel(unit){ return unit==='katha' ? 'Rate / কাঠা' : unit==='decimal' ? 'Rate / ডেসিমেল' : 'Rate / বিঘা'; }
+  function updateRateByUnit(force=false){
+    const u=document.getElementById('landUnit')?.value || 'bigha';
+    const rate=document.getElementById('rate');
+    if(!rate) return;
+    const wrap=rate.closest('div');
+    const label=wrap ? wrap.querySelector('label') : null;
+    if(label) label.textContent = rateLabel(u);
+    if(force || !rate.dataset.touched || rate.dataset.auto==='1'){
+      rate.value = rateByUnit(u);
+      rate.dataset.auto='1';
+    }
+  }
+  window.updateRateByUnit = updateRateByUnit;
+
+  const prevFillV37 = window.fillSelects;
+  window.fillSelects = function(){
+    if(prevFillV37) prevFillV37();
+    const templateOpts=`<option value="classic">Classic Official Bill</option><option value="premium">Premium Green Bill</option><option value="boxed">Boxed Modern Bill</option><option value="bengali">Bengali Heavy Bill</option><option value="qrfirst">QR Focused Bill</option><option value="standard">Standard Clean Bill</option><option value="normal">Normal Black Bill</option><option value="thermal">Thermal Compact Bill</option><option value="compact">Compact A6 Bill</option><option value="phone">Phone View Compact</option><option value="mini">Mini Compact Bill</option>`;
+    if(document.getElementById('template')){ document.getElementById('template').innerHTML=templateOpts; document.getElementById('template').value=state.settings.template||'premium'; }
+    if(document.getElementById('setTemplate')){ document.getElementById('setTemplate').innerHTML=templateOpts; document.getElementById('setTemplate').value=state.settings.template||'premium'; }
+    updateRateByUnit();
+  };
+
+  function landUnitLabel(unit){ return unit==='katha' ? 'কাঠা' : unit==='decimal' ? 'ডেসিমেল' : 'বিঘা'; }
+  function compactStatusLine(b){
+    const paid=billPaid(b), due=billDue(b), mode=b.payments?.[0]?.mode||'Cash', received=b.payments?.[0]?.receivedIn||'Cash';
+    return `${billStatus(b)} • ${mode} • ${received}`;
+  }
+
+  window.reminderTextByBill = function(b){
+    return `${state.settings.company}
+Bill No: ${b.billNo}
+Name: ${b.customerName}
+জমির পরিমাণ: ${b.landAmount} ${landUnitLabel(b.unit)}
+All Total: ${money(b.allTotal)}
+Paid/Adjusted: ${money(billPaid(b))}
+Due: ${money(billDue(b))}
+আপনাকে পুরো বিল শীঘ্রই পরিশোধের জন্য বলা হচ্ছে
+Thank you: ${state.settings.owner} (owner)
+Contact: ${state.settings.contact}`;
+  };
+
+  window.customerReminderText = function(c){
+    const bills=state.bills.filter(b=>b.customerId===c.id).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+    const last=bills[0];
+    if(last) return reminderTextByBill(last);
+    return `${state.settings.company}
+Name: ${c.name}
+Current Due: ${money(customerDue(c.id))}
+আপনাকে পুরো বিল শীঘ্রই পরিশোধের জন্য বলা হচ্ছে
+Thank you: ${state.settings.owner} (owner)`;
+  };
+
+  const oldInvoiceHTMLV37 = window.invoiceHTML;
+  window.invoiceHTML = function(b, cls){
+    const tpl=(document.getElementById('template')?.value || state.settings.template || 'premium');
+    const compactMode = ['phone','mini','compact'].includes(tpl) || cls==='phoneview';
+    if(!compactMode) return oldInvoiceHTMLV37 ? oldInvoiceHTMLV37(b, cls) : '';
+    const due=billDue(b), paid=billPaid(b), payAmount=due>0?due:b.allTotal;
+    const unitLabel=landUnitLabel(b.unit);
+    const rateSuffix = b.unit==='katha' ? '/কাঠা' : b.unit==='decimal' ? '/ডেসিমেল' : '/বিঘা';
+    const upi = makeUpiLink ? makeUpiLink(payAmount,b.billNo) : `upi://pay?pa=${encodeURIComponent(state.settings.upi)}&pn=${encodeURIComponent(state.settings.owner)}&am=${Number(payAmount).toFixed(2)}&cu=INR&tn=${encodeURIComponent(b.billNo)}`;
+    const fallback=`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upi)}`;
+    const extraNote=(b.note||'').trim();
+    const modeClass = tpl==='mini' ? 'v37share' : 'v37compact';
+    return `<div class="invoice ${modeClass} ${esc(cls||'')} ${esc(tpl)}"><div class="v37-head"><h3>${esc(state.settings.company)}</h3><div class="v37-sub">Pro: ${esc(state.settings.owner)}<br>☎ / WhatsApp: ${esc(state.settings.contact)}<br>${esc(state.settings.address)}</div></div><div class="v37-sec"><div class="v37-grid2"><div><span class="label">Bill No</span><b>${esc(b.billNo)}</b></div><div style="text-align:right"><span class="label">Date</span><b>${esc(b.date)}</b></div></div></div><div class="v37-sec"><div class="label">Customer</div><div class="cust"><b>${esc(b.customerName)}</b><br>${esc(safePhoneLabel(b.phone)||b.phone||'')}<br>${esc(b.address||b.village||'')}</div></div><div class="v37-sec"><div class="v37-grid2"><div class="mini-stat"><span class="label">Season</span><b>${esc(b.season)}</b></div><div class="mini-stat"><span class="label">জমির পরিমাণ</span><b>${esc(b.landAmount)} ${unitLabel}</b><span>${b.bigha.toFixed(2)} বিঘা</span></div><div class="mini-stat"><span class="label">Rate</span><b>${money(b.rate)}</b><span>${rateSuffix}</span></div><div class="mini-stat"><span class="label">Current Bill</span><b>${money(b.current)}</b><span>${compactStatusLine(b)}</span></div></div><div class="v37-total"><div class="mini-stat"><span class="label">All Total</span><b>${money(b.allTotal)}</b></div><div class="mini-stat"><span class="label">Paid</span><b>${money(paid)}</b></div><div class="mini-stat"><span class="label">Previous</span><b>${money(b.previousDue)}</b></div></div><div class="duebar"><small>Payable Due</small><b>${money(due)}</b></div>${extraNote?`<div class="mutedline">Note: ${esc(extraNote)}</div>`:''}</div><div class="v37-sec"><div class="qrwrap"><div style="font-size:11px;margin-bottom:6px">UPI: ${esc(state.settings.upi)}</div><div class="qr-live" data-qr="${esc(upi)}" data-fallback="${esc(fallback)}"></div><div class="compact-strip"><span>Status: ${esc(billStatus(b))}</span><span>${esc(b.payments?.[0]?.mode||'Cash')}</span><span>${esc(b.payments?.[0]?.receivedIn||'Cash')}</span></div><div class="mutedline"><b>Scan & Pay ${money(payAmount)}</b></div></div></div><div class="v37-foot">আপনাকে পুরো বিল শীঘ্রই পরিশোধের জন্য বলা হচ্ছে<br>Thank you: ${esc(state.settings.owner)} (owner)</div></div>`;
+  };
+
+  const prevWaTextV37 = window.waText;
+  window.waText = function(){
+    if(!currentBill) return alert('Preview bill first');
+    openWhatsApp(currentBill.phone, reminderTextByBill(currentBill));
+  };
+
+  window.shareBill = async function(){
+    if(!currentBill) return alert('Preview bill first');
+    const templateEl=document.getElementById('template');
+    const prevTemplate=templateEl ? templateEl.value : null;
+    if(templateEl) templateEl.value = ['phone','mini','compact'].includes(prevTemplate) ? prevTemplate : 'mini';
+    renderInvoice(currentBill); if(window.renderQRCodes) setTimeout(renderQRCodes,60);
+    const blob=await invoiceBlob();
+    const file=new File([blob],`${currentBill.billNo}.png`,{type:'image/png'});
+    const text=reminderTextByBill(currentBill);
+    try{
+      if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+        await navigator.share({title:'Asha Bill Reminder',text,files:[file]});
+      }else if(navigator.share){
+        await navigator.share({title:'Asha Bill Reminder',text});
+        downloadBlob(blob,`${currentBill.billNo}.png`);
+      }else{
+        downloadBlob(blob,`${currentBill.billNo}.png`);
+        openWhatsApp(currentBill.phone,text);
+      }
+    }catch(e){ console.warn(e); }
+    if(templateEl && prevTemplate){ templateEl.value=prevTemplate; renderInvoice(currentBill); if(window.renderQRCodes) setTimeout(renderQRCodes,60); }
+  };
+
+  window.shareCustomerBill = async function(id,billId){
+    const bills=state.bills.filter(b=>b.customerId===id).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+    if(!bills.length) return alert('No bill found');
+    currentBill = billId ? (state.bills.find(b=>b.id===billId) || bills[0]) : bills[0];
+    await shareBill();
+  };
+
+  function enhanceChatIcons(){
+    const a=document.getElementById('chatShare'), b=document.getElementById('chatCall'), c=document.getElementById('chatWhats'), d=document.getElementById('chatMore');
+    if(a){a.textContent='⇪';a.title='Reminder + Bill';}
+    if(b){b.textContent='✆';b.title='Call';}
+    if(c){c.textContent='Ⓦ';c.title='WhatsApp note';}
+    if(d){d.textContent='⋯';d.title='More';}
+  }
+
+  document.addEventListener('input',e=>{ if(e.target&&e.target.id==='rate'){ e.target.dataset.touched='1'; e.target.dataset.auto='0'; } });
+  document.addEventListener('change',e=>{ if(e.target&&e.target.id==='landUnit') updateRateByUnit(true); if(e.target&&e.target.id==='template'){ previewBill(); } });
+  document.addEventListener('DOMContentLoaded',()=>{ setTimeout(()=>{ loadSettings(); fillSelects(); setAppFonts(); updateRateByUnit(true); enhanceChatIcons(); if(activeCustomer) renderChat(); },120); });
+  setTimeout(()=>{ loadSettings(); fillSelects(); setAppFonts(); updateRateByUnit(true); enhanceChatIcons(); if(activeCustomer) renderChat(); },180);
+})();

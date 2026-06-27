@@ -42,3 +42,12 @@ V36:
 - Direct Pay / Settle modal
 - Better customer list info
 - Compact bill layout for phone view / mini templates
+
+
+V37:
+- Better reminder + bill sharing
+- Better WhatsApp reminder note
+- Compact / mini / phone bill design upgraded
+- Rate per বিঘা and rate per কাঠা in settings
+- App font and bill font settings
+- Improved land wording on bills
