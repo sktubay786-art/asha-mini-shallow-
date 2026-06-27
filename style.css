@@ -242,3 +242,141 @@ body,input,select,textarea,button{font-family:var(--app-font)}
 .invoice.v38smart .qrbox{text-align:center}.invoice.v38smart .qrbox .qr-live{margin:8px auto}
 .invoice.v38smart .foot{text-align:center;color:#53645c;font-size:11px;line-height:1.55;padding:12px 14px 16px}
 @media(max-width:520px){.research-grid,.settings-tools{grid-template-columns:1fr}.invoice.v38smart{max-width:100%}}
+
+/* ===== V39 stable bill calculation layout ===== */
+.invoice.v39bill{
+  max-width:430px;
+  margin:0 auto;
+  background:#fff;
+  border:1px solid #d8e6dd;
+  border-radius:22px;
+  overflow:hidden;
+  box-shadow:0 18px 40px rgba(0,0,0,.10);
+}
+.invoice.v39bill .top{
+  background:linear-gradient(135deg,var(--accent),#15975e);
+  color:#fff;
+  text-align:center;
+  padding:16px 15px 13px;
+}
+.invoice.v39bill .top h3{margin:0;font-size:21px;line-height:1.15}
+.invoice.v39bill .top .sub{font-size:11px;line-height:1.45;margin-top:7px;opacity:.98}
+.invoice.v39bill .sec{padding:12px 14px;border-bottom:1px dashed #d9e6df}
+.invoice.v39bill .sec-title{
+  display:block;
+  font-size:10.5px;
+  text-transform:uppercase;
+  letter-spacing:.55px;
+  color:#65736c;
+  font-weight:900;
+  margin-bottom:7px;
+}
+.invoice.v39bill .customer-box{
+  background:#f7fbf8;
+  border:1px solid #e1ece4;
+  border-radius:15px;
+  padding:10px 12px;
+  font-size:13px;
+  line-height:1.55;
+}
+.invoice.v39bill .row{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  padding:5px 0;
+  font-size:13px;
+}
+.invoice.v39bill .row span:first-child{color:#4f5f58}
+.invoice.v39bill .row b:last-child{text-align:right}
+.invoice.v39bill .amount-box{
+  background:#f8fbf9;
+  border:1px solid #e2ece5;
+  border-radius:16px;
+  padding:9px 11px;
+}
+.invoice.v39bill .grand{
+  background:#edfff4;
+  border:1px solid #ccefd8;
+  border-radius:16px;
+  padding:10px 12px;
+  text-align:center;
+  margin-top:8px;
+}
+.invoice.v39bill .grand small{display:block;color:#65736c;font-size:11px}
+.invoice.v39bill .grand b{font-size:22px;color:#0b6f42}
+.invoice.v39bill .mini-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-top:8px;
+}
+.invoice.v39bill .mini-grid div{
+  background:#fff;
+  border:1px solid #e2ece5;
+  border-radius:12px;
+  padding:7px;
+  text-align:center;
+  font-size:11px;
+}
+.invoice.v39bill .mini-grid b{display:block;font-size:13px;color:#15231b}
+.invoice.v39bill .qrbox{text-align:center}
+.invoice.v39bill .qr-live{margin:8px auto}
+.invoice.v39bill .foot{
+  text-align:center;
+  color:#52625a;
+  font-size:11px;
+  line-height:1.55;
+  padding:12px 14px 16px;
+}
+.invoice.v39bill.phoneview,
+.invoice.v39bill.phone,
+.invoice.v39bill.mini,
+.invoice.v39bill.compact{
+  max-width:410px;
+}
+.invoice.v39bill.thermal80{
+  width:78mm;
+  border-radius:10px;
+  box-shadow:none;
+}
+.invoice.v39bill.thermal80 .top h3{font-size:17px}
+.invoice.v39bill.thermal80 .sec{padding:8px 9px}
+.invoice.v39bill.thermal80 .row{font-size:11.5px;padding:3px 0}
+.invoice.v39bill.thermal80 .mini-grid{grid-template-columns:1fr 1fr}
+.calc-warning{
+  background:#fff7ed;
+  border:1px solid #fed7aa;
+  color:#9a3412;
+  border-radius:14px;
+  padding:9px 11px;
+  font-size:12px;
+  margin-top:8px;
+}
+
+/* ===== V40 iOS icons + calculator ===== */
+.hero-icon,.brand-icon{border-radius:26%;box-shadow:0 14px 35px rgba(7,92,57,.18)}
+.circle{background:rgba(255,255,255,.82)!important;border:1px solid rgba(255,255,255,.6)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 10px 25px rgba(0,0,0,.10)!important;backdrop-filter:blur(18px)}
+.quick-actions button{border-radius:28px!important;background:linear-gradient(180deg,#fff,#f7faf8)!important;border:1px solid rgba(7,92,57,.10)!important}
+.tabbar{border-radius:32px!important;padding:9px!important;background:rgba(255,255,255,.88)!important;backdrop-filter:blur(22px)!important}
+.tabbar button{display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:22px!important;min-height:54px}
+.tabbar button i{width:30px;height:30px;display:grid;place-items:center;border-radius:11px;background:linear-gradient(180deg,#f9fbfa,#e9f1ed);color:#0b6d43;font-style:normal;font-weight:900;box-shadow:inset 0 1px 0 #fff,0 5px 12px rgba(16,24,40,.06)}
+.tabbar button.active i{background:linear-gradient(135deg,var(--accent),#18b574);color:#fff}
+.chat-head button,.chat-actions button,.bubble-actions button,.entry-tools button{box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 6px 18px rgba(16,24,40,.08)}
+.ios-mini-icon{width:38px;height:38px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(180deg,#ffffff,#edf5f0);border:1px solid rgba(7,92,57,.12);box-shadow:inset 0 1px 0 #fff,0 8px 20px rgba(16,24,40,.08);font-size:21px}
+.quick-actions button .ios-mini-icon{margin-bottom:8px}
+.calc.iosCalc{max-width:430px;background:#000;color:#fff;border-radius:42px;padding:18px 16px 20px;border:1px solid rgba(255,255,255,.14);box-shadow:0 30px 70px rgba(0,0,0,.28)}
+.calcTop{display:flex;align-items:center;justify-content:space-between;color:#f5f5f7;font-size:13px;padding:4px 6px 22px}
+.calcDisplay{min-height:92px;display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-end;padding:0 6px 14px;overflow:hidden}
+.calcExpression{color:#9da3a9;font-size:15px;min-height:22px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.calcValue{font-size:48px;line-height:1.05;font-weight:300;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#calcKeys.iosKeys{grid-template-columns:repeat(4,1fr);gap:10px;margin-top:6px}
+#calcKeys.iosKeys button{border:0;color:#fff;min-height:58px;border-radius:24px;font-size:20px;font-weight:600;background:#2c2c2e;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 4px 10px rgba(0,0,0,.18)}
+#calcKeys.iosKeys button.sci{min-height:44px;border-radius:18px;font-size:14px;background:#1c1c1e;color:#d7d7db}
+#calcKeys.iosKeys button.fn{background:#6b6b6d}
+#calcKeys.iosKeys button.op,#calcKeys.iosKeys button.eq{background:#ff9f0a;color:#fff}
+#calcKeys.iosKeys button.wide{grid-column:span 2;text-align:left;padding-left:24px}
+.calcModeLine{display:flex;gap:8px;align-items:center;justify-content:space-between;margin:10px 2px 0}
+.calcModeLine button{border:1px solid rgba(255,255,255,.14);background:#1c1c1e;color:#fff;border-radius:999px;padding:8px 12px;font-size:12px}
+.calcModeLine button.active{background:#ff9f0a}
+@media(max-width:520px){.calc.iosCalc{border-radius:34px;padding:14px 12px 18px}.calcValue{font-size:42px}#calcKeys.iosKeys{gap:8px}#calcKeys.iosKeys button{min-height:54px;border-radius:22px}#calcKeys.iosKeys button.sci{min-height:40px;border-radius:16px;font-size:13px}}

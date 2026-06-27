@@ -66,3 +66,25 @@ V38 Research Ultra:
 - Reminder + Bill uses compact/mini bill automatically for sharing.
 - Improved compact bill wording and land amount line.
 - Better WhatsApp/SMS reminder text with owner thank-you line.
+
+
+V39 Bill Calculation Fix:
+- Fixed disturbed calculation from V38.
+- Rate is now based on selected land unit:
+  বিঘা = land × rate/bigha
+  কাঠা = land × rate/katha
+  ডেসিমেল = land × rate/decimal
+- Customer due no longer double-counts previous due.
+- Bill summary restored:
+  আগের বাকি, বর্তমান বিল, মোট টাকা, মোট জমা, মোট বাকি.
+- Direct payment now records on latest bill to avoid double-counting old statements.
+- All bill modes use stable V39 bill layout.
+- Reminder + Bill uses stable compact bill.
+
+
+V40 iOS Calculator + Icons:
+- New custom iOS-like PWA app icons generated.
+- Tab bar, quick actions and chat buttons polished with iOS-style rounded icons.
+- Calculator redesigned like iOS scientific calculator.
+- Calculator supports sin, cos, tan, log, ln, sqrt, powers, factorial, memory, DEG/RAD, copy result.
+- No third-party trademark icons copied; icons are custom CSS/PWA designs.

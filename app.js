@@ -1501,3 +1501,413 @@ Thank you: ${state.settings.owner} (owner)`;
   previewBill();
 });
 })();
+
+/* ==== V39 BILL CALCULATION FIX ==== */
+(function(){
+function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,240)); else setTimeout(fn,240); }
+
+ready(function(){
+  const chip=document.querySelector('.hero-chips span:last-child');
+  if(chip) chip.textContent='V39 Bill Calc Fix';
+
+  state.settings = Object.assign({
+    rateBigha:2200,
+    rateKatha:110,
+    rateDecimal:55,
+    reminderTemplate:"আপনাকে পুরো বিল শীঘ্রই পরিশোধের জন্য বলা হচ্ছে"
+  }, state.settings||{});
+
+  function unitLabel(u){ return u==='katha' ? 'কাঠা' : u==='decimal' ? 'ডেসিমেল' : 'বিঘা'; }
+  function rateSuffix(u){ return u==='katha' ? '/কাঠা' : u==='decimal' ? '/ডেসিমেল' : '/বিঘা'; }
+  function rateByUnit(u){
+    if(u==='katha') return +(state.settings.rateKatha || ((state.settings.rateBigha||2200)/20));
+    if(u==='decimal') return +(state.settings.rateDecimal || ((state.settings.rateBigha||2200)/40));
+    return +(state.settings.rateBigha || 2200);
+  }
+  function currentCharge(land, unit, rate){
+    land=+land||0; rate=+rate||0;
+    // V39 rule: rate field belongs to selected land unit.
+    // বিঘা হলে land × rate/bigha, কাঠা হলে land × rate/katha, decimal হলে land × rate/decimal.
+    return land * rate;
+  }
+  window.currentChargeV39=currentCharge;
+
+  function allPaymentsForCustomer(id){
+    return state.bills.filter(b=>b.customerId===id)
+      .reduce((s,b)=>s+(b.payments||[]).reduce((x,p)=>x+(+p.amount||0),0),0);
+  }
+
+  // V39 fixed customer due:
+  // Opening due + sum of only current bills - all payments.
+  // This avoids previous due being counted again and again.
+  window.customerDue = function(id){
+    const c=state.customers.find(x=>x.id===id);
+    const opening=+c?.openingDue||0;
+    const currentSum=state.bills.filter(b=>b.customerId===id).reduce((s,b)=>s+(+b.current||0),0);
+    const paid=allPaymentsForCustomer(id);
+    return Math.max(opening + currentSum - paid, 0);
+  };
+
+  // Statement due for a printed bill.
+  window.billDue = function(b){
+    return Math.max((+b.allTotal||0) - billPaid(b), 0);
+  };
+
+  const oldToggle=window.toggleManual;
+  window.toggleManual=function(){
+    if(oldToggle) oldToggle();
+    updateRateLabelV39(false);
+  };
+
+  function updateRateLabelV39(force=false){
+    const u=document.getElementById('landUnit')?.value||'bigha';
+    const r=document.getElementById('rate');
+    if(!r) return;
+    const label=r.closest('div')?.querySelector('label');
+    if(label) label.textContent = u==='katha' ? 'Rate / কাঠা' : u==='decimal' ? 'Rate / ডেসিমেল' : 'Rate / বিঘা';
+    if(force || r.dataset.auto!=='0'){
+      r.value = rateByUnit(u);
+      r.dataset.auto='1';
+    }
+  }
+  window.updateRateLabelV39=updateRateLabelV39;
+
+  document.getElementById('landUnit')?.addEventListener('change',()=>{updateRateLabelV39(true);previewBill();});
+  document.getElementById('rate')?.addEventListener('input',()=>{document.getElementById('rate').dataset.auto='0';});
+
+  window.makeBillFromForm = function(){
+    let c=null;
+    if($("billCustomer").value==="__new"){
+      c={id:uid(),name:$("manualName").value.trim()||"New Customer",phone:normalPhone($("manualPhone").value),village:$("manualVillage").value.trim(),address:$("manualAddress").value.trim(),openingDue:0};
+    }else c=state.customers.find(x=>x.id===$("billCustomer").value);
+    if(!c)return null;
+
+    const unit=$("landUnit").value;
+    const land=+$("land").value||0;
+    const rate=+$("rate").value||0;
+    const bigha=landToBigha(land,unit);
+    const current=currentCharge(land,unit,rate);
+
+    // previous due is customer's real live due BEFORE this new bill.
+    const savedCustomer=state.customers.find(x=>x.id===c.id);
+    const prev=savedCustomer ? customerDue(c.id) : 0;
+
+    const paid=+$("paidNow").value||0;
+    const allTotal=current+prev;
+
+    return {
+      id:uid(),
+      billNo:nextBillNo(),
+      date:today(),
+      customerId:c.id,
+      customerName:c.name,
+      phone:c.phone,
+      address:c.address,
+      village:c.village,
+      season:$("season").value,
+      landAmount:land,
+      unit,
+      bigha,
+      rate,
+      rateUnit:unit,
+      current,
+      previousDue:prev,
+      allTotal,
+      note:$("billNote").value || state.settings.defaultBillNote || "",
+      payments:paid>0?[{id:uid(),date:today(),amount:paid,mode:$("billPayMode").value,receivedIn:$("receivedIn").value,note:"Initial payment"}]:[]
+    };
+  };
+
+  // Direct pay: record to latest bill only; avoids old due being paid twice.
+  window.directPay=function(id,settle=false){
+    const c=state.customers.find(x=>x.id===id); if(!c) return;
+    actionContext={type:'v39directpay',customerId:id,settle};
+    $("actionTitle").textContent=settle?'Settle Due':'Receive Payment';
+    $("actionBody").innerHTML=`<div class="action-sheet"><div class="info-box"><b>${esc(c.name)}</b><br>Live Due <b>${money(customerDue(id))}</b></div><label>Amount</label><input id="v39PayAmount" type="number" value="${customerDue(id)||0}"><div class="two"><div><label>Mode</label><select id="v39PayMode"><option>${settle?'Settlement':'Cash'}</option><option>Cash</option><option>UPI</option><option>Bank</option><option>Online</option><option>Settlement</option></select></div><div><label>Received In</label><input id="v39PayIn" value="${settle?'Settled':'Cash'}"></div></div><label>Note</label><input id="v39PayNote" value="${settle?'Settled/adjusted without cash':'Payment received'}"></div>`;
+    $("actionSave").classList.remove("hidden");
+    $("actionDelete").classList.add("hidden");
+    $("actionModal").classList.remove("hidden");
+  };
+
+  const oldSaveAction=window.saveAction;
+  window.saveAction=function(){
+    if(actionContext && actionContext.type==='v39directpay'){
+      const id=actionContext.customerId;
+      const amt=+($("v39PayAmount").value||0);
+      if(amt<=0) return alert('Amount দিন');
+      const mode=$("v39PayMode").value;
+      const receivedIn=$("v39PayIn").value||mode;
+      const note=$("v39PayNote").value||"Payment received";
+      let bills=state.bills.filter(b=>b.customerId===id).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+      let target=bills[0];
+      if(!target){
+        alert('এই customer-এর কোনো bill নেই। আগে bill তৈরি করুন।');
+        return;
+      }
+      (target.payments=target.payments||[]).push({id:uid(),date:today(),amount:amt,mode,receivedIn,note});
+      saveState();
+      if(activeCustomer) renderChat();
+      closeAction();
+      return;
+    }
+    return oldSaveAction ? oldSaveAction() : undefined;
+  };
+
+  window.updatePayInfo=function(){
+    let b=state.bills.find(x=>x.id===$("payBill").value);
+    if(!b){$("payInfo").innerHTML="Select bill"; return;}
+    const liveDue=customerDue(b.customerId);
+    $("payInfo").innerHTML=`<b>${esc(b.billNo)}</b> • ${esc(b.customerName)}<br>Current Bill ${money(b.current)} • Previous Due ${money(b.previousDue)}<br>Bill Total ${money(b.allTotal)} • Paid/Joma ${money(billPaid(b))}<br>Live Due <b>${money(liveDue)}</b>`;
+  };
+
+  window.fillDue=function(){
+    let b=state.bills.find(x=>x.id===$("payBill").value);
+    if(b)$("payAmount").value=customerDue(b.customerId);
+  };
+
+  // Better reminder text
+  window.reminderTextByBill=function(b){
+    return `${state.settings.company}
+Bill No: ${b.billNo}
+Name: ${b.customerName}
+জমির পরিমাণ: ${b.landAmount} ${unitLabel(b.unit)}
+বর্তমান বিল: ${money(b.current)}
+আগের বাকি: ${money(b.previousDue)}
+মোট টাকা: ${money(b.allTotal)}
+জমা: ${money(billPaid(b))}
+বাকি: ${money(billDue(b))}
+${state.settings.reminderTemplate || "আপনাকে পুরো বিল শীঘ্রই পরিশোধের জন্য বলা হচ্ছে"}
+Thank you: ${state.settings.owner} (owner)
+Contact: ${state.settings.contact}`;
+  };
+
+  function qrBlockV39(amount,billNo){
+    const upi = makeUpiLink ? makeUpiLink(amount,billNo) : `upi://pay?pa=${encodeURIComponent(state.settings.upi)}&pn=${encodeURIComponent(state.settings.owner)}&am=${Number(amount).toFixed(2)}&cu=INR&tn=${encodeURIComponent(billNo)}`;
+    const fallback=`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upi)}`;
+    return `<div class="qr-live" data-qr="${esc(upi)}" data-fallback="${esc(fallback)}"></div>`;
+  }
+
+  window.invoiceHTML=function(b,cls){
+    const due=billDue(b), paid=billPaid(b), payable=due>0?due:b.allTotal;
+    const tpl=(document.getElementById('template')?.value||state.settings.template||'premium');
+    const compact=['mini','phone','compact'].includes(tpl)||cls==='phoneview';
+    const meta = compact ? `<div class="mini-grid"><div><b>${money(b.current)}</b>বর্তমান বিল</div><div><b>${money(b.previousDue)}</b>আগের বাকি</div><div><b>${money(paid)}</b>মোট জমা</div></div>` : "";
+    return `<div class="invoice v39bill ${esc(cls||'')} ${esc(tpl)}">
+      <div class="top">
+        <h3>${esc(state.settings.company)}</h3>
+        <div class="sub">Pro: ${esc(state.settings.owner)}<br>☎ / WhatsApp: ${esc(state.settings.contact)}<br>${esc(state.settings.address)}</div>
+      </div>
+
+      <div class="sec">
+        <span class="sec-title">Bill Details</span>
+        <div class="row"><span>Bill No</span><b>${esc(b.billNo)}</b></div>
+        <div class="row"><span>Date</span><b>${esc(b.date)}</b></div>
+      </div>
+
+      <div class="sec">
+        <span class="sec-title">Customer Details</span>
+        <div class="customer-box">
+          <b>${esc(b.customerName)}</b><br>
+          ${esc(safePhoneLabel ? (safePhoneLabel(b.phone)||b.phone||'') : (b.phone||''))}<br>
+          ${esc(b.address||b.village||'')}
+        </div>
+      </div>
+
+      <div class="sec">
+        <span class="sec-title">Land / Charge</span>
+        <div class="row"><span>Season</span><b>${esc(b.season)}</b></div>
+        <div class="row"><span>জমির পরিমাণ</span><b>${esc(b.landAmount)} ${unitLabel(b.unit)} (${Number(b.bigha||0).toFixed(2)} বিঘা)</b></div>
+        <div class="row"><span>Rate</span><b>${money(b.rate)} ${rateSuffix(b.rateUnit||b.unit)}</b></div>
+        <div class="row"><span>বর্তমান বিল</span><b>${money(b.current)}</b></div>
+      </div>
+
+      <div class="sec">
+        <span class="sec-title">Payment Summary</span>
+        <div class="amount-box">
+          <div class="row"><span>আগের বাকি</span><b>${money(b.previousDue)}</b></div>
+          <div class="row"><span>বর্তমান বিল</span><b>${money(b.current)}</b></div>
+          <div class="row"><span>মোট টাকা</span><b>${money(b.allTotal)}</b></div>
+          <div class="row"><span>মোট জমা</span><b>${money(paid)}</b></div>
+          <div class="row"><span>Status</span><b>${esc(billStatus(b))}</b></div>
+        </div>
+        ${meta}
+        <div class="grand"><small>মোট বাকি / Payable Due</small><b>${money(due)}</b></div>
+        ${b.note?`<div class="mutedline">Note: ${esc(b.note)}</div>`:''}
+      </div>
+
+      <div class="sec qrbox">
+        <span class="sec-title">Payment QR</span>
+        <div style="font-size:11px;margin-bottom:6px">UPI: ${esc(state.settings.upi)}</div>
+        ${qrBlockV39(payable,b.billNo)}
+        <div class="mutedline"><b>Scan & Pay ${money(payable)}</b></div>
+      </div>
+
+      <div class="foot">
+        ${esc(state.settings.reminderTemplate || "আপনাকে পুরো বিল শীঘ্রই পরিশোধের জন্য বলা হচ্ছে")}<br>
+        Thank you: ${esc(state.settings.owner)} (owner)
+      </div>
+    </div>`;
+  };
+
+  const oldRenderInvoice=window.renderInvoice;
+  window.renderInvoice=function(b){
+    let mode=$("printMode").value, html="";
+    const one=cls=>invoiceHTML(b,cls);
+    if(mode==="thermal80")html=one("thermal80");
+    if(mode==="a4two"||mode==="a4half")html=`<div class="print-sheet a4p"><div class="slot a5top">${one("a5bill")}</div></div>`;
+    if(mode==="a4four"||mode==="a4quarter")html=`<div class="print-sheet a4p"><div class="slot a6q1">${one("a6bill")}</div></div>`;
+    if(mode==="a4side")html=`<div class="print-sheet a4p"><div class="slot side">${one("sidebill")}</div></div>`;
+    if(mode==="a4land")html=`<div class="print-sheet a4l"><div class="slot land">${one("landbill")}</div></div>`;
+    if(mode==="phoneview")html=one("phoneview");
+    $("billPreview").innerHTML=html||one("thermal80");
+    if(window.renderQRCodes) setTimeout(renderQRCodes,80);
+  };
+
+  // V39 share always uses the stable compact bill.
+  window.shareBill=async function(){
+    if(!currentBill)return alert("Preview bill first");
+    const t=document.getElementById('template');
+    const old=t?t.value:null;
+    if(t)t.value='mini';
+    renderInvoice(currentBill);
+    if(window.renderQRCodes) renderQRCodes();
+    await new Promise(r=>setTimeout(r,250));
+    let blob=await invoiceBlob();
+    let file=new File([blob],`${currentBill.billNo}.png`,{type:"image/png"});
+    let text=reminderTextByBill(currentBill);
+    try{
+      if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+        await navigator.share({files:[file],text,title:"Asha Bill Reminder"});
+      }else if(navigator.share){
+        await navigator.share({text,title:"Asha Bill Reminder"});
+        downloadBlob(blob,`${currentBill.billNo}.png`);
+      }else{
+        downloadBlob(blob,`${currentBill.billNo}.png`);
+        if(window.openWhatsApp) openWhatsApp(currentBill.phone,text);
+      }
+    }catch(e){console.warn(e)}
+    if(t&&old){t.value=old;renderInvoice(currentBill);}
+  };
+
+  const oldFill=window.fillSelects;
+  window.fillSelects=function(){
+    if(oldFill)oldFill();
+    updateRateLabelV39(false);
+  };
+
+  updateRateLabelV39(true);
+  renderAll(true);
+});
+})();
+
+/* ==== V40 iOS calculator + icon polish ==== */
+(function(){
+function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,260)); else setTimeout(fn,260); }
+
+ready(function(){
+  const chip=document.querySelector('.hero-chips span:last-child');
+  if(chip) chip.textContent='V40 iOS Calc + Icons';
+
+  function iosIconize(){
+    const qa=[...document.querySelectorAll('.quick-actions button')];
+    qa.forEach(btn=>{
+      if(btn.dataset.iosDone) return;
+      const first=btn.childNodes[0];
+      let raw='';
+      if(first && first.nodeType===3){ raw=first.textContent.trim(); first.textContent=''; }
+      if(raw) btn.insertAdjacentHTML('afterbegin',`<span class="ios-mini-icon">${raw}</span>`);
+      btn.dataset.iosDone='1';
+    });
+    const ch={chatShare:'⇪',chatCall:'✆',chatWhats:'Ⓦ',chatMore:'⋯'};
+    Object.entries(ch).forEach(([id,val])=>{const el=document.getElementById(id); if(el) el.textContent=val;});
+  }
+
+  window.calcStateV40={expr:'',display:'0',rad:false,memory:0};
+
+  function calcEval(raw){
+    let expr=String(raw||'').trim();
+    if(!expr) return 0;
+    const rad=window.calcStateV40.rad;
+    expr=expr.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');
+    expr=expr.replace(/π/g,'Math.PI').replace(/\be\b/g,'Math.E');
+    expr=expr.replace(/√\(/g,'Math.sqrt(');
+    expr=expr.replace(/\bln\(/g,'Math.log(').replace(/\blog\(/g,'Math.log10(');
+    expr=expr.replace(/\bsin\(([^()]+)\)/g,(m,a)=>`Math.sin(${rad?a:`(${a})*Math.PI/180`})`);
+    expr=expr.replace(/\bcos\(([^()]+)\)/g,(m,a)=>`Math.cos(${rad?a:`(${a})*Math.PI/180`})`);
+    expr=expr.replace(/\btan\(([^()]+)\)/g,(m,a)=>`Math.tan(${rad?a:`(${a})*Math.PI/180`})`);
+    expr=expr.replace(/\^/g,'**');
+    expr=expr.replace(/(\d+)!/g,(m,n)=>{n=Number(n); let v=1; for(let i=2;i<=n;i++)v*=i; return String(v);});
+    return Function('"use strict"; return ('+expr+')')();
+  }
+
+  function updateCalcDisplay(){
+    const screen=document.getElementById('calcScreen');
+    if(!screen) return;
+    const s=window.calcStateV40;
+    screen.innerHTML=`<div class="calcTop"><span>9:41</span><span>${s.rad?'RAD':'DEG'} • Scientific</span></div><div class="calcDisplay"><div class="calcExpression">${esc(s.expr||'')}</div><div class="calcValue">${esc(s.display||'0')}</div></div>`;
+  }
+
+  function appendToken(tok){
+    const s=window.calcStateV40;
+    if(s.display==='Error'){s.expr='';s.display='0'}
+    if(tok==='AC'){s.expr='';s.display='0';return}
+    if(tok==='DEL'){s.expr=s.expr.slice(0,-1);s.display=s.expr||'0';return}
+    if(tok==='='){
+      try{
+        let v=calcEval(s.expr);
+        if(!isFinite(v)) throw new Error('bad');
+        s.display=String(Number(v.toFixed(10)));
+        s.expr=s.display;
+      }catch(e){s.display='Error'}
+      return;
+    }
+    if(tok==='+/-'){if(s.expr.startsWith('-')) s.expr=s.expr.slice(1); else s.expr='-'+(s.expr||'0'); s.display=s.expr;return;}
+    if(tok==='mc'){s.memory=0;return}
+    if(tok==='m+'){try{s.memory+=Number(calcEval(s.expr)||0)}catch(e){} return}
+    if(tok==='m-'){try{s.memory-=Number(calcEval(s.expr)||0)}catch(e){} return}
+    if(tok==='mr'){s.expr+=String(s.memory);s.display=s.expr;return}
+    const map={'÷':'÷','×':'×','−':'−','+':'+','%':'%','.':'.','π':'π','e':'e','sin':'sin(','cos':'cos(','tan':'tan(','ln':'ln(','log':'log(','√':'√(','x²':'^2','x³':'^3','xʸ':'^','1/x':'1/(','x!':'!','(':'(',')':')'};
+    s.expr += map[tok] || tok;
+    s.display=s.expr || '0';
+  }
+
+  window.setupCalc=function(){
+    const calc=document.querySelector('.calc');
+    if(!calc) return;
+    calc.classList.add('iosCalc');
+    const keys=[
+      ['(', 'sci'], [')','sci'], ['mc','sci'], ['m+','sci'],
+      ['m-','sci'], ['mr','sci'], ['x²','sci'], ['x³','sci'],
+      ['xʸ','sci'], ['e','sci'], ['π','sci'], ['ln','sci'],
+      ['log','sci'], ['√','sci'], ['sin','sci'], ['cos','sci'],
+      ['tan','sci'], ['1/x','sci'], ['x!','sci'], ['DEL','fn'],
+      ['AC','fn'], ['+/-','fn'], ['%','fn'], ['÷','op'],
+      ['7',''], ['8',''], ['9',''], ['×','op'],
+      ['4',''], ['5',''], ['6',''], ['−','op'],
+      ['1',''], ['2',''], ['3',''], ['+','op'],
+      ['0','wide'], ['.',''], ['=','eq']
+    ];
+    const keyBox=document.getElementById('calcKeys');
+    keyBox.className='iosKeys';
+    keyBox.innerHTML=keys.map(([k,c])=>`<button class="${c}" data-k="${k}">${k}</button>`).join('');
+    document.getElementById('calcScreen').className='iosScreen';
+    updateCalcDisplay();
+    keyBox.onclick=e=>{const k=e.target.dataset.k;if(!k) return;appendToken(k);updateCalcDisplay();};
+    if(!document.querySelector('.calcModeLine')){
+      calc.insertAdjacentHTML('beforeend',`<div class="calcModeLine"><button id="degBtn" class="active">DEG</button><button id="radBtn">RAD</button><button id="copyCalc">Copy Result</button></div>`);
+      document.getElementById('degBtn').onclick=()=>{window.calcStateV40.rad=false;document.getElementById('degBtn').classList.add('active');document.getElementById('radBtn').classList.remove('active');updateCalcDisplay();};
+      document.getElementById('radBtn').onclick=()=>{window.calcStateV40.rad=true;document.getElementById('radBtn').classList.add('active');document.getElementById('degBtn').classList.remove('active');updateCalcDisplay();};
+      document.getElementById('copyCalc').onclick=()=>navigator.clipboard?.writeText(window.calcStateV40.display||'0');
+    }
+  };
+
+  const oldBindV40=window.bind;
+  if(oldBindV40){window.bind=function(){oldBindV40();iosIconize();};}
+
+  const oldRenderAllV40=window.renderAll;
+  window.renderAll=function(renderPreview=false){if(oldRenderAllV40) oldRenderAllV40(renderPreview);iosIconize();};
+
+  iosIconize();
+  setupCalc();
+});
+})();
