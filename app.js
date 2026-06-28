@@ -2862,3 +2862,221 @@ Contact: ${state.settings.contact}`;
   ensureV45Sheet();
 });
 })();
+
+/* ==== V50 FINAL CLEAN PATCH ==== */
+(function(){
+function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,450)); else setTimeout(fn,450); }
+
+ready(function(){
+  const chip=document.querySelector('.hero-chips span:last-child');
+  if(chip) chip.textContent='V50 Final Clean';
+
+  const ICO={home:'⌂',users:'◉',bill:'▤',pay:'₹',history:'◷',report:'▥',calc:'▦',set:'⚙',call:'✆',wa:'Ⓦ',share:'⇪',more:'⋯',view:'👁',edit:'✎',del:'⌫',ledger:'☷',settle:'✓',remind:'⏰'};
+
+  function phoneDigits(raw){
+    let d=String(raw||'').replace(/\D/g,'');
+    if(!d) return '';
+    if(d.length===10) return '91'+d;
+    if(d.length===12 && d.startsWith('91')) return d;
+    if(d.length>10) return d;
+    return '91'+d.slice(-10);
+  }
+
+  window.openWhatsApp=function(raw,text=''){
+    const d=phoneDigits(raw);
+    if(!d || d.length<12) return alert('Valid phone number নেই। Customer phone-এ 10 digit number দিন।');
+    window.open('https://wa.me/'+d+(text?('?text='+encodeURIComponent(text)):''),'_blank');
+  };
+
+  function pageExists(id){return !!document.getElementById(id)}
+  function createCalcPage(){
+    if(pageExists('calcPage')) return;
+    const main=document.querySelector('main') || document.getElementById('app') || document.body;
+    const sec=document.createElement('section');
+    sec.id='calcPage';sec.className='page';
+    sec.innerHTML='<div class="card"><h2>Scientific Calculator</h2><div class="calc"><div id="calcScreen"></div><div id="calcKeys" class="calc-keys"></div></div></div>';
+    main.appendChild(sec);
+  }
+
+  window.rebuildTabbarV50=function(){
+    const tab=document.querySelector('.tabbar'); if(!tab) return;
+    createCalcPage();
+    const items=[['homePage',ICO.home,'Home'],['customersPage',ICO.users,'Users'],['billPage',ICO.bill,'Bill'],['payPage',ICO.pay,'Pay'],['historyPage',ICO.history,'History'],['reportsPage',ICO.report,'Report'],['calcPage',ICO.calc,'Calc'],['settingsPage',ICO.set,'Set']].filter(x=>pageExists(x[0]));
+    const cur=document.querySelector('.page.active')?.id || 'homePage';
+    tab.innerHTML=items.map(([id,ico,label])=>'<button data-page="'+id+'" class="'+(id===cur?'active':'')+'"><i>'+ico+'</i><span>'+label+'</span></button>').join('');
+    tab.querySelectorAll('button').forEach(btn=>{
+      btn.onclick=()=>{showPage(btn.dataset.page);setTimeout(()=>btn.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'}),40);};
+    });
+  };
+
+  const oldShow=window.showPage;
+  window.showPage=function(id){
+    if(id==='calcPage') createCalcPage();
+    if(oldShow) oldShow(id);
+    document.querySelectorAll('.tabbar button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
+    const active=document.querySelector('.tabbar button[data-page="'+id+'"]');
+    if(active) setTimeout(()=>active.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'}),30);
+    if(id==='calcPage' && window.setupCalc) setupCalc();
+  };
+
+  window.renderQRCodes=function(){
+    document.querySelectorAll('.qr-live').forEach(el=>{
+      const data=el.getAttribute('data-qr')||el.dataset.qr||'';
+      const fallback=el.getAttribute('data-fallback')||('https://api.qrserver.com/v1/create-qr-code/?size=180x180&data='+encodeURIComponent(data));
+      if(!data&&!fallback)return;
+      el.innerHTML='';
+      if(window.QRCode && data){
+        try{
+          new QRCode(el,{text:data,width:112,height:112,correctLevel:QRCode.CorrectLevel.M});
+          const canvas=el.querySelector('canvas');
+          if(canvas){canvas.style.width='112px';canvas.style.height='112px';canvas.style.display='block';}
+          return;
+        }catch(e){console.warn(e)}
+      }
+      const img=document.createElement('img');
+      img.alt='QR';img.crossOrigin='anonymous';img.src=fallback;img.style.width='112px';img.style.height='112px';img.style.display='block';
+      el.appendChild(img);
+    });
+  };
+
+  const oldRenderInvoice=window.renderInvoice;
+  window.renderInvoice=function(b){oldRenderInvoice(b);setTimeout(()=>renderQRCodes(),120);};
+
+  window.printBill=function(){if(currentBill){renderInvoice(currentBill);renderQRCodes();}setTimeout(()=>window.print(),260);};
+
+  async function prepareCapture(){
+    renderQRCodes();
+    await new Promise(r=>setTimeout(r,350));
+    document.querySelectorAll('.qr-live canvas').forEach(c=>{
+      try{
+        const img=document.createElement('img');
+        img.src=c.toDataURL('image/png');
+        img.style.width='112px';img.style.height='112px';img.style.display='block';
+        c.replaceWith(img);
+      }catch(e){}
+    });
+    await new Promise(r=>setTimeout(r,120));
+  }
+
+  window.shareBill=async function(){
+    if(!currentBill) return alert('Preview bill first');
+    renderInvoice(currentBill);
+    await prepareCapture();
+    const blob=await invoiceBlob();
+    const file=new File([blob],currentBill.billNo+'.png',{type:'image/png'});
+    const text=reminderTextByBill(currentBill);
+    try{
+      if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+        await navigator.share({files:[file],text,title:'Asha Bill Reminder'});
+      }else if(navigator.share){
+        await navigator.share({text,title:'Asha Bill Reminder'});
+        downloadBlob(blob,currentBill.billNo+'.png');
+      }else{
+        downloadBlob(blob,currentBill.billNo+'.png');
+        openWhatsApp(currentBill.phone,text);
+      }
+    }catch(e){console.warn(e)}
+  };
+
+  function latestBill(cid,billId){
+    const bills=state.bills.filter(b=>b.customerId===cid).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+    return billId ? (state.bills.find(b=>b.id===billId)||bills[0]) : bills[0];
+  }
+
+  window.shareCustomerBill=async function(cid,billId){
+    const b=latestBill(cid,billId);
+    if(!b)return alert('এই user-এর কোনো bill নেই।');
+    currentBill=b;
+    return shareBill();
+  };
+
+  window.normalReminderV50=function(cid){
+    const c=state.customers.find(x=>x.id===cid);
+    if(!c)return;
+    openWhatsApp(c.phone,customerReminderText(c));
+  };
+
+  window.openBillPreviewV50=async function(cid,billId){
+    const b=latestBill(cid,billId);
+    if(!b)return alert('এই user-এর কোনো bill নেই।');
+    currentBill=b;
+    renderInvoice(b);
+    await prepareCapture();
+    const blob=await invoiceBlob();
+    const url=URL.createObjectURL(blob);
+    openV45Sheet('Bill Preview',
+      '<div class="v45-preview-note">Preview দেখে তারপর share করুন।</div>'+
+      '<img class="v45-preview-img" src="'+url+'">'+
+      '<div class="v50-menu-grid">'+
+      '<button class="primary" onclick="shareCustomerBill(\''+cid+'\',\''+b.id+'\')">'+ICO.remind+' Share Bill + Reminder</button>'+
+      '<button onclick="normalReminderV50(\''+cid+'\')">'+ICO.wa+' Normal Reminder</button>'+
+      '<button onclick="downloadCurrentBillV45(\''+b.id+'\')">⇩ Download</button>'+
+      '<button onclick="closeV45Sheet()">Close</button>'+
+      '</div>');
+  };
+
+  window.openMoreMenu=function(cid){
+    const c=state.customers.find(x=>x.id===cid); if(!c)return;
+    const b=latestBill(cid);
+    openV45Sheet('User Actions',
+      '<div class="v50-menu-note"><b>'+esc(c.name)+'</b><br>'+esc(c.phone||'No phone')+' • Due '+money(customerDue(c.id))+'</div>'+
+      '<div class="v50-menu-grid">'+
+      '<button onclick="openCustomer(\''+cid+'\');closeV45Sheet()">'+ICO.edit+' Edit User</button>'+
+      '<button onclick="renderChatLedger(\''+cid+'\');closeV45Sheet()">'+ICO.ledger+' Ledger</button>'+
+      '<button onclick="directPay(\''+cid+'\',false);closeV45Sheet()">'+ICO.pay+' Receive</button>'+
+      '<button onclick="directPay(\''+cid+'\',true);closeV45Sheet()">'+ICO.settle+' Settle</button>'+
+      '<button class="primary" onclick="openBillPreviewV50(\''+cid+'\',\''+(b?b.id:'')+'\')">'+ICO.remind+' Bill + Reminder</button>'+
+      '<button onclick="normalReminderV50(\''+cid+'\')">'+ICO.wa+' Normal Reminder</button>'+
+      '<button onclick="location.href=\'tel:+'+phoneDigits(c.phone)+'\'">'+ICO.call+' Call</button>'+
+      '<button class="danger" onclick="deleteCustomer(\''+cid+'\')">'+ICO.del+' Delete</button>'+
+      '</div>');
+  };
+
+  window.chatViewBill=function(id){closeChat();viewBill(id)};
+  window.chatOpenPay=function(id){closeChat();openPayment(id);setTimeout(()=>{const a=document.getElementById('payAmount');if(a)a.focus()},100)};
+  window.chatDeleteBill=function(id){if(confirm('Delete this bill?')) deleteBill(id)};
+
+  window.renderChat=function(){
+    const c=state.customers.find(x=>x.id===activeCustomer); if(!c)return;
+    chatAvatar.textContent=initials(c.name);
+    chatName.textContent=c.name;
+    chatSub.textContent=(c.phone||'No phone')+' • '+(c.village||'No village')+' • Due '+money(customerDue(c.id));
+    chatCall.textContent=ICO.call; chatWhats.textContent=ICO.wa; chatShare.textContent=ICO.share; if(chatMore)chatMore.textContent=ICO.more;
+    chatCall.onclick=()=>{const d=phoneDigits(c.phone); if(!d)return alert('Phone number নেই'); location.href='tel:+'+d;};
+    chatWhats.onclick=()=>normalReminderV50(c.id);
+    chatShare.onclick=()=>openBillPreviewV50(c.id);
+    if(chatMore) chatMore.onclick=()=>openMoreMenu(c.id);
+    if(chatBill) chatBill.onclick=()=>{closeChat();showPage('billPage');billCustomer.value=c.id;toggleManual();previewBill()};
+    if(chatPay) chatPay.onclick=()=>directPay(c.id,false);
+    if(chatSettle) chatSettle.onclick=()=>directPay(c.id,true);
+    if(chatLedger) chatLedger.onclick=()=>renderChatLedger(c.id);
+    if(chatEdit) chatEdit.onclick=()=>openCustomer(c.id);
+
+    const bills=state.bills.filter(b=>b.customerId===c.id).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+    const total=bills.reduce((s,b)=>s+(+b.allTotal||0),0);
+    const paid=bills.reduce((s,b)=>s+billPaid(b),0);
+    let out=['<div class="chat-summary"><div class="sum-card"><small>Live Due</small><b>'+money(customerDue(c.id))+'</b></div><div class="sum-card"><small>Total Bill</small><b>'+money(total)+'</b></div><div class="sum-card"><small>Collected</small><b>'+money(paid)+'</b></div></div>'];
+    if((+c.openingDue||0)>0) out.push('<div class="bubble setB"><b>Opening Due</b><br><b>'+money(c.openingDue)+'</b></div>');
+    bills.forEach(b=>{
+      out.push('<div class="day">'+esc(b.date)+'</div><div class="bubble billB"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><div><b>'+esc(b.billNo)+'</b><div class="chat-topnote">'+esc(b.season||'-')+' • '+esc(String(b.landAmount||''))+' '+esc(b.unit||'')+'</div></div><div style="text-align:right"><b>'+money(billDue(b))+'</b><div class="chat-topnote">Due</div></div></div><div style="margin-top:8px;line-height:1.58">Total '+money(b.allTotal)+'<br>Paid/Joma '+money(billPaid(b))+(b.note?'<br><small>Note: '+esc(b.note)+'</small>':'')+'</div><div class="bubble-actions"><button type="button" onclick="chatViewBill(\''+b.id+'\')">'+ICO.view+' View</button><button type="button" class="primary" onclick="chatOpenPay(\''+b.id+'\')">'+ICO.pay+' Pay</button><button type="button" onclick="openBillPreviewV50(\''+c.id+'\',\''+b.id+'\')">'+ICO.remind+' Bill</button><button type="button" onclick="chatDeleteBill(\''+b.id+'\')">'+ICO.del+'</button></div></div>');
+      (b.payments||[]).forEach(p=>{
+        out.push('<div class="bubble '+(String(p.mode||'').toLowerCase().includes('settle')?'setB':'payB')+'"><b>'+esc(p.mode||'Payment')+'</b><div class="chat-topnote">'+esc(p.date||'')+' • '+esc(p.receivedIn||'')+'</div><b>'+money(p.amount)+'</b><br><small>'+esc(p.note||'')+'</small><div class="entry-tools"><button type="button" onclick="editEntry(\''+p.id+'\')">'+ICO.edit+' Edit</button><button type="button" onclick="editEntry(\''+p.id+'\')">'+ICO.del+' Undo</button></div></div>');
+      });
+    });
+    const logs=(c.logs||[]).slice(0,8);
+    if(logs.length){
+      out.push('<div class="chat-history-block"><div class="history-title">Edit / Action History</div>'+logs.map(l=>'<div class="v45-log-row"><b>'+esc(l.text||l.type)+'</b><small>'+esc(new Date(l.date).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}))+'</small></div>').join('')+'</div>');
+    }
+    chatBody.innerHTML=out.join('') || '<div class="bubble setB">No bill yet</div>';
+  };
+
+  const oldSetup=window.setupCalc;
+  window.setupCalc=function(){if(oldSetup)oldSetup();const s=document.getElementById('calcScreen');if(s){s.style.background='#000';s.style.color='#fff';s.style.minHeight='132px';}document.querySelector('.calc')?.classList.add('iosCalc');document.getElementById('calcKeys')?.classList.add('iosKeys')};
+
+  createCalcPage();
+  rebuildTabbarV50();
+  setupCalc();
+  if(activeCustomer) renderChat();
+  if(currentBill) renderInvoice(currentBill);
+});
+})();

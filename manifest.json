@@ -1,7 +1,7 @@
 {
-  "name": "Asha Mini Shallow V45 User Menu Preview History",
-  "short_name": "Asha Billing V45",
-  "start_url": "./index.html?v=45",
+  "name": "Asha Mini Shallow V50 Final Clean",
+  "short_name": "Asha Billing V50",
+  "start_url": "./index.html?v=50",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f4f7fb",

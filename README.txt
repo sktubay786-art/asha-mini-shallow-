@@ -144,3 +144,11 @@ V45 User Menu Preview History:
 - Payment edit/delete now logs action history.
 - User chat displays recent edit/action history.
 - QR is converted to image before capture to improve share preview reliability.
+
+
+V50 Final Clean:
+- User detail bottom action strip hidden; all major user actions moved to top three-dot menu.
+- Three-dot menu now contains Edit, Ledger, Receive, Settle, Bill+Reminder, Normal Reminder, Call, Delete.
+- Bottom app navigation rebuilt stable and scrollable, fixed size across pages.
+- QR rendering, print bill only, calculator screen, user chat actions rechecked.
+- Phone/tablet/web layout polished.
