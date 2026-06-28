@@ -1210,3 +1210,92 @@ main{width:100%!important;max-width:1180px!important;margin:0 auto!important;box
   .v51-bubble{max-width:90%}
   .v51-detail-head{padding-left:10px;padding-right:10px}
 }
+
+/* ===== V52 USERS THREE DOT MENU FIX ===== */
+#v52Menu{
+  position:fixed;
+  inset:0;
+  z-index:99999;
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  background:rgba(0,0,0,.42);
+  padding:14px;
+}
+#v52Menu.open{display:flex!important}
+.v52-panel{
+  width:min(560px,100%);
+  max-height:86vh;
+  overflow:auto;
+  background:rgba(255,255,255,.98);
+  backdrop-filter:blur(24px);
+  border:1px solid rgba(255,255,255,.65);
+  border-radius:28px;
+  box-shadow:0 30px 90px rgba(0,0,0,.28);
+  padding:16px;
+  animation:v52Up .18s ease-out;
+}
+@keyframes v52Up{from{transform:translateY(18px);opacity:.75}to{transform:translateY(0);opacity:1}}
+.v52-title{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
+  margin-bottom:14px;
+}
+.v52-title b{font-size:18px;display:block}
+.v52-title small{display:block;color:#667085;margin-top:4px;font-size:12px;line-height:1.35}
+.v52-close{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  border:1px solid #e5ece8;
+  background:#fff;
+  font-weight:900;
+}
+.v52-actions{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+.v52-actions button{
+  min-height:56px;
+  border:1px solid #e5ece8;
+  background:#fff;
+  color:#111827;
+  border-radius:18px;
+  font-size:14px;
+  font-weight:900;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  box-shadow:0 8px 22px rgba(16,24,40,.06);
+  touch-action:manipulation;
+}
+.v52-actions button.primary{
+  background:linear-gradient(135deg,#0d631b,#13a265);
+  color:#fff;
+  border-color:transparent;
+}
+.v52-actions button.danger{
+  background:#fff5f5;
+  color:#b42318;
+  border-color:#ffd6d6;
+}
+.v52-status{
+  margin-top:12px;
+  color:#667085;
+  font-size:12px;
+  line-height:1.45;
+}
+#v51More{
+  pointer-events:auto!important;
+  position:relative!important;
+  z-index:5!important;
+}
+@media(max-width:520px){
+  #v52Menu{padding:8px}
+  .v52-panel{border-radius:24px}
+  .v52-actions{grid-template-columns:1fr}
+}

@@ -161,3 +161,11 @@ V51 Users Rebuild:
 - All user actions available in top 3-dot menu: New Bill, Edit User, Ledger, Receive, Settle, Bill+Reminder, Normal Reminder, Call, Delete.
 - Added New Bill from 3-dot menu with selected customer prefilled.
 - Customer bill/payment history remains visible in user detail.
+
+
+V52 Users Menu Fixed:
+- Rebuilt top three-dot popup as a completely standalone modal.
+- Does not depend on old V45/V50 popup functions.
+- Rebound v51More and old chatMore buttons directly.
+- Menu actions: New Bill, Edit User, Ledger, Receive, Settle, Bill+Reminder, Normal Reminder, Call, Delete User.
+- New Bill closes user detail and opens Bill tab with selected user prefilled.

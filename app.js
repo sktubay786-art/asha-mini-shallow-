@@ -3271,3 +3271,196 @@ Contact: ${state.settings.contact}`;
   renderCustomers();
 });
 })();
+
+/* ==== V52: standalone user 3-dot menu fix ==== */
+(function(){
+function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,600)); else setTimeout(fn,600); }
+
+ready(function(){
+  const chip=document.querySelector('.hero-chips span:last-child');
+  if(chip) chip.textContent='V52 Users Menu Fixed';
+
+  function q(id){return document.getElementById(id)}
+  function getPhoneDigits(raw){
+    let d=String(raw||'').replace(/\D/g,'');
+    if(!d) return '';
+    if(d.length===10) return '91'+d;
+    if(d.length===12 && d.startsWith('91')) return d;
+    if(d.length>10) return d;
+    return '91'+d.slice(-10);
+  }
+  window.openWhatsApp=function(raw,text=''){
+    const d=getPhoneDigits(raw);
+    if(!d || d.length<12) return alert('Customer-এর valid 10 digit phone number নেই।');
+    window.open('https://wa.me/'+d+(text?('?text='+encodeURIComponent(text)):''),'_blank');
+  };
+
+  function ensureMenu(){
+    if(q('v52Menu')) return;
+    document.body.insertAdjacentHTML('beforeend',`
+      <div id="v52Menu">
+        <div class="v52-panel">
+          <div class="v52-title">
+            <div><b id="v52Name">User Actions</b><small id="v52Sub"></small></div>
+            <button class="v52-close" id="v52Close">×</button>
+          </div>
+          <div id="v52Body" class="v52-actions"></div>
+          <div id="v52Status" class="v52-status"></div>
+        </div>
+      </div>`);
+    q('v52Close').onclick=()=>closeMenuV52();
+    q('v52Menu').addEventListener('click',e=>{ if(e.target.id==='v52Menu') closeMenuV52(); });
+  }
+  window.closeMenuV52=function(){
+    const m=q('v52Menu');
+    if(m) m.classList.remove('open');
+  };
+
+  function normalReminder(c){
+    return `${state.settings.company}
+Name: ${c.name}
+Due: ${money(customerDue(c.id))}
+আপনাকে পুরো বিল শীঘ্রই পরিশোধের জন্য বলা হচ্ছে
+Thank you: ${state.settings.owner} (owner)
+Contact: ${state.settings.contact}`;
+  }
+
+  function latestBill(cid){
+    return state.bills.filter(b=>b.customerId===cid).sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0] || null;
+  }
+
+  function openNewBillForUser(cid){
+    closeMenuV52();
+    if(window.closeUserDetailV51) closeUserDetailV51();
+    if(window.closeChat) { try{ closeChat(); }catch(e){} }
+    showPage('billPage');
+    setTimeout(()=>{
+      const sel=q('billCustomer');
+      if(sel){
+        sel.value=cid;
+        if(window.toggleManual) toggleManual();
+        if(window.previewBill) previewBill();
+      }
+    },120);
+  }
+
+  function editUser(cid){
+    closeMenuV52();
+    if(window.openCustomer) openCustomer(cid);
+    else alert('Edit function পাওয়া যাচ্ছে না।');
+  }
+
+  function deleteUserSafe(cid){
+    const c=state.customers.find(x=>x.id===cid);
+    if(!c) return;
+    if(!confirm(`Delete ${c.name}? এই user delete করলে তার bill/payment history-ও remove হতে পারে।`)) return;
+    if(window.deleteCustomer){
+      deleteCustomer(cid);
+    }else{
+      state.customers=state.customers.filter(x=>x.id!==cid);
+      state.bills=state.bills.filter(b=>b.customerId!==cid);
+      saveState();
+    }
+    closeMenuV52();
+    if(window.closeUserDetailV51) closeUserDetailV51();
+    if(window.renderCustomers) renderCustomers();
+  }
+
+  window.openUserMenuV52=function(cid){
+    ensureMenu();
+    const c=state.customers.find(x=>x.id===cid);
+    if(!c) return alert('User not found');
+    const b=latestBill(cid);
+    q('v52Name').textContent=c.name || 'User Actions';
+    q('v52Sub').textContent=(c.phone||'No phone')+' • '+(c.village||'No village')+' • Due '+money(customerDue(c.id));
+    q('v52Body').innerHTML=`
+      <button class="primary" id="v52NewBill">▤ New Bill</button>
+      <button id="v52Edit">✎ Edit User</button>
+      <button id="v52Ledger">☷ Ledger</button>
+      <button id="v52Receive">₹ Receive</button>
+      <button id="v52Settle">✓ Settle</button>
+      <button class="primary" id="v52BillReminder">⏰ Bill + Reminder</button>
+      <button id="v52Normal">Ⓦ Normal Reminder</button>
+      <button id="v52Call">✆ Call</button>
+      <button class="danger" id="v52Delete">⌫ Delete User</button>
+    `;
+    q('v52Status').textContent = b ? ('Latest bill: '+b.billNo) : 'No bill yet. Use New Bill first.';
+    q('v52Menu').classList.add('open');
+
+    q('v52NewBill').onclick=()=>openNewBillForUser(cid);
+    q('v52Edit').onclick=()=>editUser(cid);
+    q('v52Ledger').onclick=()=>{ closeMenuV52(); if(window.renderChatLedger) renderChatLedger(cid); else alert('Ledger not available'); };
+    q('v52Receive').onclick=()=>{ closeMenuV52(); if(window.directPay) directPay(cid,false); else alert('Receive function not available'); };
+    q('v52Settle').onclick=()=>{ closeMenuV52(); if(window.directPay) directPay(cid,true); else alert('Settle function not available'); };
+    q('v52BillReminder').onclick=()=>{
+      if(!b) return alert('এই user-এর কোনো bill নেই। আগে New Bill করুন।');
+      closeMenuV52();
+      if(window.openBillPreviewV50) openBillPreviewV50(cid,b.id);
+      else if(window.shareCustomerBill) shareCustomerBill(cid,b.id);
+      else alert('Bill reminder function not available');
+    };
+    q('v52Normal').onclick=()=>openWhatsApp(c.phone,normalReminder(c));
+    q('v52Call').onclick=()=>{
+      const d=getPhoneDigits(c.phone);
+      if(!d) return alert('Phone number নেই');
+      location.href='tel:+'+d;
+    };
+    q('v52Delete').onclick=()=>deleteUserSafe(cid);
+  };
+
+  // Override old menu completely.
+  window.openMoreMenu=function(cid){ openUserMenuV52(cid); };
+
+  // Rebind every time user detail renders.
+  const oldRenderDetail=window.renderUserDetailV51;
+  if(oldRenderDetail){
+    window.renderUserDetailV51=function(){
+      oldRenderDetail();
+      const btn=q('v51More');
+      if(btn){
+        btn.onclick=function(e){
+          e.preventDefault();
+          e.stopPropagation();
+          const cid=(typeof v51ActiveUser!=='undefined' && v51ActiveUser) ? v51ActiveUser : (window.activeCustomer || activeCustomer);
+          openUserMenuV52(cid);
+        };
+      }
+    };
+  }
+
+  const oldOpenDetail=window.openUserDetailV51;
+  if(oldOpenDetail){
+    window.openUserDetailV51=function(cid){
+      oldOpenDetail(cid);
+      setTimeout(()=>{
+        const btn=q('v51More');
+        if(btn){
+          btn.onclick=function(e){
+            e.preventDefault();
+            e.stopPropagation();
+            openUserMenuV52(cid);
+          };
+        }
+      },120);
+    };
+  }
+
+  // Also fix old chat top more if any old modal appears.
+  const oldRenderChat=window.renderChat;
+  if(oldRenderChat){
+    window.renderChat=function(){
+      oldRenderChat();
+      const btn=q('chatMore');
+      if(btn && activeCustomer){
+        btn.onclick=function(e){
+          e.preventDefault();
+          e.stopPropagation();
+          openUserMenuV52(activeCustomer);
+        };
+      }
+    };
+  }
+
+  ensureMenu();
+});
+})();
