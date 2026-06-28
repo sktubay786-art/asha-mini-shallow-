@@ -152,3 +152,12 @@ V50 Final Clean:
 - Bottom app navigation rebuilt stable and scrollable, fixed size across pages.
 - QR rendering, print bill only, calculator screen, user chat actions rechecked.
 - Phone/tablet/web layout polished.
+
+
+V51 Users Rebuild:
+- Users tab and customer list rebuilt from scratch.
+- User detail page rebuilt as independent full-screen detail view.
+- Opening a user no longer blocks Bill/Pay tabs; back closes only user detail.
+- All user actions available in top 3-dot menu: New Bill, Edit User, Ledger, Receive, Settle, Bill+Reminder, Normal Reminder, Call, Delete.
+- Added New Bill from 3-dot menu with selected customer prefilled.
+- Customer bill/payment history remains visible in user detail.

@@ -3080,3 +3080,194 @@ ready(function(){
   if(currentBill) renderInvoice(currentBill);
 });
 })();
+
+/* ==== V51 USERS REBUILD PATCH ==== */
+(function(){
+function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,520)); else setTimeout(fn,520); }
+
+ready(function(){
+  const chip=document.querySelector('.hero-chips span:last-child');
+  if(chip) chip.textContent='V51 Users Rebuild';
+
+  let v51ActiveUser=null;
+  const ICON={back:'‹',more:'⋯',call:'✆',wa:'Ⓦ',view:'👁',pay:'₹',bill:'⏰',del:'⌫',edit:'✎',ledger:'☷',settle:'✓',add:'+'};
+
+  function phoneDigits(raw){
+    let d=String(raw||'').replace(/\D/g,'');
+    if(!d)return '';
+    if(d.length===10)return '91'+d;
+    if(d.length===12&&d.startsWith('91'))return d;
+    if(d.length>10)return d;
+    return '91'+d.slice(-10);
+  }
+  window.openWhatsApp=function(raw,text=''){
+    const d=phoneDigits(raw);
+    if(!d||d.length<12)return alert('Valid phone number নেই। Customer phone-এ 10 digit number দিন।');
+    window.open('https://wa.me/'+d+(text?('?text='+encodeURIComponent(text)):''),'_blank');
+  };
+
+  function ensureDetail(){
+    if(document.getElementById('v51UserDetail'))return;
+    document.body.insertAdjacentHTML('beforeend',`
+      <div id="v51UserDetail">
+        <div class="v51-detail-head">
+          <button class="v51-head-btn" id="v51Back">${ICON.back}</button>
+          <div class="v51-avatar" id="v51Avatar">U</div>
+          <div class="v51-head-info"><b id="v51Name">User</b><small id="v51Sub">Details</small></div>
+          <button class="v51-head-btn" id="v51Call">${ICON.call}</button>
+          <button class="v51-head-btn" id="v51Wa">${ICON.wa}</button>
+          <button class="v51-head-btn" id="v51More">${ICON.more}</button>
+        </div>
+        <div class="v51-detail-body" id="v51Body"></div>
+      </div>`);
+    document.getElementById('v51Back').onclick=()=>closeUserDetailV51();
+  }
+
+  window.closeUserDetailV51=function(){
+    const d=document.getElementById('v51UserDetail');
+    if(d)d.classList.remove('open');
+    v51ActiveUser=null;
+    activeCustomer=null;
+  };
+
+  function normalReminder(c){
+    return `${state.settings.company}
+Name: ${c.name}
+Due: ${money(customerDue(c.id))}
+আপনাকে পুরো বিল শীঘ্রই পরিশোধের জন্য বলা হচ্ছে
+Thank you: ${state.settings.owner} (owner)
+Contact: ${state.settings.contact}`;
+  }
+
+  function latestBill(cid,billId){
+    const bills=state.bills.filter(b=>b.customerId===cid).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+    return billId ? (state.bills.find(b=>b.id===billId)||bills[0]) : bills[0];
+  }
+
+  window.renderCustomers=function(){
+    const list=document.getElementById('customerList');
+    if(!list)return;
+    const q=(document.getElementById('customerSearch')?.value||'').toLowerCase().trim();
+    const rows=state.customers.filter(c=>(c.name+c.phone+c.village+c.address).toLowerCase().includes(q));
+    list.innerHTML=rows.length?rows.map(c=>{
+      const due=customerDue(c.id);
+      const bills=state.bills.filter(b=>b.customerId===c.id);
+      const last=(bills.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0]||{}).date||'-';
+      return `<div class="v51-user-card" onclick="openUserDetailV51('${c.id}')">
+        <div class="v51-avatar">${esc(initials(c.name))}</div>
+        <div class="v51-user-main">
+          <b>${esc(c.name||'Unnamed')}</b>
+          <small>📞 ${esc(c.phone||'No phone')} • 📍 ${esc(c.village||'No village')}</small>
+          <small>Bills ${bills.length} • Last ${esc(last)}</small>
+        </div>
+        <div class="v51-due-pill ${due>0?'due':''}">${due>0?money(due):'Paid'}</div>
+      </div>`;
+    }).join(''):`<div class="v51-empty">No customer yet</div>`;
+  };
+
+  window.openUserDetailV51=function(cid){
+    ensureDetail();
+    v51ActiveUser=cid;
+    activeCustomer=cid;
+    const d=document.getElementById('v51UserDetail');
+    d.classList.add('open');
+    renderUserDetailV51();
+  };
+
+  window.openChat=function(cid){
+    // override old WhatsApp-style modal so Bill tab does not get blocked
+    openUserDetailV51(cid);
+  };
+
+  window.renderUserDetailV51=function(){
+    const c=state.customers.find(x=>x.id===v51ActiveUser);
+    if(!c)return;
+    document.getElementById('v51Avatar').textContent=initials(c.name);
+    document.getElementById('v51Name').textContent=c.name||'Unnamed';
+    document.getElementById('v51Sub').textContent=(c.phone||'No phone')+' • '+(c.village||'No village')+' • Due '+money(customerDue(c.id));
+    document.getElementById('v51Call').onclick=()=>{const d=phoneDigits(c.phone); if(!d)return alert('Phone number নেই'); location.href='tel:+'+d;};
+    document.getElementById('v51Wa').onclick=()=>openWhatsApp(c.phone,normalReminder(c));
+    document.getElementById('v51More').onclick=()=>openMoreMenu(c.id);
+
+    const bills=state.bills.filter(b=>b.customerId===c.id).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+    const total=bills.reduce((s,b)=>s+(+b.allTotal||0),0);
+    const paid=bills.reduce((s,b)=>s+billPaid(b),0);
+    let out=[`<div class="v51-summary">
+      <div class="box"><small>Live Due</small><b>${money(customerDue(c.id))}</b></div>
+      <div class="box"><small>Total Bill</small><b>${money(total)}</b></div>
+      <div class="box"><small>Collected</small><b>${money(paid)}</b></div>
+    </div>`];
+
+    if(!bills.length && !(+c.openingDue||0)){
+      out.push(`<div class="v51-empty">No bill yet. Use 3-dot menu → New Bill.</div>`);
+    }
+    if((+c.openingDue||0)>0){
+      out.push(`<div class="v51-bubble settle"><b>Opening Due</b><br><b>${money(c.openingDue)}</b></div>`);
+    }
+    bills.forEach(b=>{
+      out.push(`<div class="v51-day">${esc(b.date)}</div>
+      <div class="v51-bubble bill">
+        <div class="topline"><div><b>${esc(b.billNo)}</b><br><small>${esc(b.season||'-')} • ${esc(String(b.landAmount||''))} ${esc(b.unit||'')}</small></div><div style="text-align:right"><b>${money(billDue(b))}</b><br><small>Due</small></div></div>
+        <div>Total ${money(b.allTotal)}<br>Paid/Joma ${money(billPaid(b))}${b.note?`<br><small>Note: ${esc(b.note)}</small>`:''}</div>
+        <div class="v51-bubble-actions">
+          <button onclick="chatViewBill('${b.id}')">${ICON.view} View</button>
+          <button class="primary" onclick="chatOpenPay('${b.id}')">${ICON.pay} Pay</button>
+          <button onclick="openBillPreviewV50('${c.id}','${b.id}')">${ICON.bill} Bill</button>
+          <button onclick="chatDeleteBill('${b.id}')">${ICON.del}</button>
+        </div>
+      </div>`);
+      (b.payments||[]).forEach(p=>{
+        out.push(`<div class="v51-bubble ${String(p.mode||'').toLowerCase().includes('settle')?'settle':'pay'}">
+          <div class="topline"><div><b>${esc(p.mode||'Payment')}</b><br><small>${esc(p.date||'')} • ${esc(p.receivedIn||'')}</small></div><b>${money(p.amount)}</b></div>
+          <small>${esc(p.note||'')}</small>
+          <div class="v51-bubble-actions"><button onclick="editEntry('${p.id}')">${ICON.edit} Edit</button><button onclick="editEntry('${p.id}')">${ICON.del} Undo</button></div>
+        </div>`);
+      });
+    });
+    const logs=(c.logs||[]).slice(0,8);
+    if(logs.length){
+      out.push(`<div class="v51-history"><div class="v51-history-title">Edit / Action History</div>${logs.map(l=>`<div class="v51-history-row"><b>${esc(l.text||l.type)}</b><small>${esc(new Date(l.date).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}))}</small></div>`).join('')}</div>`);
+    }
+    document.getElementById('v51Body').innerHTML=out.join('');
+  };
+
+  window.openMoreMenu=function(cid){
+    const c=state.customers.find(x=>x.id===cid); if(!c)return;
+    const b=latestBill(cid);
+    openV45Sheet('User Actions',
+      '<div class="v50-menu-note"><b>'+esc(c.name)+'</b><br>'+esc(c.phone||'No phone')+' • Due '+money(customerDue(c.id))+'</div>'+
+      '<div class="v50-menu-grid">'+
+      '<button onclick="closeV45Sheet(); closeUserDetailV51(); showPage(\'billPage\'); billCustomer.value=\''+cid+'\'; toggleManual(); previewBill();">▤ New Bill</button>'+
+      '<button onclick="openCustomer(\''+cid+'\');closeV45Sheet()">✎ Edit User</button>'+
+      '<button onclick="renderChatLedger(\''+cid+'\');closeV45Sheet()">☷ Ledger</button>'+
+      '<button onclick="directPay(\''+cid+'\',false);closeV45Sheet()">₹ Receive</button>'+
+      '<button onclick="directPay(\''+cid+'\',true);closeV45Sheet()">✓ Settle</button>'+
+      '<button class="primary" onclick="openBillPreviewV50(\''+cid+'\',\''+(b?b.id:'')+'\')">⏰ Bill + Reminder</button>'+
+      '<button onclick="openWhatsApp(\''+(c.phone||'').replace(/'/g,'')+'\',\''+normalReminder(c).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n')+'\')">Ⓦ Normal Reminder</button>'+
+      '<button onclick="location.href=\'tel:+'+phoneDigits(c.phone)+'\'">✆ Call</button>'+
+      '<button class="danger" onclick="if(confirm(\'Delete user?\')){deleteCustomer(\''+cid+'\');closeV45Sheet();closeUserDetailV51();}">⌫ Delete</button>'+
+      '</div>');
+  };
+
+  window.chatViewBill=function(id){closeUserDetailV51(); viewBill(id);};
+  window.chatOpenPay=function(id){closeUserDetailV51(); openPayment(id); setTimeout(()=>{const a=document.getElementById('payAmount');if(a)a.focus();},100);};
+  window.chatDeleteBill=function(id){if(confirm('Delete this bill?')){deleteBill(id); if(v51ActiveUser)renderUserDetailV51();}};
+
+  const oldSaveState=window.saveState;
+  if(oldSaveState){
+    window.saveState=function(render=true){
+      oldSaveState(render);
+      if(v51ActiveUser) setTimeout(renderUserDetailV51,80);
+    };
+  }
+
+  const oldShow=window.showPage;
+  window.showPage=function(id){
+    closeUserDetailV51();
+    if(oldShow) oldShow(id);
+  };
+
+  ensureDetail();
+  renderCustomers();
+});
+})();
