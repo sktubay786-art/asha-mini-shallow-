@@ -95,3 +95,12 @@ V41 Premium Settings:
 - Company profile, payment setup, billing configuration, reminder, appearance and cloud tools separated.
 - Existing settings logic preserved: company, owner, contact, address, UPI, QR upload/remove, rates, fonts, template, print mode, cloud sync.
 - Compact bill meta toggle added as iOS-style switch.
+
+
+V42:
+- Billing mode now visually changes bill design.
+- Customer detail/chat screen updated with premium action bar and working buttons.
+- Calculator added as separate bottom tab and home quick action.
+- Login remember checkbox added using Firebase LOCAL persistence + saved email.
+- Rate line shows bigha rate note when unit is katha/decimal.
+- Indian rupee logic preserved.

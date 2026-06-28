@@ -1,7 +1,7 @@
 {
-  "name": "Asha Mini Shallow V41 Premium Settings",
-  "short_name": "Asha Billing V41",
-  "start_url": "./index.html?v=41",
+  "name": "Asha Mini Shallow V42 User UI Bill Modes",
+  "short_name": "Asha Billing V42",
+  "start_url": "./index.html?v=42",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f4f7fb",

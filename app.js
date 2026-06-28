@@ -2167,3 +2167,102 @@ ready(function(){
   bindV41();
 });
 })();
+
+
+/* ==== V42 billing modes + customer detail + login remember ==== */
+(function(){
+function ready(fn){if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,260));else setTimeout(fn,260)}
+ready(function(){
+  const chip=document.querySelector('.hero-chips span:last-child'); if(chip) chip.textContent='V42 User UI + Bill Modes';
+
+  const savedEmail=localStorage.getItem('ashaRememberEmail')||'';
+  if(document.getElementById('email') && savedEmail) document.getElementById('email').value=savedEmail;
+  if(document.getElementById('rememberLogin')) document.getElementById('rememberLogin').checked=!!savedEmail;
+
+  window.login=async function(){
+    try{
+      const remember=!!document.getElementById('rememberLogin')?.checked;
+      if(auth && firebase?.auth){ await auth.setPersistence(remember?firebase.auth.Auth.Persistence.LOCAL:firebase.auth.Auth.Persistence.SESSION); }
+      let cred=await auth.signInWithEmailAndPassword($('email').value.trim(),$('password').value);
+      if(cred.user.uid!==OWNER_UID){await auth.signOut();$('loginMsg').textContent='Only owner account allowed';return}
+      if(remember) localStorage.setItem('ashaRememberEmail',$('email').value.trim()); else localStorage.removeItem('ashaRememberEmail');
+      $('login').classList.add('hidden');$('app').classList.remove('hidden');await pullCloud();
+    }catch(e){$('loginMsg').textContent=e.message}
+  };
+  if(document.getElementById('loginBtn')) document.getElementById('loginBtn').onclick=login;
+
+  function unitLabel(u){return u==='katha'?'কাঠা':u==='decimal'?'ডেসিমেল':'বিঘা'}
+  function rateSuffix(u){return u==='katha'?'/কাঠা':u==='decimal'?'/ডেসিমেল':'/বিঘা'}
+  function bighaRateNote(b){
+    const rb=+(state.settings.rateBigha||2200);
+    if((b.rateUnit||b.unit)==='bigha') return '';
+    return `<span class="rate-note">বিঘা rate: ${money(rb)}/বিঘা</span>`;
+  }
+  function qrBlock(amount,billNo){
+    const upi = makeUpiLink ? makeUpiLink(amount,billNo) : `upi://pay?pa=${encodeURIComponent(state.settings.upi)}&pn=${encodeURIComponent(state.settings.owner)}&am=${Number(amount).toFixed(2)}&cu=INR&tn=${encodeURIComponent(billNo)}`;
+    const fallback=`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upi)}`;
+    return `<div class="qr-live" data-qr="${esc(upi)}" data-fallback="${esc(fallback)}"></div>`;
+  }
+
+  window.invoiceHTML=function(b,cls){
+    const tpl=(document.getElementById('template')?.value||state.settings.template||'premium');
+    const due=billDue(b), paid=billPaid(b), payable=due>0?due:b.allTotal;
+    const showMeta=['mini','phone','compact'].includes(tpl)||cls==='phoneview'||tpl==='thermal';
+    const meta=showMeta?`<div class="mini-grid"><div><b>${money(b.current)}</b>বর্তমান বিল</div><div><b>${money(b.previousDue)}</b>আগের বাকি</div><div><b>${money(paid)}</b>মোট জমা</div></div>`:'';
+    return `<div class="invoice v42bill ${esc(cls||'')} ${esc(tpl)}">
+      <div class="top"><h3>${esc(state.settings.company)}</h3><div class="sub">Pro: ${esc(state.settings.owner)}<br>☎ / WhatsApp: ${esc(state.settings.contact)}<br>${esc(state.settings.address)}</div></div>
+      <div class="sec"><span class="sec-title">Bill Details</span><div class="row"><span>Bill No</span><b>${esc(b.billNo)}</b></div><div class="row"><span>Date</span><b>${esc(b.date)}</b></div></div>
+      <div class="sec"><span class="sec-title">Customer Details</span><div class="customer-box"><b>${esc(b.customerName)}</b><br>${esc(safePhoneLabel?(safePhoneLabel(b.phone)||b.phone||''):(b.phone||''))}<br>${esc(b.address||b.village||'')}</div></div>
+      <div class="sec"><span class="sec-title">Land / Charge</span><div class="row"><span>Season</span><b>${esc(b.season)}</b></div><div class="row"><span>জমির পরিমাণ</span><b>${esc(b.landAmount)} ${unitLabel(b.unit)} (${Number(b.bigha||0).toFixed(2)} বিঘা)</b></div><div class="row"><span>Rate</span><b>${money(b.rate)} ${rateSuffix(b.rateUnit||b.unit)}${bighaRateNote(b)}</b></div><div class="row"><span>বর্তমান বিল</span><b>${money(b.current)}</b></div></div>
+      ${tpl==='qrfirst'?`<div class="sec qrbox pay-section"><span class="sec-title">Payment QR</span><div style="font-size:11px;margin-bottom:6px">UPI: ${esc(state.settings.upi)}</div>${qrBlock(payable,b.billNo)}<div class="mutedline"><b>Scan & Pay ${money(payable)}</b></div></div>`:''}
+      <div class="sec"><span class="sec-title">Payment Summary</span><div class="amount-box"><div class="row"><span>আগের বাকি</span><b>${money(b.previousDue)}</b></div><div class="row"><span>বর্তমান বিল</span><b>${money(b.current)}</b></div><div class="row"><span>মোট টাকা</span><b>${money(b.allTotal)}</b></div><div class="row"><span>মোট জমা</span><b>${money(paid)}</b></div><div class="row"><span>Status</span><b>${esc(billStatus(b))}</b></div></div>${meta}<div class="grand"><small>মোট বাকি / Payable Due</small><b>${money(due)}</b></div>${b.note?`<div class="mutedline">Note: ${esc(b.note)}</div>`:''}</div>
+      ${tpl!=='qrfirst'?`<div class="sec qrbox pay-section"><span class="sec-title">Payment QR</span><div style="font-size:11px;margin-bottom:6px">UPI: ${esc(state.settings.upi)}</div>${qrBlock(payable,b.billNo)}<div class="mutedline"><b>Scan & Pay ${money(payable)}</b></div></div>`:''}
+      <div class="foot">${esc(state.settings.reminderTemplate||'আপনাকে পুরো বিল শীঘ্রই পরিশোধের জন্য বলা হচ্ছে')}<br>Thank you: ${esc(state.settings.owner)} (owner)</div>
+    </div>`;
+  };
+
+  window.renderInvoice=function(b){
+    let mode=$('printMode').value, html='';
+    const one=cls=>invoiceHTML(b,cls);
+    if(mode==='thermal80')html=one('thermal80');
+    if(mode==='a4two'||mode==='a4half')html=`<div class="print-sheet a4p"><div class="slot a5top">${one('a5bill')}</div></div>`;
+    if(mode==='a4four'||mode==='a4quarter')html=`<div class="print-sheet a4p"><div class="slot a6q1">${one('a6bill')}</div></div>`;
+    if(mode==='a4side')html=`<div class="print-sheet a4p"><div class="slot side">${one('sidebill')}</div></div>`;
+    if(mode==='a4land')html=`<div class="print-sheet a4l"><div class="slot land">${one('landbill')}</div></div>`;
+    if(mode==='phoneview')html=one('phoneview');
+    $('billPreview').innerHTML=html||one('thermal80');
+    if(window.renderQRCodes)setTimeout(renderQRCodes,70);
+  };
+  document.getElementById('template')?.addEventListener('change',()=>{state.settings.template=document.getElementById('template').value;previewBill();});
+  document.getElementById('printMode')?.addEventListener('change',()=>{state.settings.print=document.getElementById('printMode').value;previewBill();});
+
+  window.openPayment=function(id){closeChat();showPage('payPage');$('payBill').value=id;updatePayInfo();let b=state.bills.find(x=>x.id===id);if(b)$('payAmount').value=billDue(b);setTimeout(()=>$('payAmount')?.focus(),80)};
+  window.chatViewBill=function(id){closeChat();viewBill(id)};
+  window.chatDeleteBill=function(id){if(confirm('Delete this bill?'))deleteBill(id)};
+
+  window.openChat=function(id){activeCustomer=id;$('chatModal').classList.remove('hidden');$('chatModal').classList.add('v42-chat');renderChat()};
+
+  window.renderChat=function(){
+    const c=state.customers.find(x=>x.id===activeCustomer); if(!c)return;
+    $('chatAvatar').textContent=initials(c.name);$('chatName').textContent=c.name;$('chatSub').textContent=(safePhoneLabel?(safePhoneLabel(c.phone)||c.phone||'No phone'):(c.phone||'No phone'))+' • '+(c.village||'No village');
+    $('chatBack').onclick=closeChat;$('chatCall').onclick=()=>{let d=(phoneDigitsV36?phoneDigitsV36(c.phone):phone(c.phone));if(!d)return alert('Phone number নেই');location.href='tel:+'+d};$('chatWhats').onclick=()=>openWhatsApp(c.phone,customerReminderText(c));$('chatShare').onclick=()=>shareCustomerBill(c.id);$('chatBill').onclick=()=>{closeChat();showPage('billPage');$('billCustomer').value=c.id;toggleManual();previewBill()};$('chatPay').onclick=()=>directPay(c.id,false);$('chatSettle').onclick=()=>directPay(c.id,true);$('chatLedger').onclick=()=>renderChatLedger(c.id);$('chatEdit').onclick=()=>openCustomer(c.id);$('chatMore').onclick=()=>openMoreMenu(c.id);
+    const bills=state.bills.filter(b=>b.customerId===c.id).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+    const total=bills.reduce((s,b)=>s+(+b.allTotal||0),0), paid=bills.reduce((s,b)=>s+billPaid(b),0), due=customerDue(c.id);
+    let out=`<div class="v42-actionbar"><button id="v42NewBill">▤<br>বিল</button><button id="v42Pay">₹<br>পেমেন্ট</button><button id="v42Settle">✓<br>নিষ্পত্তি</button></div><div class="v42-summary"><small>Current Balance Due</small><b>${money(due)}</b><div class="chat-topnote">Total ${money(total)} • Paid ${money(paid)}</div></div>`;
+    let lastDate='';
+    bills.forEach(b=>{
+      if(b.date!==lastDate){out+=`<div class="v42-date"><span>${esc(b.date)}</span></div>`;lastDate=b.date;}
+      out+=`<div class="v42-bubble v42-bill"><div class="v42-bubble-title"><span>▤ ${esc(b.billNo)}</span><span class="due">${money(billDue(b))}</span></div><div class="line"><span>মোট টাকা</span><b>${money(b.allTotal)}</b></div><div class="line"><span>মোট জমা</span><b>${money(billPaid(b))}</b></div><div class="line"><span>বাকি</span><b class="due">${money(billDue(b))}</b></div><p class="muted">${esc(b.season||'')} • ${esc(b.landAmount)} ${unitLabel(b.unit)}</p><div class="v42-bubble-actions"><button data-act="view" data-id="${b.id}">View</button><button data-act="pay" data-id="${b.id}">Pay</button><button data-act="reminder" data-id="${b.id}">Reminder + Bill</button><button data-act="delete" data-id="${b.id}">Delete</button></div></div>`;
+      (b.payments||[]).forEach(p=>{out+=`<div class="v42-bubble ${String(p.mode).toLowerCase().includes('settle')?'v42-settle':'v42-pay'}"><div class="v42-bubble-title"><span>${String(p.mode).toLowerCase().includes('settle')?'✓ Settlement':'✓ Payment Received'}</span><span>${money(p.amount)}</span></div><p class="muted">${esc(p.receivedIn||'')} • ${esc(p.note||'')}</p><div class="v42-bubble-actions"><button data-act="editpay" data-id="${p.id}">Edit</button><button data-act="editpay" data-id="${p.id}">Undo/Delete</button></div></div>`});
+    });
+    out+=`<div class="v42-sticky-reminder"><button id="v42SendReminder">Send Reminder</button></div>`;
+    $('chatBody').innerHTML=out;
+    $('v42NewBill')?.addEventListener('click',()=>$('chatBill').click());$('v42Pay')?.addEventListener('click',()=>$('chatPay').click());$('v42Settle')?.addEventListener('click',()=>$('chatSettle').click());$('v42SendReminder')?.addEventListener('click',()=>shareCustomerBill(c.id));
+    $('chatBody').onclick=e=>{const btn=e.target.closest('button[data-act]');if(!btn)return;const act=btn.dataset.act,id=btn.dataset.id;if(act==='view')chatViewBill(id);if(act==='pay')openPayment(id);if(act==='reminder')shareCustomerBill(c.id,id);if(act==='delete')chatDeleteBill(id);if(act==='editpay')editEntry(id)};
+  };
+
+  const prevSetupCalc=window.setupCalc;
+  window.setupCalc=function(){if(prevSetupCalc)prevSetupCalc();};
+  fillSelects();renderAll(true);
+});
+})();
