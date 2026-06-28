@@ -3762,3 +3762,88 @@ Contact: ${state.settings.contact}`;
   }
 });
 })();
+
+/* ==== V54 cloud status fix ==== */
+(function(){
+function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,750)); else setTimeout(fn,750); }
+
+ready(function(){
+  const chip=document.querySelector('.hero-chips span:last-child');
+  if(chip) chip.textContent='V54 Cloud Status Fix';
+
+  function setCloudStatus(text,type='warn'){
+    const el=document.getElementById('cloudChip');
+    if(!el) return;
+    el.textContent=text;
+    el.classList.remove('cloud-ok','cloud-warn','cloud-bad');
+    el.classList.add(type==='ok'?'cloud-ok':type==='bad'?'cloud-bad':'cloud-warn');
+  }
+  window.setCloudStatusV54=setCloudStatus;
+
+  // Immediately resolve stuck checking.
+  try{
+    if(!window.firebase || !auth){
+      setCloudStatus('Cloud: offline mode','warn');
+    }else if(auth.currentUser && auth.currentUser.uid===OWNER_UID){
+      setCloudStatus('Cloud: connected','ok');
+    }else{
+      setCloudStatus('Cloud: login needed','warn');
+    }
+  }catch(e){
+    setCloudStatus('Cloud: offline mode','warn');
+  }
+
+  // Auth state listener only for chip. Does not change data logic.
+  try{
+    if(auth && auth.onAuthStateChanged){
+      auth.onAuthStateChanged(u=>{
+        if(u && u.uid===OWNER_UID) setCloudStatus('Cloud: connected','ok');
+        else setCloudStatus('Cloud: login needed','warn');
+      });
+    }
+  }catch(e){
+    setCloudStatus('Cloud: auth error','bad');
+  }
+
+  // Wrap pullCloud with visible status.
+  const oldPullCloudV54=window.pullCloud || (typeof pullCloud!=='undefined'?pullCloud:null);
+  window.pullCloud=async function(){
+    setCloudStatus('Cloud: loading...','warn');
+    try{
+      if(oldPullCloudV54) await oldPullCloudV54();
+      setCloudStatus('Cloud: loaded ✅','ok');
+    }catch(e){
+      setCloudStatus('Cloud: pull failed','bad');
+      const s=document.getElementById('cloudStatus');
+      if(s) s.textContent='Pull failed: '+(e.message||e);
+    }
+  };
+
+  // Wrap pushCloud with visible status.
+  const oldPushCloudV54=window.pushCloud || (typeof pushCloud!=='undefined'?pushCloud:null);
+  window.pushCloud=async function(manual=true){
+    setCloudStatus('Cloud: saving...','warn');
+    try{
+      if(oldPushCloudV54) await oldPushCloudV54(manual);
+      setCloudStatus('Cloud: saved ✅','ok');
+    }catch(e){
+      setCloudStatus('Cloud: save failed','bad');
+      const s=document.getElementById('cloudStatus');
+      if(s) s.textContent='Push failed: '+(e.message||e);
+    }
+  };
+
+  // If still "checking" after 4 seconds, show meaningful status.
+  setTimeout(()=>{
+    const el=document.getElementById('cloudChip');
+    if(el && /checking/i.test(el.textContent||'')){
+      try{
+        if(auth?.currentUser?.uid===OWNER_UID) setCloudStatus('Cloud: connected','ok');
+        else setCloudStatus('Cloud: login needed','warn');
+      }catch(e){
+        setCloudStatus('Cloud: offline mode','warn');
+      }
+    }
+  },4000);
+});
+})();

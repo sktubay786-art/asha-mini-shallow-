@@ -1345,3 +1345,20 @@ main{width:100%!important;max-width:1180px!important;margin:0 auto!important;box
 @media(max-width:520px){
   .v53-row2{grid-template-columns:1fr}
 }
+
+/* ===== V54 Cloud status fix ===== */
+#cloudChip{
+  transition:.2s ease;
+}
+#cloudChip.cloud-ok{
+  background:rgba(16,185,129,.18)!important;
+  color:#eafff5!important;
+}
+#cloudChip.cloud-warn{
+  background:rgba(245,158,11,.22)!important;
+  color:#fff7ed!important;
+}
+#cloudChip.cloud-bad{
+  background:rgba(239,68,68,.22)!important;
+  color:#fff1f2!important;
+}

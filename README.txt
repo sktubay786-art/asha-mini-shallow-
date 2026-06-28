@@ -177,3 +177,15 @@ V53 Menu Actions Fixed:
 - Hard-fixed Settle inside user 3-dot menu with standalone settlement form.
 - Bill + Reminder now creates bill image preview and supports image+text share, WhatsApp text only, and download.
 - Menu no longer relies on broken older openCustomer/direct popup flow for edit/settle.
+
+
+V54 Cloud Status Fix:
+- Fixed Cloud: checking stuck status.
+- Added visible statuses:
+  Cloud: connected
+  Cloud: loaded ✅
+  Cloud: saved ✅
+  Cloud: login needed
+  Cloud: offline mode
+  Cloud: pull failed / save failed
+- App name kept as Asha Billing in manifest.
