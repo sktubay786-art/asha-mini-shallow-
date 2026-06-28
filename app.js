@@ -2605,3 +2605,260 @@ ready(function(){
   createCalcPageV44(); rebuildTabbarV44(); setupCalc(); renderCustomers(); if(currentBill) renderInvoice(currentBill);
 });
 })();
+
+/* ==== V45 user menu, bill preview, history/audit ==== */
+(function(){
+function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,420)); else setTimeout(fn,420); }
+
+ready(function(){
+  const chip=document.querySelector('.hero-chips span:last-child'); if(chip) chip.textContent='V45 Preview Menu History';
+
+  function ensureV45Sheet(){
+    if(document.getElementById('v45Sheet')) return;
+    document.body.insertAdjacentHTML('beforeend',`
+      <div id="v45Sheet" class="v45-sheet hidden">
+        <div class="v45-panel">
+          <h3 id="v45Title">Options</h3>
+          <div id="v45Body"></div>
+          <button class="v45-full-btn" id="v45Close" style="margin-top:12px">Close</button>
+        </div>
+      </div>`);
+    document.getElementById('v45Close').onclick=()=>closeV45Sheet();
+    document.getElementById('v45Sheet').addEventListener('click',e=>{ if(e.target.id==='v45Sheet') closeV45Sheet(); });
+  }
+  function openV45Sheet(title,body){
+    ensureV45Sheet();
+    document.getElementById('v45Title').textContent=title;
+    document.getElementById('v45Body').innerHTML=body;
+    document.getElementById('v45Sheet').classList.remove('hidden');
+  }
+  window.closeV45Sheet=function(){ const s=document.getElementById('v45Sheet'); if(s) s.classList.add('hidden'); };
+
+  function nowText(){
+    const d=new Date();
+    return d.toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});
+  }
+  function logCustomer(customerId,type,text,amount){
+    const c=state.customers.find(x=>x.id===customerId);
+    if(!c) return;
+    c.logs=c.logs||[];
+    c.logs.unshift({id:uid(),type,date:new Date().toISOString(),text,amount:amount||0});
+    if(c.logs.length>80) c.logs=c.logs.slice(0,80);
+  }
+  window.logCustomerV45=logCustomer;
+
+  function phoneDigits(raw){
+    let d=String(raw||'').replace(/\D/g,'');
+    if(!d) return '';
+    if(d.length===10) return '91'+d;
+    if(d.length===12 && d.startsWith('91')) return d;
+    if(d.length>10) return d;
+    return '91'+d.slice(-10);
+  }
+  window.v45PhoneDigits=phoneDigits;
+
+  window.openWhatsApp=function(raw,text=''){
+    const d=phoneDigits(raw);
+    if(!d || d.length<12) return alert('Valid phone number নেই। Customer phone-এ 10 digit number দিন।');
+    window.open('https://wa.me/'+d+(text?('?text='+encodeURIComponent(text)):''),'_blank');
+  };
+
+  function customerById(id){ return state.customers.find(x=>x.id===id); }
+  function latestBill(cid,billId){
+    const bills=state.bills.filter(b=>b.customerId===cid).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+    return billId ? (state.bills.find(b=>b.id===billId)||bills[0]) : bills[0];
+  }
+  function normalReminderText(c){
+    return `${state.settings.company}
+Name: ${c.name}
+Due: ${money(customerDue(c.id))}
+আপনাকে পুরো বিল শীঘ্রই পরিশোধের জন্য বলা হচ্ছে
+Thank you: ${state.settings.owner} (owner)
+Contact: ${state.settings.contact}`;
+  }
+
+  // Force QR visible and convert QR canvas into image if needed before html2canvas/share.
+  async function prepareBillForCapture(){
+    if(window.renderQRCodes) renderQRCodes();
+    await new Promise(r=>setTimeout(r,300));
+    document.querySelectorAll('.qr-live canvas').forEach(canvas=>{
+      try{
+        const img=document.createElement('img');
+        img.src=canvas.toDataURL('image/png');
+        img.style.width='112px';
+        img.style.height='112px';
+        img.style.display='block';
+        canvas.replaceWith(img);
+      }catch(e){}
+    });
+    await new Promise(r=>setTimeout(r,120));
+  }
+
+  window.billImageBlobV45=async function(bill){
+    currentBill=bill;
+    renderInvoice(bill);
+    await prepareBillForCapture();
+    return await invoiceBlob();
+  };
+
+  window.openBillPreviewV45=async function(cid,billId){
+    const c=customerById(cid); const b=latestBill(cid,billId);
+    if(!c || !b) return alert('এই user-এর কোনো bill নেই।');
+    currentBill=b;
+    const blob=await billImageBlobV45(b);
+    const url=URL.createObjectURL(blob);
+    const text=reminderTextByBill(b);
+    openV45Sheet('Bill Image Preview',`
+      <div class="v45-preview-note">প্রথমে bill preview দেখুন, তারপর WhatsApp/Share দিয়ে পাঠান। Android share sheet contact select করতে দেবে।</div>
+      <img class="v45-preview-img" src="${url}">
+      <div class="v45-action-grid">
+        <button class="primary" onclick="shareBillImageV45('${cid}','${b.id}')">⏰ Share Image + Reminder</button>
+        <button onclick="openWhatsApp('${(c.phone||'').replace(/'/g,'')}','${text.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n')}')">Ⓦ Normal WhatsApp Text</button>
+        <button onclick="downloadCurrentBillV45('${b.id}')">⇩ Download Image</button>
+        <button onclick="closeV45Sheet()">Close</button>
+      </div>`);
+  };
+
+  window.shareBillImageV45=async function(cid,billId){
+    const c=customerById(cid); const b=latestBill(cid,billId);
+    if(!c || !b) return alert('Bill not found');
+    currentBill=b;
+    const blob=await billImageBlobV45(b);
+    const file=new File([blob],`${b.billNo}.png`,{type:'image/png'});
+    const text=reminderTextByBill(b);
+    try{
+      if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+        await navigator.share({files:[file],text,title:'Asha Bill Reminder'});
+        logCustomer(c.id,'share','Bill image + reminder shared: '+b.billNo, billDue(b));
+        saveState(false);
+      }else if(navigator.share){
+        await navigator.share({text,title:'Asha Bill Reminder'});
+        downloadBlob(blob,`${b.billNo}.png`);
+      }else{
+        downloadBlob(blob,`${b.billNo}.png`);
+        openWhatsApp(c.phone,text);
+      }
+    }catch(e){ console.warn(e); }
+    if(activeCustomer===cid) renderChat();
+  };
+
+  window.downloadCurrentBillV45=async function(billId){
+    const b=state.bills.find(x=>x.id===billId) || currentBill;
+    if(!b) return;
+    const blob=await billImageBlobV45(b);
+    downloadBlob(blob,`${b.billNo}.png`);
+  };
+
+  window.shareCustomerBill=async function(cid,billId){
+    return openBillPreviewV45(cid,billId);
+  };
+
+  window.openMoreMenu=function(cid){
+    const c=customerById(cid); if(!c) return;
+    const b=latestBill(cid);
+    openV45Sheet('User Options',`
+      <div class="v45-preview-note"><b>${esc(c.name)}</b><br>${esc(c.phone||'No phone')} • Due ${money(customerDue(c.id))}</div>
+      <div class="v45-action-grid">
+        <button onclick="openCustomer('${cid}');closeV45Sheet()">✎ Edit User</button>
+        <button onclick="renderChatLedger('${cid}');closeV45Sheet()">☷ Ledger</button>
+        <button onclick="directPay('${cid}',false);closeV45Sheet()">₹ Receive Payment</button>
+        <button onclick="directPay('${cid}',true);closeV45Sheet()">✓ Settlement</button>
+        <button class="primary" onclick="openBillPreviewV45('${cid}','${b?b.id:''}')">⏰ Bill + Reminder</button>
+        <button onclick="openWhatsApp('${(c.phone||'').replace(/'/g,'')}','${normalReminderText(c).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n')}')">Ⓦ Normal Reminder</button>
+        <button onclick="location.href='tel:+${phoneDigits(c.phone)}'">✆ Call</button>
+        <button class="danger" onclick="deleteCustomer('${cid}')">⌫ Delete User</button>
+      </div>`);
+  };
+
+  // Payment edit/delete with logs.
+  window.findPaymentV45=function(pid){
+    for(const b of state.bills){
+      const p=(b.payments||[]).find(x=>x.id===pid);
+      if(p) return {bill:b,p};
+    }
+    return null;
+  };
+
+  window.editEntry=function(pid){
+    const fp=findPaymentV45(pid);
+    if(!fp) return alert('Payment entry not found');
+    actionContext={type:'v45editPayment',paymentId:pid};
+    $("actionTitle").textContent=(String(fp.p.mode||'').toLowerCase().includes('settle')?'Edit Settlement':'Edit Payment');
+    $("actionBody").innerHTML=`<label>Amount</label><input id="editAmount" type="number" value="${fp.p.amount||0}">
+      <label>Mode</label><select id="editMode"><option>Cash</option><option>UPI</option><option>Bank</option><option>Online</option><option>Settlement</option></select>
+      <label>Received In</label><input id="editReceived" value="${esc(fp.p.receivedIn||'')}">
+      <label>Note</label><input id="editNote" value="${esc(fp.p.note||'')}">`;
+    $("editMode").value=fp.p.mode||'Cash';
+    $("actionSave").classList.remove("hidden");
+    $("actionDelete").classList.remove("hidden");
+    $("actionModal").classList.remove("hidden");
+  };
+
+  const oldSaveAction=window.saveAction;
+  window.saveAction=function(){
+    if(actionContext && actionContext.type==='v45editPayment'){
+      const fp=findPaymentV45(actionContext.paymentId); if(!fp) return closeAction();
+      const before=+fp.p.amount||0;
+      fp.p.amount=+$("editAmount").value||0;
+      fp.p.mode=$("editMode").value;
+      fp.p.receivedIn=$("editReceived").value;
+      fp.p.note=$("editNote").value;
+      fp.p.editedAt=new Date().toISOString();
+      logCustomer(fp.bill.customerId,'edit',`Edited ${fp.p.mode} on ${fp.bill.billNo}: ${money(before)} → ${money(fp.p.amount)}`, fp.p.amount);
+      saveState();
+      if(activeCustomer) renderChat();
+      closeAction();
+      return;
+    }
+    return oldSaveAction ? oldSaveAction() : undefined;
+  };
+
+  const oldDeleteAction=window.deleteAction;
+  window.deleteAction=function(){
+    if(actionContext && actionContext.type==='v45editPayment'){
+      const fp=findPaymentV45(actionContext.paymentId); if(!fp) return closeAction();
+      if(confirm('Delete/Undo this payment or settlement?')){
+        logCustomer(fp.bill.customerId,'delete',`Deleted ${fp.p.mode} from ${fp.bill.billNo}: ${money(fp.p.amount)}`, fp.p.amount);
+        fp.bill.payments=(fp.bill.payments||[]).filter(p=>p.id!==actionContext.paymentId);
+        saveState();
+        if(activeCustomer) renderChat();
+      }
+      closeAction();
+      return;
+    }
+    return oldDeleteAction ? oldDeleteAction() : undefined;
+  };
+
+  // Direct payment logs.
+  const oldDirectPay=window.directPay;
+  window.directPay=function(cid,settle=false){
+    oldDirectPay(cid,settle);
+    // actual save happens in saveAction in older code, so logs will be visible from bill payments; this marker is just menu action.
+  };
+
+  // Render user chat with clean top more and history block.
+  const oldRenderChat=window.renderChat;
+  window.renderChat=function(){
+    oldRenderChat();
+    const c=customerById(activeCustomer);
+    if(!c) return;
+    if(chatMore) chatMore.onclick=()=>openMoreMenu(c.id);
+
+    const logs=(c.logs||[]).slice(0,8);
+    if(logs.length && chatBody && !document.getElementById('v45HistoryBlock')){
+      chatBody.insertAdjacentHTML('beforeend',`
+        <div id="v45HistoryBlock" class="chat-history-block">
+          <div class="history-title">Edit / Action History</div>
+          ${logs.map(l=>`<div class="v45-log-row"><b>${esc(l.text||l.type)}</b><small>${esc(new Date(l.date).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}))}</small></div>`).join('')}
+        </div>`);
+    }
+  };
+
+  // Better print/share click actions in bill bubble.
+  window.chatViewBill=function(id){ closeChat(); viewBill(id); };
+  window.chatOpenPay=function(id){ closeChat(); openPayment(id); setTimeout(()=>{const a=document.getElementById('payAmount'); if(a) a.focus();},100); };
+  window.chatDeleteBill=function(id){ if(confirm('Delete this bill?')) deleteBill(id); };
+
+  ensureV45Sheet();
+});
+})();

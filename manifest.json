@@ -1,7 +1,7 @@
 {
-  "name": "Asha Mini Shallow V44 Clean Fix",
-  "short_name": "Asha Billing V44",
-  "start_url": "./index.html?v=44",
+  "name": "Asha Mini Shallow V45 User Menu Preview History",
+  "short_name": "Asha Billing V45",
+  "start_url": "./index.html?v=45",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f4f7fb",

@@ -134,3 +134,13 @@ V44 Checked Final Audit:
 - Confirmed core functions exist: login, renderChat, renderCustomers, renderInvoice, renderQRCodes, shareBill, printBill, setupCalc.
 - Confirmed print CSS targets only #billPreview.
 - Confirmed QR rendering function has canvas and fallback image route.
+
+
+V45 User Menu Preview History:
+- Added bill image preview modal before sharing.
+- Bill + Reminder opens preview and then native share sheet with image+text where supported.
+- Normal reminder opens direct WhatsApp text to customer number.
+- Top three-dot menu now shows user actions popup: edit, ledger, receive, settle, bill+reminder, normal reminder, call, delete.
+- Payment edit/delete now logs action history.
+- User chat displays recent edit/action history.
+- QR is converted to image before capture to improve share preview reliability.
