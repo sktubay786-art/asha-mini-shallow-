@@ -1,7 +1,7 @@
 {
-  "name": "Asha Mini Shallow V52 Users Menu Fixed",
-  "short_name": "Asha Billing V52",
-  "start_url": "./index.html?v=52",
+  "name": "Asha Mini Shallow V53 Menu Actions Fixed",
+  "short_name": "Asha Billing V53",
+  "start_url": "./index.html?v=53",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f4f7fb",

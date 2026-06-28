@@ -1299,3 +1299,49 @@ main{width:100%!important;max-width:1180px!important;margin:0 auto!important;box
   .v52-panel{border-radius:24px}
   .v52-actions{grid-template-columns:1fr}
 }
+
+/* ===== V53 MENU ACTIONS FIX ===== */
+.v53-form{
+  display:grid;
+  gap:10px;
+  margin-top:8px;
+}
+.v53-form label{
+  font-size:12px;
+  color:#667085;
+  font-weight:900;
+  margin-left:3px;
+}
+.v53-form input,.v53-form textarea,.v53-form select{
+  width:100%;
+  border:1px solid #e5ece8;
+  background:#f8faf9;
+  border-radius:14px;
+  min-height:44px;
+  padding:10px 12px;
+  font-size:14px;
+  outline:none;
+}
+.v53-form textarea{min-height:76px}
+.v53-row2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.v53-preview-img{
+  width:100%;
+  max-height:58vh;
+  object-fit:contain;
+  border-radius:18px;
+  border:1px solid #e5ece8;
+  background:#fff;
+  margin:8px 0 12px;
+}
+.v53-small{
+  font-size:12px;
+  color:#667085;
+  line-height:1.45;
+}
+@media(max-width:520px){
+  .v53-row2{grid-template-columns:1fr}
+}

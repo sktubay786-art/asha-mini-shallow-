@@ -169,3 +169,11 @@ V52 Users Menu Fixed:
 - Rebound v51More and old chatMore buttons directly.
 - Menu actions: New Bill, Edit User, Ledger, Receive, Settle, Bill+Reminder, Normal Reminder, Call, Delete User.
 - New Bill closes user detail and opens Bill tab with selected user prefilled.
+
+
+V53 Menu Actions Fixed:
+- Hard-fixed Bill + Reminder inside user 3-dot menu.
+- Hard-fixed Edit User inside user 3-dot menu with standalone edit form.
+- Hard-fixed Settle inside user 3-dot menu with standalone settlement form.
+- Bill + Reminder now creates bill image preview and supports image+text share, WhatsApp text only, and download.
+- Menu no longer relies on broken older openCustomer/direct popup flow for edit/settle.

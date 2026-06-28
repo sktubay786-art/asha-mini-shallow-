@@ -3464,3 +3464,301 @@ Contact: ${state.settings.contact}`;
   ensureMenu();
 });
 })();
+
+/* ==== V53: hard fix menu actions ==== */
+(function(){
+function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,650)); else setTimeout(fn,650); }
+
+ready(function(){
+  const chip=document.querySelector('.hero-chips span:last-child');
+  if(chip) chip.textContent='V53 Menu Actions Fixed';
+
+  function q(id){ return document.getElementById(id); }
+  function closeMenu(){ if(q('v52Menu')) q('v52Menu').classList.remove('open'); }
+
+  function phoneDigits(raw){
+    let d=String(raw||'').replace(/\D/g,'');
+    if(!d) return '';
+    if(d.length===10) return '91'+d;
+    if(d.length===12 && d.startsWith('91')) return d;
+    if(d.length>10) return d;
+    return '91'+d.slice(-10);
+  }
+
+  window.openWhatsApp=function(raw,text=''){
+    const d=phoneDigits(raw);
+    if(!d || d.length<12) return alert('Customer-এর valid 10 digit phone number নেই।');
+    window.open('https://wa.me/'+d+(text?('?text='+encodeURIComponent(text)):''),'_blank');
+  };
+
+  function getCustomer(cid){ return state.customers.find(c=>c.id===cid); }
+  function getLatestBill(cid){
+    return state.bills.filter(b=>b.customerId===cid).sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0] || null;
+  }
+  function refreshAfterChange(cid){
+    saveState();
+    if(window.renderCustomers) renderCustomers();
+    if(window.renderUserDetailV51 && (window.activeCustomer===cid || activeCustomer===cid)) {
+      try{ renderUserDetailV51(); }catch(e){}
+    }
+  }
+  function addLog(cid,text,amount=0){
+    const c=getCustomer(cid);
+    if(!c) return;
+    c.logs=c.logs||[];
+    c.logs.unshift({id:uid(),type:'action',date:new Date().toISOString(),text,amount});
+    if(c.logs.length>80) c.logs=c.logs.slice(0,80);
+  }
+
+  function normalReminderText(c){
+    return `${state.settings.company}
+Name: ${c.name}
+Due: ${money(customerDue(c.id))}
+আপনাকে পুরো বিল শীঘ্রই পরিশোধের জন্য বলা হচ্ছে
+Thank you: ${state.settings.owner} (owner)
+Contact: ${state.settings.contact}`;
+  }
+
+  async function forceQrReady(){
+    if(window.renderQRCodes) renderQRCodes();
+    await new Promise(r=>setTimeout(r,450));
+    document.querySelectorAll('.qr-live canvas').forEach(canvas=>{
+      try{
+        const img=document.createElement('img');
+        img.src=canvas.toDataURL('image/png');
+        img.style.width='112px';
+        img.style.height='112px';
+        img.style.display='block';
+        canvas.replaceWith(img);
+      }catch(e){}
+    });
+    await new Promise(r=>setTimeout(r,120));
+  }
+
+  window.v53BillReminder=function(cid){
+    const c=getCustomer(cid);
+    const b=getLatestBill(cid);
+    if(!c) return alert('User not found');
+    if(!b) return alert('এই user-এর bill নেই। আগে New Bill তৈরি করুন।');
+    closeMenu();
+    currentBill=b;
+    renderInvoice(b);
+    forceQrReady().then(async()=>{
+      let blob;
+      try{ blob=await invoiceBlob(); }catch(e){ console.warn(e); alert('Bill image তৈরি করতে সমস্যা হয়েছে। Preview থেকে আবার চেষ্টা করুন।'); return; }
+      const url=URL.createObjectURL(blob);
+      const text=reminderTextByBill(b);
+      if(!q('v52Menu')) return;
+      q('v52Name').textContent='Bill + Reminder';
+      q('v52Sub').textContent=b.billNo+' • Due '+money(billDue(b));
+      q('v52Body').className='v52-actions';
+      q('v52Body').innerHTML=`
+        <button class="primary" id="v53ShareImg">⏰ Share Image + Reminder</button>
+        <button id="v53WaText">Ⓦ WhatsApp Text Only</button>
+        <button id="v53Download">⇩ Download Bill Image</button>
+        <button id="v53CloseBtn">Close</button>
+      `;
+      q('v52Status').innerHTML='<img class="v53-preview-img" src="'+url+'"><div class="v53-small">Image preview দেখাচ্ছে। Share Image + Reminder চাপলে Android share sheet খুলবে।</div>';
+      q('v52Menu').classList.add('open');
+
+      q('v53ShareImg').onclick=async()=>{
+        const file=new File([blob],`${b.billNo}.png`,{type:'image/png'});
+        try{
+          if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+            await navigator.share({files:[file],text,title:'Asha Bill Reminder'});
+          }else if(navigator.share){
+            await navigator.share({text,title:'Asha Bill Reminder'});
+            downloadBlob(blob,`${b.billNo}.png`);
+          }else{
+            downloadBlob(blob,`${b.billNo}.png`);
+            openWhatsApp(c.phone,text);
+          }
+          addLog(cid,'Shared bill image + reminder: '+b.billNo,billDue(b));
+          refreshAfterChange(cid);
+        }catch(e){ console.warn(e); }
+      };
+      q('v53WaText').onclick=()=>openWhatsApp(c.phone,text);
+      q('v53Download').onclick=()=>downloadBlob(blob,`${b.billNo}.png`);
+      q('v53CloseBtn').onclick=()=>closeMenu();
+    });
+  };
+
+  window.v53EditUser=function(cid){
+    const c=getCustomer(cid);
+    if(!c) return alert('User not found');
+    q('v52Name').textContent='Edit User';
+    q('v52Sub').textContent=c.name+' • '+(c.phone||'No phone');
+    q('v52Body').className='v53-form';
+    q('v52Body').innerHTML=`
+      <label>Name</label><input id="v53Name" value="${esc(c.name||'')}">
+      <label>Phone</label><input id="v53Phone" value="${esc(c.phone||'')}">
+      <label>Village</label><input id="v53Village" value="${esc(c.village||'')}">
+      <label>Address</label><textarea id="v53Address">${esc(c.address||'')}</textarea>
+      <label>Opening Due</label><input id="v53Opening" type="number" value="${+c.openingDue||0}">
+      <div class="v52-actions" style="grid-template-columns:1fr 1fr">
+        <button class="primary" id="v53SaveUser">Save User</button>
+        <button id="v53CancelUser">Cancel</button>
+      </div>
+    `;
+    q('v52Status').textContent='Edit করে Save চাপুন।';
+    q('v52Menu').classList.add('open');
+    q('v53SaveUser').onclick=()=>{
+      c.name=q('v53Name').value.trim()||c.name;
+      c.phone=q('v53Phone').value.trim();
+      c.village=q('v53Village').value.trim();
+      c.address=q('v53Address').value.trim();
+      c.openingDue=+(q('v53Opening').value||0);
+      addLog(cid,'Edited user details',0);
+      refreshAfterChange(cid);
+      closeMenu();
+      alert('User updated');
+    };
+    q('v53CancelUser').onclick=()=>closeMenu();
+  };
+
+  window.v53Settle=function(cid){
+    const c=getCustomer(cid);
+    if(!c) return alert('User not found');
+    const due=customerDue(cid);
+    q('v52Name').textContent='Settle Due';
+    q('v52Sub').textContent=c.name+' • Due '+money(due);
+    q('v52Body').className='v53-form';
+    q('v52Body').innerHTML=`
+      <label>Settlement Amount</label><input id="v53SettleAmount" type="number" value="${due||0}">
+      <label>Note</label><input id="v53SettleNote" value="Settled / adjusted">
+      <div class="v52-actions" style="grid-template-columns:1fr 1fr">
+        <button class="primary" id="v53SaveSettle">Save Settlement</button>
+        <button id="v53CancelSettle">Cancel</button>
+      </div>
+    `;
+    q('v52Status').textContent='Settlement cash collection নয়, due adjustment হিসেবে save হবে।';
+    q('v52Menu').classList.add('open');
+    q('v53SaveSettle').onclick=()=>{
+      const amt=+(q('v53SettleAmount').value||0);
+      if(amt<=0) return alert('Amount দিন');
+      const note=q('v53SettleNote').value||'Settled / adjusted';
+      let bills=state.bills.filter(b=>b.customerId===cid && billDue(b)>0).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+      if(!bills.length) return alert('এই user-এর due bill নেই।');
+      let left=amt;
+      bills.forEach(b=>{
+        if(left<=0) return;
+        const pay=Math.min(left,billDue(b));
+        (b.payments=b.payments||[]).push({id:uid(),date:today(),amount:pay,mode:'Settlement',receivedIn:'Adjusted',note});
+        left-=pay;
+      });
+      addLog(cid,'Settlement saved: '+money(amt),amt);
+      refreshAfterChange(cid);
+      closeMenu();
+      alert('Settlement saved');
+    };
+    q('v53CancelSettle').onclick=()=>closeMenu();
+  };
+
+  window.v53Receive=function(cid){
+    if(window.directPay) return directPay(cid,false);
+    alert('Receive function unavailable');
+  };
+
+  window.v53Ledger=function(cid){
+    closeMenu();
+    if(window.renderChatLedger) return renderChatLedger(cid);
+    alert('Ledger function unavailable');
+  };
+
+  // Override menu builder with direct hard-fixed handlers.
+  window.openUserMenuV52=function(cid){
+    const c=getCustomer(cid);
+    if(!c) return alert('User not found');
+    const b=getLatestBill(cid);
+    if(!q('v52Menu')){
+      document.body.insertAdjacentHTML('beforeend',`
+        <div id="v52Menu"><div class="v52-panel"><div class="v52-title"><div><b id="v52Name"></b><small id="v52Sub"></small></div><button class="v52-close" id="v52Close">×</button></div><div id="v52Body" class="v52-actions"></div><div id="v52Status" class="v52-status"></div></div></div>`);
+      q('v52Close').onclick=()=>closeMenu();
+      q('v52Menu').addEventListener('click',e=>{if(e.target.id==='v52Menu')closeMenu();});
+    }
+    q('v52Name').textContent=c.name||'User Actions';
+    q('v52Sub').textContent=(c.phone||'No phone')+' • '+(c.village||'No village')+' • Due '+money(customerDue(cid));
+    q('v52Body').className='v52-actions';
+    q('v52Body').innerHTML=`
+      <button class="primary" id="mNewBill">▤ New Bill</button>
+      <button id="mEdit">✎ Edit User</button>
+      <button id="mLedger">☷ Ledger</button>
+      <button id="mReceive">₹ Receive</button>
+      <button id="mSettle">✓ Settle</button>
+      <button class="primary" id="mBillReminder">⏰ Bill + Reminder</button>
+      <button id="mNormal">Ⓦ Normal Reminder</button>
+      <button id="mCall">✆ Call</button>
+      <button class="danger" id="mDelete">⌫ Delete User</button>
+    `;
+    q('v52Status').textContent=b ? ('Latest bill: '+b.billNo) : 'No bill yet. Use New Bill first.';
+    q('v52Menu').classList.add('open');
+
+    q('mNewBill').onclick=()=>{
+      closeMenu();
+      if(window.closeUserDetailV51) closeUserDetailV51();
+      if(window.closeChat){try{closeChat()}catch(e){}}
+      showPage('billPage');
+      setTimeout(()=>{
+        const sel=q('billCustomer');
+        if(sel){ sel.value=cid; if(window.toggleManual) toggleManual(); if(window.previewBill) previewBill(); }
+      },160);
+    };
+    q('mEdit').onclick=()=>v53EditUser(cid);
+    q('mLedger').onclick=()=>v53Ledger(cid);
+    q('mReceive').onclick=()=>{closeMenu();v53Receive(cid);};
+    q('mSettle').onclick=()=>v53Settle(cid);
+    q('mBillReminder').onclick=()=>v53BillReminder(cid);
+    q('mNormal').onclick=()=>openWhatsApp(c.phone,normalReminderText(c));
+    q('mCall').onclick=()=>{const d=phoneDigits(c.phone); if(!d)return alert('Phone number নেই'); location.href='tel:+'+d;};
+    q('mDelete').onclick=()=>{
+      if(!confirm('Delete this user?')) return;
+      if(window.deleteCustomer) deleteCustomer(cid);
+      else{
+        state.customers=state.customers.filter(x=>x.id!==cid);
+        state.bills=state.bills.filter(b=>b.customerId!==cid);
+        saveState();
+      }
+      closeMenu();
+      if(window.closeUserDetailV51) closeUserDetailV51();
+      if(window.renderCustomers) renderCustomers();
+    };
+  };
+
+  window.openMoreMenu=function(cid){ openUserMenuV52(cid); };
+
+  // Rebind visible three-dot buttons
+  const oldOpenDetail=window.openUserDetailV51;
+  if(oldOpenDetail){
+    window.openUserDetailV51=function(cid){
+      oldOpenDetail(cid);
+      setTimeout(()=>{
+        const btn=q('v51More');
+        if(btn){ btn.onclick=function(e){e.preventDefault();e.stopPropagation();openUserMenuV52(cid);}; }
+      },180);
+    };
+  }
+
+  const oldRenderDetail=window.renderUserDetailV51;
+  if(oldRenderDetail){
+    window.renderUserDetailV51=function(){
+      oldRenderDetail();
+      setTimeout(()=>{
+        const btn=q('v51More');
+        const cid=activeCustomer;
+        if(btn && cid){ btn.onclick=function(e){e.preventDefault();e.stopPropagation();openUserMenuV52(cid);}; }
+      },60);
+    };
+  }
+
+  const oldRenderChat=window.renderChat;
+  if(oldRenderChat){
+    window.renderChat=function(){
+      oldRenderChat();
+      setTimeout(()=>{
+        const btn=q('chatMore');
+        if(btn && activeCustomer){ btn.onclick=function(e){e.preventDefault();e.stopPropagation();openUserMenuV52(activeCustomer);}; }
+      },60);
+    };
+  }
+});
+})();
