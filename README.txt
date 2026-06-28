@@ -88,3 +88,10 @@ V40 iOS Calculator + Icons:
 - Calculator redesigned like iOS scientific calculator.
 - Calculator supports sin, cos, tan, log, ln, sqrt, powers, factorial, memory, DEG/RAD, copy result.
 - No third-party trademark icons copied; icons are custom CSS/PWA designs.
+
+
+V41 Premium Settings:
+- Settings page redesigned in iOS/Material premium list style.
+- Company profile, payment setup, billing configuration, reminder, appearance and cloud tools separated.
+- Existing settings logic preserved: company, owner, contact, address, UPI, QR upload/remove, rates, fonts, template, print mode, cloud sync.
+- Compact bill meta toggle added as iOS-style switch.

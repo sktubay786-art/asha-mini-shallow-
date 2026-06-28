@@ -380,3 +380,182 @@ body,input,select,textarea,button{font-family:var(--app-font)}
 .calcModeLine button{border:1px solid rgba(255,255,255,.14);background:#1c1c1e;color:#fff;border-radius:999px;padding:8px 12px;font-size:12px}
 .calcModeLine button.active{background:#ff9f0a}
 @media(max-width:520px){.calc.iosCalc{border-radius:34px;padding:14px 12px 18px}.calcValue{font-size:42px}#calcKeys.iosKeys{gap:8px}#calcKeys.iosKeys button{min-height:54px;border-radius:22px}#calcKeys.iosKeys button.sci{min-height:40px;border-radius:16px;font-size:13px}}
+
+/* ===== V41 Premium Settings UI ===== */
+#settingsPage{
+  padding-bottom:120px;
+}
+.v41-settings{
+  display:grid;
+  gap:18px;
+}
+.v41-settings .v41-hero{
+  background:linear-gradient(135deg,rgba(7,92,57,.12),rgba(255,255,255,.92));
+  border:1px solid rgba(7,92,57,.10);
+  border-radius:30px;
+  padding:18px;
+  box-shadow:0 18px 45px rgba(16,24,40,.08);
+}
+.v41-settings .v41-hero h2{
+  margin:0;
+  font-size:28px;
+  line-height:1.15;
+  letter-spacing:-.03em;
+}
+.v41-settings .v41-hero p{
+  margin:6px 0 0;
+  color:#667085;
+  font-size:14px;
+}
+.v41-section-title{
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:#707a6c;
+  font-weight:900;
+  padding-left:10px;
+  margin:4px 0 -4px;
+}
+.v41-card{
+  background:rgba(255,255,255,.92);
+  border:1px solid rgba(7,92,57,.08);
+  border-radius:28px;
+  overflow:hidden;
+  box-shadow:0 14px 35px rgba(16,24,40,.06);
+  backdrop-filter:blur(18px);
+}
+.v41-row{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:14px 16px;
+  border-bottom:1px solid rgba(191,202,186,.45);
+}
+.v41-row:last-child{border-bottom:0}
+.v41-icon{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:rgba(13,99,27,.10);
+  color:#0d631b;
+  flex:0 0 auto;
+  font-size:21px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
+}
+.v41-main{
+  flex:1;
+  min-width:0;
+}
+.v41-main b{
+  display:block;
+  font-size:15px;
+  color:#191c1d;
+}
+.v41-main small{
+  display:block;
+  color:#667085;
+  margin-top:3px;
+  font-size:12px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.v41-row input,.v41-row select,.v41-row textarea{
+  width:100%;
+  background:#f1f3f4!important;
+  border:1px solid transparent!important;
+  border-radius:14px!important;
+  padding:11px 13px!important;
+  font-size:14px!important;
+  margin-top:8px!important;
+  outline:none!important;
+  box-shadow:none!important;
+}
+.v41-row textarea{
+  min-height:82px;
+}
+.v41-row input:focus,.v41-row select:focus,.v41-row textarea:focus{
+  background:#fff!important;
+  border-color:#0d631b!important;
+}
+.v41-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  padding:14px 16px;
+}
+.v41-field{
+  min-width:0;
+}
+.v41-field label{
+  display:block;
+  color:#667085;
+  font-size:12px;
+  margin:0 0 6px 3px;
+  font-weight:800;
+}
+.v41-field input,.v41-field select{
+  width:100%;
+  background:#f1f3f4!important;
+  border:1px solid transparent!important;
+  border-radius:14px!important;
+  padding:12px 13px!important;
+  font-size:14px!important;
+  outline:none!important;
+}
+.v41-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  padding:14px 16px 16px;
+}
+.v41-actions .btn{
+  min-height:48px;
+  border-radius:18px!important;
+  justify-content:center;
+}
+.v41-switch{
+  position:relative;
+  width:52px;
+  height:30px;
+  border-radius:999px;
+  background:#e1e3e4;
+  flex:0 0 auto;
+  transition:.25s;
+}
+.v41-switch::after{
+  content:"";
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  background:#fff;
+  position:absolute;
+  left:2px;
+  top:2px;
+  box-shadow:0 2px 8px rgba(0,0,0,.18);
+  transition:.25s;
+}
+.v41-switch.active{
+  background:#0d631b;
+}
+.v41-switch.active::after{
+  transform:translateX(22px);
+}
+.v41-hidden-old{
+  display:none!important;
+}
+.v41-status{
+  margin:10px 16px 0;
+  color:#667085;
+  font-size:12px;
+}
+.v41-file-row input[type=file]{
+  background:#fff!important;
+}
+@media(max-width:560px){
+  .v41-grid,.v41-actions{grid-template-columns:1fr}
+  .v41-row{padding:13px 14px}
+  .v41-settings .v41-hero h2{font-size:25px}
+}

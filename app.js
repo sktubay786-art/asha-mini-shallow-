@@ -1911,3 +1911,259 @@ ready(function(){
   setupCalc();
 });
 })();
+
+/* ==== V41 Premium Settings UI Patch ==== */
+(function(){
+function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,260)); else setTimeout(fn,260); }
+
+ready(function(){
+  const chip=document.querySelector('.hero-chips span:last-child');
+  if(chip) chip.textContent='V41 Premium Settings';
+
+  state.settings = Object.assign({
+    company:"আশা মিনি শ্যালো",
+    owner:"SK EKRAMUL Haque",
+    contact:"9564061920",
+    address:"Raghunathpur, Chaklachipur, Ghatal, Paschim Medinipur, 721232",
+    upi:"8710065540@axl",
+    accent:"#075c39",
+    rateBigha:2200,
+    rateKatha:110,
+    rateDecimal:55,
+    appFont:"Inter",
+    billFont:"Hind Siliguri",
+    reminderTemplate:"আপনাকে পুরো বিল শীঘ্রই পরিশোধের জন্য বলা হচ্ছে",
+    defaultBillNote:"",
+    qrMode:"dynamic",
+    showCompactMeta:true
+  }, state.settings||{});
+
+  function v41Icon(name){
+    const map={
+      person:'👤', call:'☎', location:'⌖', wallet:'▣', qr:'▦', rate:'₹',
+      bill:'▤', print:'⎙', font:'Aa', theme:'●', reminder:'◷',
+      cloud:'☁', tools:'⚙', backup:'⇩', logout:'↪'
+    };
+    return map[name]||'●';
+  }
+
+  function buildPremiumSettings(){
+    const page=document.getElementById('settingsPage');
+    if(!page || document.getElementById('v41Settings')) return;
+
+    page.innerHTML = `
+      <div id="v41Settings" class="v41-settings">
+        <div class="v41-hero">
+          <h2>Settings</h2>
+          <p>Manage business profile, payment, billing, reminder, fonts and cloud sync.</p>
+        </div>
+
+        <div class="v41-section-title">Company Profile</div>
+        <div class="v41-card">
+          <div class="v41-row">
+            <div class="v41-icon">${v41Icon('person')}</div>
+            <div class="v41-main"><b>Company Name</b><small id="v41CompanySmall"></small><input id="setCompany"></div>
+          </div>
+          <div class="v41-row">
+            <div class="v41-icon">${v41Icon('person')}</div>
+            <div class="v41-main"><b>Owner / Proprietor</b><small id="v41OwnerSmall"></small><input id="setOwner"></div>
+          </div>
+          <div class="v41-row">
+            <div class="v41-icon">${v41Icon('call')}</div>
+            <div class="v41-main"><b>Contact Number</b><small id="v41ContactSmall"></small><input id="setContact"></div>
+          </div>
+          <div class="v41-row">
+            <div class="v41-icon">${v41Icon('location')}</div>
+            <div class="v41-main"><b>Business Address</b><small id="v41AddressSmall"></small><textarea id="setAddress"></textarea></div>
+          </div>
+        </div>
+
+        <div class="v41-section-title">Payment Setup</div>
+        <div class="v41-card">
+          <div class="v41-row">
+            <div class="v41-icon">${v41Icon('wallet')}</div>
+            <div class="v41-main"><b>UPI ID</b><small id="v41UpiSmall"></small><input id="setUpi"></div>
+          </div>
+          <div class="v41-row v41-file-row">
+            <div class="v41-icon">${v41Icon('qr')}</div>
+            <div class="v41-main"><b>Payment QR Code</b><small id="v41QrSmall">Dynamic amount QR / Uploaded QR</small><select id="setQrMode"><option value="dynamic">Dynamic amount QR</option><option value="static">Uploaded static QR</option></select><input id="setQrImage" type="file" accept="image/*"></div>
+          </div>
+          <div class="v41-actions"><button class="btn" id="removeQrBtn">Remove QR</button><button class="btn" id="testQrBtn">Preview QR in Bill</button></div>
+        </div>
+
+        <div class="v41-section-title">Billing Configuration</div>
+        <div class="v41-card">
+          <div class="v41-grid">
+            <div class="v41-field"><label>Rate per বিঘা</label><input id="setRateBigha" type="number"></div>
+            <div class="v41-field"><label>Rate per কাঠা</label><input id="setRateKatha" type="number"></div>
+            <div class="v41-field"><label>Rate per ডেসিমেল</label><input id="setRateDecimal" type="number"></div>
+            <div class="v41-field"><label>Theme Colour</label><input id="setAccent" type="color"></div>
+            <div class="v41-field"><label>Default Print Size</label><select id="setPrint"></select></div>
+            <div class="v41-field"><label>Default Bill Template</label><select id="setTemplate"></select></div>
+          </div>
+          <div class="v41-row">
+            <div class="v41-icon">${v41Icon('bill')}</div>
+            <div class="v41-main"><b>Compact Bill Meta</b><small>Status / payment / received chips on compact bill</small></div>
+            <div id="compactMetaSwitch" class="v41-switch"></div>
+          </div>
+        </div>
+
+        <div class="v41-section-title">Reminder & Notes</div>
+        <div class="v41-card">
+          <div class="v41-row">
+            <div class="v41-icon">${v41Icon('reminder')}</div>
+            <div class="v41-main"><b>WhatsApp / SMS Reminder Message</b><small>Used in Reminder + Bill</small><textarea id="setReminderTemplate"></textarea></div>
+          </div>
+          <div class="v41-row">
+            <div class="v41-icon">${v41Icon('bill')}</div>
+            <div class="v41-main"><b>Default Bill Note</b><small>Auto note for new bills if note is empty</small><input id="setDefaultBillNote"></div>
+          </div>
+        </div>
+
+        <div class="v41-section-title">Appearance</div>
+        <div class="v41-card">
+          <div class="v41-grid">
+            <div class="v41-field"><label>App Font</label><select id="setAppFont"><option>Inter</option><option>Poppins</option><option>Nunito</option><option>System</option></select></div>
+            <div class="v41-field"><label>Bill Font</label><select id="setBillFont"><option>Hind Siliguri</option><option>Inter</option><option>Poppins</option><option>Nunito</option></select></div>
+          </div>
+        </div>
+
+        <div class="v41-section-title">Cloud & Data Tools</div>
+        <div class="v41-card">
+          <div class="v41-actions">
+            <button class="btn primary" id="saveSettingsBtn">Save Settings</button>
+            <button class="btn" id="cloudPullBtn">Pull Cloud</button>
+            <button class="btn" id="cloudPushBtn">Push Cloud</button>
+            <button class="btn" id="toolBackupNow">Instant Backup</button>
+            <button class="btn" id="toolDueCSV">Due CSV</button>
+            <button class="btn" id="toolTodayCSV">Today CSV</button>
+            <button class="btn" id="toolDuplicate">Clean Duplicate Phones</button>
+            <button class="btn danger" id="logoutBtn">Logout</button>
+          </div>
+          <p id="cloudStatus" class="v41-status"></p>
+        </div>
+
+        <input id="setPayee" type="hidden">
+        <input id="setCountry" type="hidden" value="+91">
+      </div>`;
+  }
+
+  buildPremiumSettings();
+
+  function setValue(id,val){ const el=document.getElementById(id); if(el) el.value = val ?? ""; }
+  function syncSmall(){
+    const pairs=[
+      ['v41CompanySmall',state.settings.company],
+      ['v41OwnerSmall',state.settings.owner],
+      ['v41ContactSmall',state.settings.contact],
+      ['v41AddressSmall',state.settings.address],
+      ['v41UpiSmall',state.settings.upi]
+    ];
+    pairs.forEach(([id,val])=>{const el=document.getElementById(id); if(el) el.textContent=val||'';});
+    const sw=document.getElementById('compactMetaSwitch');
+    if(sw) sw.classList.toggle('active',!!state.settings.showCompactMeta);
+  }
+
+  const oldLoadSettings = window.loadSettings;
+  window.loadSettings = function(){
+    buildPremiumSettings();
+
+    setValue('setCompany',state.settings.company);
+    setValue('setOwner',state.settings.owner);
+    setValue('setContact',state.settings.contact);
+    setValue('setAddress',state.settings.address);
+    setValue('setUpi',state.settings.upi);
+    setValue('setPayee',state.settings.owner||state.settings.payee||'');
+    setValue('setCountry','+91');
+    setValue('setAccent',state.settings.accent||'#075c39');
+
+    if(document.getElementById('setPrint')) document.getElementById('setPrint').innerHTML=document.getElementById('printMode')?.innerHTML||'';
+    if(document.getElementById('setTemplate')) document.getElementById('setTemplate').innerHTML=document.getElementById('template')?.innerHTML||'';
+
+    setValue('setPrint',state.settings.print||'thermal80');
+    setValue('setTemplate',state.settings.template||'premium');
+    setValue('setQrMode',state.settings.qrMode||'dynamic');
+    setValue('setRateBigha',state.settings.rateBigha||2200);
+    setValue('setRateKatha',state.settings.rateKatha||110);
+    setValue('setRateDecimal',state.settings.rateDecimal||55);
+    setValue('setReminderTemplate',state.settings.reminderTemplate||'');
+    setValue('setDefaultBillNote',state.settings.defaultBillNote||'');
+    setValue('setAppFont',state.settings.appFont||'Inter');
+    setValue('setBillFont',state.settings.billFont||'Hind Siliguri');
+    syncSmall();
+  };
+
+  window.saveSettings = function(){
+    Object.assign(state.settings,{
+      company:document.getElementById('setCompany')?.value||state.settings.company,
+      owner:document.getElementById('setOwner')?.value||state.settings.owner,
+      contact:document.getElementById('setContact')?.value||state.settings.contact,
+      address:document.getElementById('setAddress')?.value||state.settings.address,
+      upi:document.getElementById('setUpi')?.value||state.settings.upi,
+      payee:document.getElementById('setOwner')?.value||state.settings.owner,
+      country:'+91',
+      accent:document.getElementById('setAccent')?.value||state.settings.accent,
+      print:document.getElementById('setPrint')?.value||state.settings.print,
+      template:document.getElementById('setTemplate')?.value||state.settings.template,
+      qrMode:document.getElementById('setQrMode')?.value||state.settings.qrMode,
+      rateBigha:+(document.getElementById('setRateBigha')?.value||state.settings.rateBigha||2200),
+      rateKatha:+(document.getElementById('setRateKatha')?.value||state.settings.rateKatha||110),
+      rateDecimal:+(document.getElementById('setRateDecimal')?.value||state.settings.rateDecimal||55),
+      reminderTemplate:document.getElementById('setReminderTemplate')?.value||state.settings.reminderTemplate,
+      defaultBillNote:document.getElementById('setDefaultBillNote')?.value||'',
+      appFont:document.getElementById('setAppFont')?.value||state.settings.appFont||'Inter',
+      billFont:document.getElementById('setBillFont')?.value||state.settings.billFont||'Hind Siliguri'
+    });
+    if(document.getElementById('printMode')) document.getElementById('printMode').value=state.settings.print;
+    if(document.getElementById('template')) document.getElementById('template').value=state.settings.template;
+    saveState();
+    syncSmall();
+    alert('Settings saved');
+  };
+
+  function bindV41(){
+    document.getElementById('saveSettingsBtn')?.addEventListener('click',saveSettings);
+    document.getElementById('cloudPullBtn')?.addEventListener('click',pullCloud);
+    document.getElementById('cloudPushBtn')?.addEventListener('click',()=>pushCloud(true));
+    document.getElementById('logoutBtn')?.addEventListener('click',logout);
+    document.getElementById('removeQrBtn')?.addEventListener('click',removeQr);
+    document.getElementById('setQrImage')?.addEventListener('change',loadQr);
+    document.getElementById('testQrBtn')?.addEventListener('click',()=>{showPage('billPage');previewBill();});
+    document.getElementById('toolBackupNow')?.addEventListener('click',backup);
+    document.getElementById('toolDueCSV')?.addEventListener('click',()=>window.exportDueCSVV38?exportDueCSVV38():exportCSV());
+    document.getElementById('toolTodayCSV')?.addEventListener('click',()=>window.exportTodayCSVV38?exportTodayCSVV38():exportCSV());
+    document.getElementById('toolDuplicate')?.addEventListener('click',()=>window.cleanDuplicatePhonesV38?cleanDuplicatePhonesV38():alert('Duplicate cleanup unavailable'));
+    document.getElementById('compactMetaSwitch')?.addEventListener('click',()=>{
+      state.settings.showCompactMeta=!state.settings.showCompactMeta;
+      syncSmall();
+      saveState(false);
+    });
+    ['setCompany','setOwner','setContact','setAddress','setUpi'].forEach(id=>{
+      document.getElementById(id)?.addEventListener('input',()=>{
+        const tmp={
+          setCompany:'v41CompanySmall',
+          setOwner:'v41OwnerSmall',
+          setContact:'v41ContactSmall',
+          setAddress:'v41AddressSmall',
+          setUpi:'v41UpiSmall'
+        };
+        const el=document.getElementById(tmp[id]); if(el) el.textContent=document.getElementById(id).value;
+      });
+    });
+  }
+
+  const oldShowPage=window.showPage;
+  window.showPage=function(id){
+    if(oldShowPage) oldShowPage(id);
+    if(id==='settingsPage'){
+      buildPremiumSettings();
+      loadSettings();
+      bindV41();
+    }
+  };
+
+  buildPremiumSettings();
+  loadSettings();
+  bindV41();
+});
+})();
