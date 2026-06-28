@@ -744,7 +744,6 @@ ready(function(){
     if(!d) return '';
     if(d.length===10) return '+'+cc+' '+d;
     if(d.length===11 && d.startsWith('0')) return '+'+cc+' '+d.slice(1);
-    if(d.startswith){} // harmless no-op
     if(d.length>10 && d.startsWith(cc)) return '+'+cc+' '+d.slice(cc.length);
     if(d.length>10) return '+'+d;
     return '+'+cc+' '+d;
@@ -2478,5 +2477,131 @@ ready(function(){
   normalizeTabsV43();
   setupCalc();
   renderCustomers();
+});
+})();
+
+/* ==== V44 clean fix: nav, users, QR, print, buttons ==== */
+(function(){
+function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,350)); else setTimeout(fn,350); }
+ready(function(){
+  const chip=document.querySelector('.hero-chips span:last-child'); if(chip) chip.textContent='V44 Clean Fix';
+  const ICONS={home:'⌂',users:'◉',bill:'▤',pay:'₹',history:'◷',report:'▥',calc:'▦',set:'⚙',view:'👁',pay2:'₹',remind:'⏰',del:'⌫',edit:'✎',bill2:'▤',settle:'✓',ledger:'☷',call:'✆',wa:'Ⓦ',more:'⋯',share:'⇪'};
+  function pageExists(id){ return !!document.getElementById(id); }
+
+  window.createCalcPageV44=function(){
+    if(pageExists('calcPage')) return;
+    const main=document.querySelector('main') || document.getElementById('app') || document.body;
+    const sec=document.createElement('section');
+    sec.id='calcPage'; sec.className='page';
+    sec.innerHTML=`<div class="card"><h2>Scientific Calculator</h2><div class="calc"><div id="calcScreen"></div><div id="calcKeys" class="calc-keys"></div></div></div>`;
+    main.appendChild(sec);
+  };
+
+  window.rebuildTabbarV44=function(){
+    const tab=document.querySelector('.tabbar'); if(!tab) return;
+    createCalcPageV44();
+    const items=[['homePage',ICONS.home,'Home'],['customersPage',ICONS.users,'Users'],['billPage',ICONS.bill,'Bill'],['payPage',ICONS.pay,'Pay'],['historyPage',ICONS.history,'History'],['reportsPage',ICONS.report,'Report'],['calcPage',ICONS.calc,'Calc'],['settingsPage',ICONS.set,'Set']].filter(x=>pageExists(x[0]));
+    const current=document.querySelector('.page.active')?.id || 'homePage';
+    tab.innerHTML=items.map(([id,ico,label])=>`<button data-page="${id}" class="${id===current?'active':''}"><i>${ico}</i><span>${label}</span></button>`).join('');
+    tab.querySelectorAll('button[data-page]').forEach(btn=>{btn.onclick=()=>{showPage(btn.dataset.page);setTimeout(()=>btn.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'}),40);};});
+  };
+
+  const oldShow=window.showPage;
+  window.showPage=function(id){
+    if(id==='calcPage') createCalcPageV44();
+    if(oldShow) oldShow(id);
+    document.querySelectorAll('.tabbar button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
+    const active=document.querySelector(`.tabbar button[data-page="${id}"]`);
+    if(active) setTimeout(()=>active.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'}),30);
+    if(id==='calcPage' && window.setupCalc) setupCalc();
+  };
+
+  function normalizePhone(raw){let d=String(raw||'').replace(/\D/g,'');if(!d)return '';if(d.length===10)return '91'+d;if(d.length===12&&d.startsWith('91'))return d;if(d.length>10)return d;return '91'+d.slice(-10);}
+  window.openWhatsApp=function(raw,text=''){const d=normalizePhone(raw);if(!d||d.length<12)return alert('Valid phone number নেই। Customer phone-এ 10 digit number দিন।');window.open('https://wa.me/'+d+(text?('?text='+encodeURIComponent(text)):''),'_blank');};
+
+  window.renderQRCodes=function(){
+    document.querySelectorAll('.qr-live').forEach(el=>{
+      const data=el.getAttribute('data-qr')||el.dataset.qr||'';
+      const fallback=el.getAttribute('data-fallback')||`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(data)}`;
+      if(!data&&!fallback) return;
+      el.innerHTML='';
+      if(window.QRCode && data){
+        try{
+          new QRCode(el,{text:data,width:112,height:112,correctLevel:QRCode.CorrectLevel.M});
+          const canvas=el.querySelector('canvas'); if(canvas){canvas.style.display='block';canvas.style.width='112px';canvas.style.height='112px';}
+          return;
+        }catch(e){console.warn('QR canvas failed',e)}
+      }
+      const img=document.createElement('img'); img.alt='QR'; img.crossOrigin='anonymous'; img.src=fallback; img.style.width='112px'; img.style.height='112px'; img.style.display='block'; el.appendChild(img);
+    });
+  };
+
+  const oldRenderInvoice=window.renderInvoice;
+  window.renderInvoice=function(b){oldRenderInvoice(b);setTimeout(()=>{ if(window.renderQRCodes) renderQRCodes(); },100);};
+
+  window.printBill=function(){if(currentBill){renderInvoice(currentBill);if(window.renderQRCodes) renderQRCodes();}setTimeout(()=>window.print(),220);};
+
+  window.shareBill=async function(){
+    if(!currentBill) return alert('Preview bill first');
+    renderInvoice(currentBill); if(window.renderQRCodes) renderQRCodes();
+    await new Promise(r=>setTimeout(r,450));
+    const blob=await invoiceBlob();
+    const file=new File([blob],`${currentBill.billNo}.png`,{type:'image/png'});
+    const text=reminderTextByBill(currentBill);
+    try{
+      if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})) await navigator.share({files:[file],text,title:'Asha Bill Reminder'});
+      else if(navigator.share){await navigator.share({text,title:'Asha Bill Reminder'});downloadBlob(blob,`${currentBill.billNo}.png`);}
+      else{downloadBlob(blob,`${currentBill.billNo}.png`);openWhatsApp(currentBill.phone,text);}
+    }catch(e){ console.warn(e); }
+  };
+
+  window.shareCustomerBill=async function(cid,billId){
+    const bills=state.bills.filter(b=>b.customerId===cid).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+    if(!bills.length) return alert('এই user-এর কোনো bill নেই।');
+    currentBill=billId ? (state.bills.find(b=>b.id===billId) || bills[0]) : bills[0];
+    await shareBill();
+  };
+
+  window.chatViewBill=function(id){ closeChat(); viewBill(id); };
+  window.chatOpenPay=function(id){ closeChat(); openPayment(id); setTimeout(()=>{const a=document.getElementById('payAmount'); if(a) a.focus();},100); };
+  window.chatDeleteBill=function(id){ if(confirm('Delete this bill?')) deleteBill(id); };
+
+  window.renderCustomers=function(){
+    const list=document.getElementById('customerList'); if(!list) return;
+    const q=(document.getElementById('customerSearch')?.value||'').toLowerCase().trim();
+    const rows=state.customers.filter(c=>(c.name+c.phone+c.village+c.address).toLowerCase().includes(q));
+    list.innerHTML=rows.length?rows.map(c=>{
+      const due=customerDue(c.id); const bills=state.bills.filter(b=>b.customerId===c.id);
+      const last=(bills.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0]||{}).date||'-';
+      return `<div class="customer-row" role="button" tabindex="0" onclick="openChat('${c.id}')"><div class="avatar">${esc(initials(c.name))}</div><div class="cust-main"><div class="cust-name">${esc(c.name||'Unnamed')}</div><div class="cust-sub">📞 ${esc(c.phone||'No phone')} • 📍 ${esc(c.village||'No village')}</div><div class="cust-sub">Bills ${bills.length} • Last ${esc(last)}</div></div><span class="pill ${due>0?'due':'paid'}">${due>0?money(due):'Paid'}</span></div>`;
+    }).join(''):`<div class="card muted">No customer yet</div>`;
+  };
+
+  window.renderChat=function(){
+    const c=state.customers.find(x=>x.id===activeCustomer); if(!c) return;
+    chatAvatar.textContent=initials(c.name); chatName.textContent=c.name; chatSub.textContent=(c.phone||'No phone')+' • '+(c.village||'No village')+' • Due '+money(customerDue(c.id));
+    chatCall.textContent=ICONS.call; chatWhats.textContent=ICONS.wa; chatShare.textContent=ICONS.share; if(chatMore) chatMore.textContent=ICONS.more;
+    chatCall.onclick=()=>{const d=normalizePhone(c.phone); if(!d)return alert('Phone number নেই'); location.href='tel:+'+d;};
+    chatWhats.onclick=()=>openWhatsApp(c.phone, customerReminderText(c));
+    chatShare.onclick=()=>shareCustomerBill(c.id);
+    chatBill.onclick=()=>{closeChat(); showPage('billPage'); billCustomer.value=c.id; toggleManual(); previewBill();};
+    chatPay.onclick=()=>directPay(c.id,false); chatSettle.onclick=()=>directPay(c.id,true); chatLedger.onclick=()=>renderChatLedger(c.id); chatEdit.onclick=()=>openCustomer(c.id); if(chatMore) chatMore.onclick=()=>openMoreMenu(c.id);
+    const bills=state.bills.filter(b=>b.customerId===c.id).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+    const total=bills.reduce((s,b)=>s+(+b.allTotal||0),0); const paid=bills.reduce((s,b)=>s+billPaid(b),0);
+    let out=[`<div class="chat-summary"><div class="sum-card"><small>Live Due</small><b>${money(customerDue(c.id))}</b></div><div class="sum-card"><small>Total Bill</small><b>${money(total)}</b></div><div class="sum-card"><small>Collected</small><b>${money(paid)}</b></div></div>`];
+    if((+c.openingDue||0)>0) out.push(`<div class="bubble setB"><b>Opening Due</b><br><b>${money(c.openingDue)}</b></div>`);
+    bills.forEach(b=>{
+      out.push(`<div class="day">${esc(b.date)}</div><div class="bubble billB"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><div><b>${esc(b.billNo)}</b><div class="chat-topnote">${esc(b.season||'-')} • ${esc(String(b.landAmount||''))} ${esc(b.unit||'')}</div></div><div style="text-align:right"><b>${money(billDue(b))}</b><div class="chat-topnote">Due</div></div></div><div style="margin-top:8px;line-height:1.58">Total ${money(b.allTotal)}<br>Paid/Joma ${money(billPaid(b))}${b.note?`<br><small>Note: ${esc(b.note)}</small>`:''}</div><div class="bubble-actions"><button type="button" title="View" onclick="chatViewBill('${b.id}')">${ICONS.view} View</button><button type="button" class="primary" title="Pay" onclick="chatOpenPay('${b.id}')">${ICONS.pay2} Pay</button><button type="button" title="Reminder + Bill" onclick="shareCustomerBill('${c.id}','${b.id}')">${ICONS.remind} Bill</button><button type="button" title="Delete" onclick="chatDeleteBill('${b.id}')">${ICONS.del}</button></div></div>`);
+      (b.payments||[]).forEach(p=>{
+        out.push(`<div class="bubble ${String(p.mode||'').toLowerCase().includes('settle')?'setB':'payB'}"><b>${esc(p.mode||'Payment')}</b><div class="chat-topnote">${esc(p.date||'')} • ${esc(p.receivedIn||'')}</div><b>${money(p.amount)}</b><br><small>${esc(p.note||'')}</small><div class="entry-tools"><button type="button" onclick="editEntry('${p.id}')">${ICONS.edit} Edit</button><button type="button" onclick="editEntry('${p.id}')">${ICONS.del} Undo</button></div></div>`);
+      });
+    });
+    chatBody.innerHTML=out.join('') || `<div class="bubble setB">No bill yet</div>`;
+  };
+
+  const oldSetup=window.setupCalc;
+  window.setupCalc=function(){if(oldSetup) oldSetup();const screen=document.getElementById('calcScreen');if(screen){screen.style.background='#000';screen.style.color='#fff';screen.style.minHeight='132px';}document.querySelector('.calc')?.classList.add('iosCalc');document.getElementById('calcKeys')?.classList.add('iosKeys');};
+
+  createCalcPageV44(); rebuildTabbarV44(); setupCalc(); renderCustomers(); if(currentBill) renderInvoice(currentBill);
 });
 })();

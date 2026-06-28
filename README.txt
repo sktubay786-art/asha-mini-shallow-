@@ -114,3 +114,23 @@ V43 Responsive Icons Users:
 - User detail/chat buttons re-bound and fixed.
 - Customer list click/tap behavior improved.
 - Phone/tablet/web responsive layout improved.
+
+V44 Clean Fix:
+- Fixed Users page width / blank right-side issue.
+- Rebuilt bottom navigation to one stable row with horizontal scroll.
+- Fixed tabbar size changing when switching pages.
+- Fixed print so only bill preview prints, not app/tabbar.
+- Fixed QR rendering for print/share using canvas + fallback image.
+- Re-bound user detail/chat actions.
+- Cleaned chat action buttons and reduced clutter.
+- Improved phone/tablet/web responsive layout.
+
+
+V44 Checked Final Audit:
+- JS syntax checked with node --check: OK.
+- Manifest JSON checked: OK.
+- Required app files present.
+- Removed one harmless leftover no-op line from older patch.
+- Confirmed core functions exist: login, renderChat, renderCustomers, renderInvoice, renderQRCodes, shareBill, printBill, setupCalc.
+- Confirmed print CSS targets only #billPreview.
+- Confirmed QR rendering function has canvas and fallback image route.
