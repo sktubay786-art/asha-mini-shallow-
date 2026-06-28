@@ -2266,3 +2266,217 @@ ready(function(){
   fillSelects();renderAll(true);
 });
 })();
+
+/* ==== V43: tabbar duplicate fix, responsive nav, calculator display, user buttons ==== */
+(function(){
+function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,300)); else setTimeout(fn,300); }
+
+ready(function(){
+  const chip=document.querySelector('.hero-chips span:last-child');
+  if(chip) chip.textContent='V43 Responsive Fix';
+
+  function realIcon(name){
+    const map={
+      home:'⌂',
+      users:'◉',
+      bill:'▤',
+      pay:'₹',
+      history:'◷',
+      report:'▥',
+      calc:'▦',
+      settings:'⚙',
+      call:'✆',
+      whatsapp:'Ⓦ',
+      share:'⇪',
+      more:'⋯',
+      edit:'✎',
+      delete:'⌫',
+      ledger:'☷',
+      settle:'✓'
+    };
+    return map[name]||'●';
+  }
+
+  window.normalizeTabsV43=function(){
+    const tab=document.querySelector('.tabbar');
+    if(!tab) return;
+
+    const pages=[
+      ['homePage',realIcon('home'),'Home'],
+      ['customersPage',realIcon('users'),'Users'],
+      ['billPage',realIcon('bill'),'Bill'],
+      ['payPage',realIcon('pay'),'Pay'],
+      ['historyPage',realIcon('history'),'History'],
+      ['reportsPage',realIcon('report'),'Report'],
+      ['calcPage',realIcon('calc'),'Calc'],
+      ['settingsPage',realIcon('settings'),'Set']
+    ];
+
+    // Remove duplicates and rebuild once. This fixes two/three icons issue.
+    tab.innerHTML=pages.map(([page,ico,label],idx)=>`<button data-page="${page}" class="${idx===0?'active':''}"><i>${ico}</i><span>${label}</span></button>`).join('');
+
+    tab.querySelectorAll('button[data-page]').forEach(btn=>{
+      btn.onclick=()=>{
+        const page=btn.dataset.page;
+        if(page==='calcPage' && !document.getElementById('calcPage')) createCalcPageV43();
+        showPage(page);
+        setTimeout(()=>btn.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'}),50);
+      };
+    });
+  };
+
+  window.createCalcPageV43=function(){
+    if(document.getElementById('calcPage')) return;
+    const main=document.querySelector('main') || document.getElementById('app') || document.body;
+    const sec=document.createElement('section');
+    sec.id='calcPage';
+    sec.className='page';
+    sec.innerHTML=`<div class="card"><h2>Scientific Calculator</h2><div class="calc"><div id="calcScreen"></div><div id="calcKeys" class="calc-keys"></div></div></div>`;
+    main.appendChild(sec);
+    if(window.setupCalc) setupCalc();
+  };
+
+  // Create calculator page if missing, separate tab route.
+  createCalcPageV43();
+
+  // Strong calculator display fix
+  const oldSetupCalc=window.setupCalc;
+  window.setupCalc=function(){
+    if(oldSetupCalc) oldSetupCalc();
+    const screen=document.getElementById('calcScreen');
+    if(screen){
+      screen.style.background='#050505';
+      screen.style.color='#fff';
+    }
+    const calc=document.querySelector('.calc');
+    if(calc) calc.classList.add('iosCalc');
+    const keys=document.getElementById('calcKeys');
+    if(keys) keys.classList.add('iosKeys');
+  };
+
+  function safePhoneDigits(raw){
+    let d=String(raw||'').replace(/\D/g,'');
+    if(d.length===10) return '91'+d;
+    if(d.length===12 && d.startsWith('91')) return d;
+    if(d.length>10) return d;
+    return d ? '91'+d.slice(-10) : '';
+  }
+  window.safePhoneDigitsV43=safePhoneDigits;
+  window.openWhatsApp=function(raw,text=''){
+    const d=safePhoneDigits(raw);
+    if(!d || d.length<12) return alert('Valid phone number নেই। 10 digit number দিন।');
+    window.open('https://wa.me/'+d+(text?('?text='+encodeURIComponent(text)):''),'_blank');
+  };
+
+  window.chatViewBill=function(id){
+    closeChat();
+    viewBill(id);
+  };
+  window.chatOpenPay=function(id){
+    closeChat();
+    openPayment(id);
+    setTimeout(()=>{const a=document.getElementById('payAmount'); if(a) a.focus();},120);
+  };
+  window.chatDeleteBill=function(id){
+    if(!confirm('Delete this bill?')) return;
+    deleteBill(id);
+  };
+
+  window.renderCustomers=function(){
+    const list=document.getElementById('customerList');
+    if(!list) return;
+    let q=(document.getElementById('customerSearch')?.value||'').toLowerCase().trim();
+    let rows=state.customers.filter(c=>(c.name+c.phone+c.village+c.address).toLowerCase().includes(q));
+    list.innerHTML=rows.length?rows.map(c=>{
+      let due=customerDue(c.id);
+      let bills=state.bills.filter(b=>b.customerId===c.id);
+      let last=(bills.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0]||{}).date||'-';
+      return `<div class="customer-row" role="button" tabindex="0" onclick="openChat('${c.id}')">
+        <div class="avatar">${esc(initials(c.name))}</div>
+        <div class="cust-main">
+          <div class="cust-name">${esc(c.name||'Unnamed')}</div>
+          <div class="cust-sub">📞 ${esc(c.phone||'No phone')} • 📍 ${esc(c.village||'No village')}</div>
+          <div class="cust-sub">Bills ${bills.length} • Last ${esc(last)} • Tap to open ledger</div>
+        </div>
+        <span class="pill ${due>0?'due':'paid'}">${due>0?money(due):'Paid'}</span>
+      </div>`;
+    }).join(''):`<div class="card muted">No customer yet</div>`;
+  };
+
+  window.renderChat=function(){
+    let c=state.customers.find(x=>x.id===activeCustomer); if(!c) return;
+
+    chatAvatar.textContent=initials(c.name);
+    chatName.textContent=c.name;
+    chatSub.textContent=(c.phone||'No phone')+' • '+(c.village||'No village')+' • Due '+money(customerDue(c.id));
+
+    chatCall.textContent=realIcon('call');
+    chatWhats.textContent=realIcon('whatsapp');
+    chatShare.textContent=realIcon('share');
+    if(chatMore) chatMore.textContent=realIcon('more');
+
+    chatCall.onclick=()=>{const d=safePhoneDigits(c.phone); if(!d)return alert('Phone number নেই'); location.href='tel:+'+d;};
+    chatWhats.onclick=()=>openWhatsApp(c.phone, customerReminderText(c));
+    chatShare.onclick=()=>shareCustomerBill(c.id);
+    chatBill.onclick=()=>{closeChat(); showPage('billPage'); billCustomer.value=c.id; toggleManual(); previewBill();};
+    chatPay.onclick=()=>directPay(c.id,false);
+    chatSettle.onclick=()=>directPay(c.id,true);
+    chatLedger.onclick=()=>renderChatLedger(c.id);
+    chatEdit.onclick=()=>openCustomer(c.id);
+    if(chatMore) chatMore.onclick=()=>openMoreMenu(c.id);
+
+    const bills=state.bills.filter(b=>b.customerId===c.id).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+    const total=bills.reduce((s,b)=>s+(+b.allTotal||0),0);
+    const paid=bills.reduce((s,b)=>s+billPaid(b),0);
+    let out=[`<div class="chat-summary"><div class="sum-card"><small>Live Due</small><b>${money(customerDue(c.id))}</b></div><div class="sum-card"><small>Total Bill</small><b>${money(total)}</b></div><div class="sum-card"><small>Collected</small><b>${money(paid)}</b></div></div>`];
+
+    if((+c.openingDue||0)>0){
+      out.push(`<div class="bubble setB"><b>Opening Due</b><br><b>${money(c.openingDue)}</b></div>`);
+    }
+
+    bills.forEach(b=>{
+      out.push(`<div class="day">${esc(b.date)}</div>
+        <div class="bubble billB">
+          <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+            <div><b>${esc(b.billNo)}</b><div class="chat-topnote">${esc(b.season||'-')} • ${esc(String(b.landAmount||''))} ${esc(b.unit||'')}</div></div>
+            <div style="text-align:right"><b>${money(billDue(b))}</b><div class="chat-topnote">Due</div></div>
+          </div>
+          <div style="margin-top:8px;line-height:1.58">Total ${money(b.allTotal)}<br>Paid/Joma ${money(billPaid(b))}${b.note?`<br><small>Note: ${esc(b.note)}</small>`:''}</div>
+          <div class="bubble-actions">
+            <button type="button" onclick="chatViewBill('${b.id}')">View</button>
+            <button type="button" class="primary" onclick="chatOpenPay('${b.id}')">Pay</button>
+            <button type="button" onclick="shareCustomerBill('${c.id}','${b.id}')">Reminder + Bill</button>
+            <button type="button" onclick="chatDeleteBill('${b.id}')">Delete</button>
+          </div>
+        </div>`);
+      (b.payments||[]).forEach(p=>{
+        out.push(`<div class="bubble ${String(p.mode||'').toLowerCase().includes('settle')?'setB':'payB'}">
+          <b>${esc(p.mode||'Payment')}</b><div class="chat-topnote">${esc(p.date||'')} • ${esc(p.receivedIn||'')}</div>
+          <b>${money(p.amount)}</b><br><small>${esc(p.note||'')}</small>
+          <div class="entry-tools">
+            <button type="button" onclick="editEntry('${p.id}')">Edit</button>
+            <button type="button" onclick="editEntry('${p.id}')">Undo/Delete</button>
+          </div>
+        </div>`);
+      });
+    });
+
+    chatBody.innerHTML=out.join('') || `<div class="bubble setB">No bill yet</div>`;
+  };
+
+  const oldShow=window.showPage;
+  window.showPage=function(id){
+    if(id==='calcPage') createCalcPageV43();
+    if(oldShow) oldShow(id);
+    document.querySelectorAll('.tabbar button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
+    const active=document.querySelector(`.tabbar button[data-page="${id}"]`);
+    if(active) active.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});
+    if(id==='calcPage' && window.setupCalc) setupCalc();
+  };
+
+  // Repair tabbar after all older patches are loaded.
+  normalizeTabsV43();
+  setupCalc();
+  renderCustomers();
+});
+})();

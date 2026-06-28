@@ -568,3 +568,232 @@ body,input,select,textarea,button{font-family:var(--app-font)}
 .invoice.v42bill .top{background:linear-gradient(135deg,var(--accent),#15975e);color:#fff;text-align:center;padding:16px 15px 13px}.invoice.v42bill .top h3{margin:0;font-size:21px;line-height:1.15}.invoice.v42bill .top .sub{font-size:11px;line-height:1.45;margin-top:7px;opacity:.98}.invoice.v42bill .sec{padding:12px 14px;border-bottom:1px dashed #d9e6df}.invoice.v42bill .sec-title{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.55px;color:#65736c;font-weight:900;margin-bottom:7px}.invoice.v42bill .customer-box{background:#f7fbf8;border:1px solid #e1ece4;border-radius:15px;padding:10px 12px;font-size:13px;line-height:1.55}.invoice.v42bill .row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:5px 0;font-size:13px}.invoice.v42bill .row span:first-child{color:#4f5f58}.invoice.v42bill .row b:last-child{text-align:right}.invoice.v42bill .amount-box{background:#f8fbf9;border:1px solid #e2ece5;border-radius:16px;padding:9px 11px}.invoice.v42bill .grand{background:#edfff4;border:1px solid #ccefd8;border-radius:16px;padding:10px 12px;text-align:center;margin-top:8px}.invoice.v42bill .grand small{display:block;color:#65736c;font-size:11px}.invoice.v42bill .grand b{font-size:22px;color:#0b6f42}.invoice.v42bill .mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}.invoice.v42bill .mini-grid div{background:#fff;border:1px solid #e2ece5;border-radius:12px;padding:7px;text-align:center;font-size:11px}.invoice.v42bill .mini-grid b{display:block;font-size:13px;color:#15231b}.invoice.v42bill .qrbox{text-align:center}.invoice.v42bill .qr-live{margin:8px auto}.invoice.v42bill .foot{text-align:center;color:#52625a;font-size:11px;line-height:1.55;padding:12px 14px 16px}
 .invoice.v42bill.classic{border:2px solid #075c39}.invoice.v42bill.classic .top{border-radius:0 0 18px 18px;margin:8px;background:#075c39}.invoice.v42bill.premium .top{background:linear-gradient(135deg,#075c39,#08a86f)}.invoice.v42bill.boxed{border:2px solid #111;box-shadow:none}.invoice.v42bill.boxed .top{background:linear-gradient(135deg,#111,#455)}.invoice.v42bill.bengali .top h3{font-size:24px}.invoice.v42bill.bengali .row{font-weight:750}.invoice.v42bill.standard{border:1px solid #d0d5dd;box-shadow:none}.invoice.v42bill.standard .top{background:#f8fafc;color:#111;border-bottom:1px solid #e5e7eb}.invoice.v42bill.normal{border:1px solid #111;box-shadow:none;border-radius:10px}.invoice.v42bill.normal .top{background:#fff;color:#111;border-bottom:2px solid #111}.invoice.v42bill.thermal{width:78mm;max-width:78mm;border-radius:8px;box-shadow:none}.invoice.v42bill.thermal .top{padding:8px}.invoice.v42bill.thermal .top h3{font-size:17px}.invoice.v42bill.thermal .sec{padding:7px 9px}.invoice.v42bill.thermal .row{font-size:11.5px;padding:3px 0}.invoice.v42bill.compact,.invoice.v42bill.phone,.invoice.v42bill.mini,.invoice.v42bill.phoneview{max-width:410px}.invoice.v42bill.qrfirst .pay-section{order:-1;background:#f2fff6}.invoice.v42bill.qrfirst{display:flex;flex-direction:column}.invoice.v42bill.qrfirst .qr-live{width:140px;height:140px}.invoice.v42bill.mini .top h3,.invoice.v42bill.phone .top h3,.invoice.v42bill.compact .top h3{font-size:19px}.invoice.v42bill.mini .sec,.invoice.v42bill.phone .sec,.invoice.v42bill.compact .sec{padding:10px 12px}.invoice.v42bill.mini .row,.invoice.v42bill.phone .row,.invoice.v42bill.compact .row{font-size:12px;padding:4px 0}.rate-note{display:block;font-size:10.5px;color:#667085;font-weight:600;margin-top:2px}
 .chat-modal.v42-chat{background:radial-gradient(at 0% 0%,rgba(163,246,156,.38),transparent 45%),radial-gradient(at 100% 100%,rgba(13,99,27,.12),transparent 45%),#f8f9fa}.v42-chat .chat-head{background:rgba(248,249,250,.84);backdrop-filter:blur(24px);border-bottom:1px solid rgba(191,202,186,.45);box-shadow:0 8px 28px rgba(16,24,40,.06)}.v42-chat .chat-head button{background:#fff;border:1px solid rgba(0,0,0,.05);border-radius:50%;min-width:42px;min-height:42px;color:#0d631b}.v42-chat .avatar{width:74px;height:74px;border:2px solid #fff;box-shadow:0 10px 26px rgba(0,0,0,.12);background:linear-gradient(135deg,#0d631b,#20be7a)}.v42-summary{background:rgba(255,255,255,.90);border:1px solid rgba(255,255,255,.8);border-radius:24px;padding:16px;margin:12px 0;box-shadow:0 8px 20px rgba(0,0,0,.04);text-align:center}.v42-summary small{display:block;color:#667085}.v42-summary b{font-size:28px;color:#ba1a1a}.v42-actionbar{display:flex;justify-content:center;gap:10px;overflow:auto;padding:6px 0 14px}.v42-actionbar button{min-width:82px;background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:18px;padding:10px;font-weight:800;box-shadow:0 8px 18px rgba(16,24,40,.05)}.v42-date{text-align:center;margin:12px 0}.v42-date span{background:rgba(0,0,0,.06);border-radius:9px;padding:5px 11px;font-size:11px;color:#667085}.v42-bubble{max-width:86%;border-radius:22px;padding:14px;margin:10px 0;box-shadow:0 8px 20px rgba(16,24,40,.05);border:1px solid rgba(255,255,255,.8)}.v42-bill{margin-left:auto;background:rgba(46,125,50,.12);border-top-right-radius:6px}.v42-pay,.v42-settle{margin-right:auto;background:#fff;border-top-left-radius:6px}.v42-settle{background:#fff7ed;border-color:#fed7aa}.v42-bubble-title{display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:900;color:#0d631b}.v42-bubble .line{display:flex;justify-content:space-between;gap:14px;font-size:13px;padding:3px 0}.v42-bubble .due{font-weight:900;color:#ba1a1a}.v42-bubble-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:10px}.v42-bubble-actions button{border:0;background:#fff;border-radius:13px;padding:8px 10px;font-size:12px;font-weight:800;color:#0d631b;box-shadow:0 5px 12px rgba(16,24,40,.06)}.v42-sticky-reminder{position:sticky;bottom:0;background:rgba(248,249,250,.92);backdrop-filter:blur(24px);padding:12px 0}.v42-sticky-reminder button{width:100%;background:#0d631b;color:#fff;border:0;border-radius:18px;padding:14px;font-size:15px;font-weight:900;box-shadow:0 8px 18px rgba(13,99,27,.25)}
+
+/* ===== V43 responsive real-ish icons + nav + calculator fixes ===== */
+:root{
+  --nav-h:86px;
+}
+body{
+  overflow-x:hidden;
+}
+.tabbar{
+  left:50%!important;
+  transform:translateX(-50%)!important;
+  right:auto!important;
+  width:min(96vw,820px)!important;
+  max-width:820px!important;
+  min-height:var(--nav-h)!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:10px!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  white-space:nowrap!important;
+  scroll-snap-type:x proximity!important;
+  -webkit-overflow-scrolling:touch!important;
+  padding:10px 12px calc(10px + env(safe-area-inset-bottom))!important;
+  border-radius:32px!important;
+  background:rgba(255,255,255,.92)!important;
+  backdrop-filter:blur(24px)!important;
+  box-shadow:0 -10px 35px rgba(16,24,40,.10)!important;
+}
+.tabbar::-webkit-scrollbar{display:none}
+.tabbar button{
+  flex:0 0 74px!important;
+  min-width:74px!important;
+  max-width:84px!important;
+  scroll-snap-align:center!important;
+  border:0!important;
+  background:transparent!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:5px!important;
+  padding:6px 4px!important;
+  border-radius:22px!important;
+  color:#27342d!important;
+  font-weight:900!important;
+}
+.tabbar button span{
+  display:block!important;
+  font-size:12px!important;
+  line-height:1!important;
+  font-weight:900!important;
+  color:inherit!important;
+}
+.tabbar button i{
+  width:44px!important;
+  height:44px!important;
+  border-radius:17px!important;
+  display:grid!important;
+  place-items:center!important;
+  background:linear-gradient(180deg,#ffffff,#eef6f2)!important;
+  color:#0d631b!important;
+  font-style:normal!important;
+  font-size:24px!important;
+  font-weight:900!important;
+  box-shadow:inset 0 1px 0 #fff,0 10px 26px rgba(13,99,27,.10)!important;
+  border:1px solid rgba(13,99,27,.08)!important;
+}
+.tabbar button.active{
+  background:rgba(13,99,27,.10)!important;
+  color:#0d631b!important;
+}
+.tabbar button.active i{
+  background:linear-gradient(135deg,#0d631b,#16a464)!important;
+  color:white!important;
+  border-color:transparent!important;
+  box-shadow:0 12px 26px rgba(13,99,27,.22)!important;
+}
+.tabbar button[data-page="reportsPage"],
+.tabbar button[data-page="settingsPage"],
+.tabbar button[data-page="calcPage"]{
+  display:flex!important;
+}
+.page{
+  width:100%;
+}
+main,.app-main,.content{
+  max-width:1120px;
+  margin-left:auto;
+  margin-right:auto;
+}
+#calcPage .card{
+  background:transparent!important;
+  box-shadow:none!important;
+  border:0!important;
+  padding:0!important;
+}
+.calc.iosCalc{
+  width:min(96vw,430px);
+  margin:0 auto;
+  background:#050505!important;
+  color:#fff!important;
+  border-radius:38px!important;
+  padding:18px 14px 18px!important;
+}
+#calcScreen.iosScreen{
+  background:#050505!important;
+  color:#fff!important;
+  min-height:132px!important;
+  border-radius:28px 28px 8px 8px!important;
+}
+.calcTop,.calcExpression,.calcValue{
+  color:#fff!important;
+}
+.calcExpression{
+  color:#b9bdc2!important;
+}
+.calcValue{
+  color:#fff!important;
+  text-shadow:0 1px 0 rgba(255,255,255,.08);
+}
+#calcKeys.iosKeys button{
+  color:#fff!important;
+  user-select:none;
+  touch-action:manipulation;
+}
+#calcKeys.iosKeys button.fn{
+  color:#fff!important;
+}
+#calcKeys.iosKeys button.sci{
+  color:#e5e7eb!important;
+}
+.customer-row{
+  cursor:pointer;
+  touch-action:manipulation;
+}
+.customer-row,.card,.modal-card,.chat-modal{
+  max-width:100%;
+}
+.chat-modal{
+  background:rgba(248,249,250,.98)!important;
+}
+.chat-head{
+  min-height:86px;
+  gap:10px;
+}
+.chat-head button{
+  min-width:44px!important;
+  min-height:44px!important;
+  flex:0 0 auto!important;
+}
+.chat-actions{
+  display:flex!important;
+  overflow-x:auto!important;
+  gap:10px!important;
+  -webkit-overflow-scrolling:touch!important;
+  scroll-snap-type:x proximity!important;
+}
+.chat-actions::-webkit-scrollbar{display:none}
+.chat-actions button{
+  flex:0 0 auto!important;
+  min-width:86px!important;
+  min-height:46px!important;
+  scroll-snap-align:start!important;
+}
+.bubble-actions,.entry-tools{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  gap:8px!important;
+}
+.bubble-actions button,.entry-tools button{
+  min-height:38px!important;
+  padding:0 12px!important;
+  border-radius:14px!important;
+  border:1px solid #e5e7eb!important;
+  background:#fff!important;
+}
+.bubble-actions button.primary{
+  background:var(--accent)!important;
+  color:#fff!important;
+  border-color:var(--accent)!important;
+}
+@media(min-width:720px){
+  .tabbar{
+    width:min(94vw,920px)!important;
+    justify-content:center!important;
+  }
+  .tabbar button{
+    flex-basis:84px!important;
+  }
+  #customersPage,#billPage,#reportsPage,#settingsPage,#homePage,#historyPage,#payPage,#calcPage{
+    max-width:1040px;
+    margin:0 auto;
+  }
+  .two{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+}
+@media(min-width:980px){
+  .page.active{
+    padding-bottom:120px;
+  }
+  .preview-panel{
+    position:sticky;
+    top:20px;
+  }
+}
+@media(max-width:480px){
+  .tabbar{
+    width:100vw!important;
+    border-radius:28px 28px 0 0!important;
+    bottom:0!important;
+  }
+  .tabbar button{
+    flex-basis:70px!important;
+    min-width:70px!important;
+  }
+  .tabbar button i{
+    width:42px!important;
+    height:42px!important;
+  }
+  body{
+    padding-bottom:calc(var(--nav-h) + 18px)!important;
+  }
+  .chat-head{
+    padding-right:8px!important;
+  }
+}

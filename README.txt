@@ -104,3 +104,13 @@ V42:
 - Login remember checkbox added using Firebase LOCAL persistence + saved email.
 - Rate line shows bigha rate note when unit is katha/decimal.
 - Indian rupee logic preserved.
+
+
+V43 Responsive Icons Users:
+- Bottom navigation rebuilt to remove duplicate/misaligned icons.
+- Mobile bottom nav is now horizontally scrollable when all tabs do not fit.
+- Calculator page display fixed with black background and white result text.
+- Calculator kept as a separate tab.
+- User detail/chat buttons re-bound and fixed.
+- Customer list click/tap behavior improved.
+- Phone/tablet/web responsive layout improved.
