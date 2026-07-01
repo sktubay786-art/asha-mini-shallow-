@@ -214,3 +214,23 @@ V57 Cloud Push Fix:
 - Firestore rules included again for owner UID only.
 - Cloud buttons rebound after old code.
 - Open with index.html?v=57 after upload.
+
+
+V58 Cloud + Edit Undo Fix:
+- Cloud Doctor added in Settings.
+- Manual Push Cloud now shows exact diagnostic details and rules to copy.
+- Background cloud failures no longer disturb local save; shows local saved / cloud pending.
+- User chat payment and settlement Edit button fixed.
+- User chat Undo button now directly deletes/undoes payment or settlement.
+- Action modal Save/Delete buttons rebound after final patches.
+- Chat history remains visible with edit/undo logs.
+
+
+V59 Sanitize + Entries Fix:
+- Fixed Firestore unsupported undefined field error, including settings.reminderTemplate.
+- Cloud push now sanitizes full state before DOC.set().
+- Settings save no longer creates undefined fields.
+- Added Entries button in user chat.
+- Entries panel shows all payments and settlements with Edit and Undo/Delete.
+- Edit/Undo buttons also shown directly on payment bubbles.
+- Updated start_url to index.html?v=59 and service worker cache v59.

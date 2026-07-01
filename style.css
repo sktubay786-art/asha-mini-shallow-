@@ -1407,3 +1407,67 @@ main{width:100%!important;max-width:1180px!important;margin:0 auto!important;box
   font-size:12px;
   font-weight:800;
 }
+
+/* V58 edit undo cloud doctor */
+.v58-doctor{
+  background:#f8fafc;
+  border:1px solid #d0d5dd;
+  border-radius:18px;
+  padding:12px;
+  font-size:12px;
+  line-height:1.55;
+  white-space:pre-wrap;
+  overflow:auto;
+}
+.v58-copy-rules{
+  width:100%;
+  min-height:150px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:11px;
+}
+.entry-tools button.danger-mini{
+  color:#d92d20;
+  border-color:#fecdca;
+  background:#fff5f5;
+}
+.chat-history-block .v45-log-row{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  border-bottom:1px solid #e4e7ec;
+  padding:7px 0;
+}
+
+/* V59 transaction manager */
+.tx-list{display:grid;gap:10px}
+.tx-row{
+  border:1px solid #e4e7ec;
+  border-radius:18px;
+  padding:12px;
+  background:#fff;
+}
+.tx-row .tx-top{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:flex-start;
+}
+.tx-row small{color:#667085}
+.tx-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.tx-actions button{
+  border:1px solid #d0d5dd;
+  background:#fff;
+  border-radius:14px;
+  padding:8px 10px;
+  font-weight:900;
+}
+.tx-actions .undo{
+  color:#d92d20;
+  border-color:#fecdca;
+  background:#fff5f5;
+}
+.chat-actions #chatEntries{
+  background:#e8f6ee;
+  color:#075c39;
+  border-color:#b8d9c5;
+}

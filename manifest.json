@@ -1,7 +1,7 @@
 {
   "name": "Asha Billing",
   "short_name": "Asha Billing",
-  "start_url": "./index.html?v=57",
+  "start_url": "./index.html?v=59",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f4f7fb",

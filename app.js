@@ -3769,7 +3769,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 
 ready(function(){
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V57 Cloud Push Fix';
+  if(chip) chip.textContent='V59 Sanitize + Entries Fix';
 
   function setCloudStatus(text,type='warn'){
     const el=document.getElementById('cloudChip');
@@ -3856,7 +3856,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V57 Cloud Push Fix';
+  if(chip) chip.textContent='V59 Sanitize + Entries Fix';
 
   function selectedCustomerV55(){
     const sel=q('billCustomer');
@@ -4045,7 +4045,7 @@ ready(function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,1200)); else setTimeout(fn,1200); }
 ready(function(){
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V57 Cloud Push Fix';
+  if(chip) chip.textContent='V59 Sanitize + Entries Fix';
   const prev=document.getElementById('previousDue');
   if(prev){
     prev.addEventListener('focus',()=>prev.select());
@@ -4067,13 +4067,13 @@ ready(function(){
 
 
 
-/* ==== V57 Cloud Push Fix / Diagnostics ==== */
+/* ==== V59 Sanitize + Entries Fix / Diagnostics ==== */
 (function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,1400)); else setTimeout(fn,1400); }
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V57 Cloud Push Fix';
+  if(chip) chip.textContent='V59 Sanitize + Entries Fix';
 
   function setCloudV57(text,type='info'){
     const s=q('cloudStatus');
@@ -4226,5 +4226,556 @@ ready(function(){
     else if(!d.uidMatches) setCloudV57('Cloud: wrong owner');
     else setCloudV57('Cloud: ready');
   },900);
+});
+})();
+
+
+
+/* ==== V58 Cloud + Edit/Undo Final Fix ==== */
+(function(){
+function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,1800)); else setTimeout(fn,1800); }
+ready(function(){
+  const q=id=>document.getElementById(id);
+  const chip=document.querySelector('.hero-chips span:last-child');
+  if(chip) chip.textContent='V59 Sanitize + Entries Fix';
+
+  const RULES_TEXT=`rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /ashaMiniShallow/{docId} {
+      allow read, write: if request.auth != null
+        && request.auth.uid == "FZIhTAr0JEMoHCeQd3kr2t8cJKk2"
+        && docId == "ekramul-main";
+    }
+  }
+}`;
+
+  function setCloudV58(text){
+    const s=q('cloudStatus'); if(s) s.textContent=text;
+    const c=q('cloudChip'); if(c) c.textContent=text;
+    console.log('[V58 cloud]', text);
+  }
+  window.setCloudV58=setCloudV58;
+
+  window.cloudDebugV58=function(){
+    const u=auth?.currentUser;
+    return {
+      online:navigator.onLine,
+      firebaseLoaded:!!window.firebase,
+      authReady:!!auth,
+      firestoreReady:!!db,
+      docReady:!!DOC,
+      loggedIn:!!u,
+      email:u?.email||'',
+      uid:u?.uid||'',
+      expectedUid:OWNER_UID,
+      uidMatch:!!u && u.uid===OWNER_UID,
+      docPath:'ashaMiniShallow/ekramul-main',
+      currentUrl:location.href
+    };
+  };
+
+  window.openCloudDoctorV58=function(lastError=''){
+    const d=cloudDebugV58();
+    const text=`Cloud Doctor
+
+Online: ${d.online}
+Firebase loaded: ${d.firebaseLoaded}
+Auth ready: ${d.authReady}
+Firestore ready: ${d.firestoreReady}
+Logged in: ${d.loggedIn}
+Email: ${d.email}
+UID: ${d.uid}
+Expected UID: ${d.expectedUid}
+UID match: ${d.uidMatch}
+Doc path: ${d.docPath}
+Last error: ${lastError || '-'}
+
+যদি UID match true হয় কিন্তু push failed থাকে, তাহলে Firebase Console > Firestore > Rules এ নিচের rules paste করে Publish করো।`;
+    q('actionTitle').textContent='Cloud Doctor';
+    q('actionBody').innerHTML=`<div class="v58-doctor">${esc(text)}</div>
+      <label>Firestore Rules</label>
+      <textarea class="v58-copy-rules" readonly>${esc(RULES_TEXT)}</textarea>
+      <p class="muted">Local save already works. Cloud save fail হলে usually Rules publish হয়নি, wrong owner login, অথবা Firestore database create হয়নি।</p>`;
+    q('actionSave').classList.add('hidden');
+    q('actionDelete').classList.add('hidden');
+    q('actionModal').classList.remove('hidden');
+    bindActionButtonsV58();
+  };
+
+  // Final cloud push: background failure won't disturb app, manual shows doctor.
+  window.pushCloud=async function(manual=true){
+    try{
+      if(manual) setCloudV58('Cloud: saving...');
+      if(!navigator.onLine){ setCloudV58('Cloud: local saved / offline'); if(manual) openCloudDoctorV58('Offline'); return false; }
+      if(!auth || !db || !DOC){ setCloudV58('Cloud: Firebase not ready'); if(manual) openCloudDoctorV58('Firebase not ready'); return false; }
+      const u=auth.currentUser;
+      if(!u){ setCloudV58('Cloud: local saved / login needed'); if(manual) openCloudDoctorV58('Login needed'); return false; }
+      if(u.uid!==OWNER_UID){ setCloudV58('Cloud: wrong owner login'); if(manual) openCloudDoctorV58('Wrong UID'); return false; }
+      try{ await u.getIdToken(true); }catch(e){}
+      await DOC.set({data:state,updatedAt:new Date().toISOString(),ownerUid:u.uid,appVersion:'v58'}, {merge:true});
+      setCloudV58('Cloud: saved ✅');
+      if(manual) alert('Cloud saved ✅');
+      return true;
+    }catch(e){
+      const msg=(e && (e.code?e.code+': ':'')+(e.message||e)) || String(e);
+      setCloudV58(manual ? 'Cloud: push failed - see doctor' : 'Cloud: local saved / cloud pending');
+      console.error('V58 push failed', e, cloudDebugV58());
+      if(manual) openCloudDoctorV58(msg);
+      return false;
+    }
+  };
+
+  window.saveState=function(sync=true){
+    try{
+      localStorage.setItem(typeof V30_KEY!=='undefined'?V30_KEY:KEY, JSON.stringify(state));
+      localStorage.setItem(KEY, JSON.stringify(state));
+    }catch(e){ alert('Local save failed: '+(e.message||e)); }
+    try{ renderAll(); }catch(e){ console.warn(e); }
+    if(sync) setTimeout(()=>pushCloud(false),120);
+  };
+
+  // Payment find/edit/undo final
+  window.findPaymentV58=function(pid){
+    for(const b of state.bills){
+      const p=(b.payments||[]).find(x=>x.id===pid);
+      if(p) return {bill:b,p};
+    }
+    return null;
+  };
+
+  window.bindActionButtonsV58=function(){
+    const save=q('actionSave'), del=q('actionDelete'), close=q('actionClose');
+    if(save) save.onclick=()=>window.saveAction();
+    if(del) del.onclick=()=>window.deleteAction();
+    if(close) close.onclick=()=>window.closeAction();
+  };
+
+  window.editEntry=function(pid){
+    const fp=findPaymentV58(pid);
+    if(!fp) return alert('Entry পাওয়া যায়নি।');
+    actionContext={type:'v58editPayment',paymentId:pid};
+    q('actionTitle').textContent=(String(fp.p.mode||'').toLowerCase().includes('settle')?'Edit Settlement':'Edit Payment');
+    q('actionBody').innerHTML=`<label>Amount</label><input id="editAmount" type="number" value="${+fp.p.amount||0}">
+      <label>Mode</label><select id="editMode"><option>Cash</option><option>UPI</option><option>Bank</option><option>Online</option><option>Settlement</option></select>
+      <label>Received In</label><input id="editReceived" value="${esc(fp.p.receivedIn||'')}">
+      <label>Note</label><input id="editNote" value="${esc(fp.p.note||'')}">
+      <p class="muted small">Save করলে entry update হবে। Delete চাপলে এই payment/settlement undo হবে।</p>`;
+    q('editMode').value=fp.p.mode||'Cash';
+    q('actionSave').classList.remove('hidden');
+    q('actionDelete').classList.remove('hidden');
+    q('actionModal').classList.remove('hidden');
+    bindActionButtonsV58();
+  };
+
+  window.undoPaymentV58=function(pid){
+    const fp=findPaymentV58(pid);
+    if(!fp) return alert('Entry পাওয়া যায়নি।');
+    if(!confirm('এই payment/settlement undo/delete করবে?')) return;
+    const before=+fp.p.amount||0;
+    const mode=fp.p.mode||'Payment';
+    fp.bill.payments=(fp.bill.payments||[]).filter(p=>p.id!==pid);
+    if(typeof logCustomerV45==='function') logCustomerV45(fp.bill.customerId,'undo',`Undo ${mode} from ${fp.bill.billNo}: ${money(before)}`,before);
+    saveState();
+    if(activeCustomer) renderChat();
+    alert('Undo/Delete done');
+  };
+
+  window.saveAction=function(){
+    if(actionContext && actionContext.type==='v58editPayment'){
+      const fp=findPaymentV58(actionContext.paymentId);
+      if(!fp) return closeAction();
+      const before=+fp.p.amount||0;
+      fp.p.amount=+q('editAmount').value||0;
+      fp.p.mode=q('editMode').value;
+      fp.p.receivedIn=q('editReceived').value;
+      fp.p.note=q('editNote').value;
+      fp.p.editedAt=new Date().toISOString();
+      if(typeof logCustomerV45==='function') logCustomerV45(fp.bill.customerId,'edit',`Edited ${fp.p.mode} on ${fp.bill.billNo}: ${money(before)} → ${money(fp.p.amount)}`,fp.p.amount);
+      saveState();
+      if(activeCustomer) renderChat();
+      closeAction();
+      alert('Entry updated');
+      return;
+    }
+    closeAction();
+  };
+
+  window.deleteAction=function(){
+    if(actionContext && actionContext.type==='v58editPayment'){
+      undoPaymentV58(actionContext.paymentId);
+      closeAction();
+      return;
+    }
+    closeAction();
+  };
+
+  window.closeAction=function(){
+    actionContext=null;
+    q('actionModal')?.classList.add('hidden');
+    q('actionSave')?.classList.remove('hidden');
+    q('actionDelete')?.classList.remove('hidden');
+  };
+
+  // Final chat renderer: visible Edit and direct Undo buttons.
+  window.renderChat=function(){
+    const c=state.customers.find(x=>x.id===activeCustomer); if(!c) return;
+    const setTxt=(id,t)=>{const el=q(id); if(el) el.textContent=t;};
+    setTxt('chatAvatar',initials(c.name)); setTxt('chatName',c.name);
+    setTxt('chatSub',(c.phone||'No phone')+' • '+(c.village||'No village')+' • Due '+money(customerDue(c.id)));
+    if(q('chatBack')) q('chatBack').onclick=closeChat;
+    if(q('chatCall')) q('chatCall').onclick=()=>{let d=String(c.phone||'').replace(/\D/g,''); if(d.length===10)d='91'+d; location.href='tel:+'+d;};
+    if(q('chatWhats')) q('chatWhats').onclick=()=>openWhatsApp(c.phone, typeof customerReminderText==='function'?customerReminderText(c):'Payment reminder');
+    if(q('chatShare')) q('chatShare').onclick=()=>shareCustomerBill(c.id);
+    if(q('chatBill')) q('chatBill').onclick=()=>{closeChat();showPage('billPage');q('billCustomer').value=c.id;toggleManual();if(window.updatePreviousDueV55)updatePreviousDueV55(true);previewBill();};
+    if(q('chatPay')) q('chatPay').onclick=()=>directPay(c.id,false);
+    if(q('chatSettle')) q('chatSettle').onclick=()=>directPay(c.id,true);
+    if(q('chatLedger')) q('chatLedger').onclick=()=>renderChatLedger(c.id);
+    if(q('chatEdit')) q('chatEdit').onclick=()=>openCustomer(c.id);
+    if(q('chatMore')) q('chatMore').onclick=()=>typeof openUserMenuV52==='function'?openUserMenuV52(c.id):(typeof openMoreMenu==='function'?openMoreMenu(c.id):null);
+
+    const bills=state.bills.filter(b=>b.customerId===c.id).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+    const total=bills.reduce((s,b)=>s+(+b.allTotal||0),0);
+    const paid=bills.reduce((s,b)=>s+billPaid(b),0);
+    let out=[`<div class="chat-summary"><div class="sum-card"><small>Live Due</small><b>${money(customerDue(c.id))}</b></div><div class="sum-card"><small>Total Bill</small><b>${money(total)}</b></div><div class="sum-card"><small>Collected</small><b>${money(paid)}</b></div></div>`];
+
+    if((+c.openingDue||0)>0) out.push(`<div class="bubble setB"><b>Opening Due</b><br><b>${money(c.openingDue)}</b></div>`);
+    bills.forEach(b=>{
+      out.push(`<div class="day">${esc(b.date||'')}</div><div class="bubble billB"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><div><b>${esc(b.billNo)}</b><div class="chat-topnote">${esc(b.season||'-')} • ${esc(String(b.landAmount||''))} ${esc(b.unit||'')}</div></div><div style="text-align:right"><b>${money(billDue(b))}</b><div class="chat-topnote">Due</div></div></div><div style="margin-top:8px;line-height:1.58">Total ${money(b.allTotal)}<br>Paid/Joma ${money(billPaid(b))}${b.note?`<br><small>Note: ${esc(b.note)}</small>`:''}</div><div class="bubble-actions"><button type="button" onclick="chatViewBill('${b.id}')">👁 View</button><button type="button" class="primary" onclick="chatOpenPay('${b.id}')">₹ Pay</button><button type="button" onclick="shareCustomerBill('${c.id}','${b.id}')">⏰ Bill</button><button type="button" onclick="chatDeleteBill('${b.id}')">⌫ Delete</button></div></div>`);
+      (b.payments||[]).forEach(p=>{
+        const isSet=String(p.mode||'').toLowerCase().includes('settle');
+        out.push(`<div class="bubble ${isSet?'setB':'payB'}"><b>${esc(p.mode||'Payment')}</b><div class="chat-topnote">${esc(p.date||'')} • ${esc(p.receivedIn||'')}</div><b>${money(p.amount)}</b><br><small>${esc(p.note||'')}</small>${p.editedAt?`<br><small>Edited</small>`:''}<div class="entry-tools"><button type="button" onclick="editEntry('${p.id}')">✎ Edit</button><button type="button" class="danger-mini" onclick="undoPaymentV58('${p.id}')">⌫ Undo</button></div></div>`);
+      });
+    });
+    const logs=(c.logs||[]).slice(0,8);
+    if(logs.length){
+      out.push(`<div id="v45HistoryBlock" class="chat-history-block"><div class="history-title">Edit / Action History</div>${logs.map(l=>`<div class="v45-log-row"><b>${esc(l.text||l.type)}</b><small>${esc(new Date(l.date).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}))}</small></div>`).join('')}</div>`);
+    }
+    q('chatBody').innerHTML=out.join('') || `<div class="bubble setB">No bill yet</div>`;
+  };
+
+  const docBtn=q('cloudDoctorBtn');
+  if(docBtn) docBtn.onclick=()=>openCloudDoctorV58();
+  const pushBtn=q('cloudPushBtn'); if(pushBtn) pushBtn.onclick=()=>pushCloud(true);
+  const pullBtn=q('cloudPullBtn'); if(pullBtn) pullBtn.onclick=()=>pullCloud();
+  bindActionButtonsV58();
+
+  setTimeout(()=>{const d=cloudDebugV58(); if(d.loggedIn&&d.uidMatch)setCloudV58('Cloud: ready'); else if(d.loggedIn)setCloudV58('Cloud: wrong owner'); else setCloudV58('Cloud: login needed');},700);
+});
+})();
+
+
+
+/* ==== V59 Firestore Sanitize + Transaction Entries Fix ==== */
+(function(){
+function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,2200)); else setTimeout(fn,2200); }
+ready(function(){
+  const q=id=>document.getElementById(id);
+  const chip=document.querySelector('.hero-chips span:last-child');
+  if(chip) chip.textContent='V59 Sanitize + Entries Fix';
+
+  function setCloudV59(text){
+    const s=q('cloudStatus'); if(s) s.textContent=text;
+    const c=q('cloudChip'); if(c) c.textContent=text;
+    console.log('[V59]', text);
+  }
+
+  // Firestore does not accept undefined. This removes/replaces all unsafe values.
+  window.sanitizeForFirestoreV59=function(input){
+    if(input === undefined) return null;
+    if(input === null) return null;
+    if(typeof input === 'number'){
+      if(!Number.isFinite(input)) return 0;
+      return input;
+    }
+    if(typeof input === 'string' || typeof input === 'boolean') return input;
+    if(input instanceof Date) return input.toISOString();
+    if(Array.isArray(input)){
+      return input.map(v=>sanitizeForFirestoreV59(v)).filter(v=>v !== undefined);
+    }
+    if(typeof input === 'object'){
+      const out={};
+      Object.keys(input).forEach(k=>{
+        const v=sanitizeForFirestoreV59(input[k]);
+        if(v !== undefined) out[k]=v;
+      });
+      return out;
+    }
+    return null;
+  };
+
+  window.fixStateV59=function(){
+    if(!state.settings) state.settings={};
+    const defaults={
+      company:'আশা মিনি শ্যালো',
+      owner:'SK EKRAMUL Haque',
+      contact:'9564061920',
+      address:'Raghunathpur, Chaklachipur, Ghatal, Paschim Medinipur, 721232',
+      upi:'8710065540@axl',
+      payee:'SK ENAMUL HAQUE',
+      country:'+91',
+      accent:'#075c39',
+      print:'thermal80',
+      template:'premium',
+      qrMode:'dynamic',
+      qrImage:'',
+      reminderTemplate:'',
+      defaultBillNote:'',
+      appFont:'',
+      billFont:'',
+      compactMeta:true
+    };
+    Object.keys(defaults).forEach(k=>{
+      if(state.settings[k] === undefined || state.settings[k] === null) state.settings[k]=defaults[k];
+    });
+    state=sanitizeForFirestoreV59(state);
+    return state;
+  };
+
+  window.saveState=function(sync=true){
+    try{
+      fixStateV59();
+      const text=JSON.stringify(state);
+      localStorage.setItem(typeof V30_KEY!=='undefined'?V30_KEY:KEY, text);
+      localStorage.setItem(KEY, text);
+    }catch(e){
+      alert('Local save failed: '+(e.message||e));
+    }
+    try{ renderAll(); }catch(e){ console.warn('renderAll failed',e); }
+    if(sync) setTimeout(()=>pushCloud(false),120);
+  };
+
+  window.pushCloud=async function(manual=true){
+    try{
+      fixStateV59();
+      if(manual) setCloudV59('Cloud: saving...');
+      if(!navigator.onLine){ setCloudV59('Cloud: local saved / offline'); return false; }
+      if(!auth || !db || !DOC){ setCloudV59('Cloud: Firebase not ready'); return false; }
+      const u=auth.currentUser;
+      if(!u){ setCloudV59('Cloud: local saved / login needed'); if(manual) alert('Login needed for cloud. Local save already done.'); return false; }
+      if(u.uid !== OWNER_UID){ setCloudV59('Cloud: wrong owner login'); if(manual) alert('Wrong owner login. Local save already done.'); return false; }
+      try{ await u.getIdToken(true); }catch(e){}
+      const cleanData=sanitizeForFirestoreV59(state);
+      await DOC.set({
+        data: cleanData,
+        updatedAt: new Date().toISOString(),
+        ownerUid: u.uid,
+        appVersion:'v59'
+      }, {merge:true});
+      setCloudV59('Cloud: saved ✅');
+      if(manual) alert('Cloud saved ✅');
+      return true;
+    }catch(e){
+      const msg=(e && (e.code?e.code+': ':'')+(e.message||e)) || String(e);
+      setCloudV59(manual ? 'Cloud: push failed - '+msg.slice(0,110) : 'Cloud: local saved / cloud pending');
+      console.error('V59 cloud push failed',e,state);
+      if(manual) alert('Cloud push failed: '+msg);
+      return false;
+    }
+  };
+
+  window.pullCloud=async function(){
+    try{
+      setCloudV59('Cloud: loading...');
+      if(!auth?.currentUser){ setCloudV59('Cloud: login needed'); return false; }
+      let snap=await DOC.get();
+      if(snap.exists && snap.data().data){
+        state=sanitizeForFirestoreV59(snap.data().data);
+        fixStateV59();
+        const text=JSON.stringify(state);
+        localStorage.setItem(typeof V30_KEY!=='undefined'?V30_KEY:KEY, text);
+        localStorage.setItem(KEY, text);
+        renderAll(true);
+        if(typeof loadSettings==='function') loadSettings();
+        setCloudV59('Cloud: loaded ✅');
+        return true;
+      }
+      setCloudV59('Cloud: no cloud data');
+      return false;
+    }catch(e){
+      setCloudV59('Cloud: pull failed - '+(e.message||e).slice(0,110));
+      return false;
+    }
+  };
+
+  // Fresh settings save: no undefined reminderTemplate/default fields.
+  window.saveSettings=function(){
+    try{
+      fixStateV59();
+      const val=id=>q(id)?.value ?? '';
+      state.settings.company=val('setCompany') || state.settings.company;
+      state.settings.owner=val('setOwner') || state.settings.owner;
+      state.settings.contact=val('setContact') || state.settings.contact;
+      state.settings.address=val('setAddress') || state.settings.address;
+      state.settings.upi=val('setUpi') || state.settings.upi;
+      state.settings.payee=val('setPayee') || state.settings.payee || state.settings.owner;
+      state.settings.country=val('setCountry') || '+91';
+      state.settings.accent=val('setAccent') || state.settings.accent;
+      state.settings.print=val('setPrint') || state.settings.print;
+      state.settings.template=val('setTemplate') || state.settings.template;
+      state.settings.qrMode=val('setQrMode') || state.settings.qrMode || 'dynamic';
+      state.settings.reminderTemplate=state.settings.reminderTemplate || '';
+      state.settings.defaultBillNote=state.settings.defaultBillNote || '';
+      if(q('printMode')) q('printMode').value=state.settings.print;
+      if(q('template')) q('template').value=state.settings.template;
+      saveState(false);
+      if(typeof applyTheme==='function') applyTheme();
+      pushCloud(true);
+      alert('Settings saved locally. Cloud push started.');
+    }catch(e){
+      alert('Settings save error: '+(e.message||e));
+    }
+  };
+
+  const saveBtn=q('saveSettingsBtn'); if(saveBtn) saveBtn.onclick=()=>saveSettings();
+  const pushBtn=q('cloudPushBtn'); if(pushBtn) pushBtn.onclick=()=>pushCloud(true);
+  const pullBtn=q('cloudPullBtn'); if(pullBtn) pullBtn.onclick=()=>pullCloud();
+
+  // ---------- Transaction edit / undo ----------
+  window.getCustomerTransactionsV59=function(cid){
+    const list=[];
+    state.bills.filter(b=>b.customerId===cid).forEach(b=>{
+      (b.payments||[]).forEach(p=>{
+        list.push({bill:b,p,sort:(p.date||b.date||'')});
+      });
+    });
+    return list.sort((a,b)=>String(b.sort).localeCompare(String(a.sort)));
+  };
+
+  window.findPaymentV59=function(pid){
+    for(const b of state.bills){
+      const p=(b.payments||[]).find(x=>x.id===pid);
+      if(p) return {bill:b,p};
+    }
+    return null;
+  };
+
+  window.openEntriesV59=function(cid=activeCustomer){
+    const c=state.customers.find(x=>x.id===cid);
+    if(!c) return alert('Customer পাওয়া যায়নি।');
+    const tx=getCustomerTransactionsV59(cid);
+    q('actionTitle').textContent='Edit / Undo Entries';
+    q('actionBody').innerHTML=`<p class="muted">Customer: <b>${esc(c.name)}</b> • Live due: <b>${money(customerDue(c.id))}</b></p>
+      <div class="tx-list">${tx.length?tx.map(({bill,p})=>`<div class="tx-row">
+        <div class="tx-top"><div><b>${esc(p.mode||'Payment')}</b><br><small>${esc(bill.billNo)} • ${esc(p.date||'')}</small></div><b>${money(p.amount)}</b></div>
+        <small>Received: ${esc(p.receivedIn||'-')} ${p.note?`• ${esc(p.note)}`:''}</small>
+        <div class="tx-actions"><button onclick="editEntryV59('${p.id}')">✎ Edit</button><button class="undo" onclick="undoEntryV59('${p.id}')">⌫ Undo/Delete</button></div>
+      </div>`).join(''):'<div class="card muted">No payment/settlement entry found.</div>'}</div>`;
+    q('actionSave').classList.add('hidden');
+    q('actionDelete').classList.add('hidden');
+    q('actionClose').onclick=()=>closeActionV59();
+    q('actionModal').classList.remove('hidden');
+  };
+
+  window.editEntryV59=function(pid){
+    const fp=findPaymentV59(pid);
+    if(!fp) return alert('Entry পাওয়া যায়নি।');
+    window.actionContext={type:'v59edit',paymentId:pid};
+    q('actionTitle').textContent='Edit Entry';
+    q('actionBody').innerHTML=`<label>Amount</label><input id="editAmount" type="number" value="${+fp.p.amount||0}">
+      <label>Mode</label><select id="editMode"><option>Cash</option><option>UPI</option><option>Bank</option><option>Online</option><option>Settlement</option></select>
+      <label>Received In</label><input id="editReceived" value="${esc(fp.p.receivedIn||'')}">
+      <label>Note</label><input id="editNote" value="${esc(fp.p.note||'')}">
+      <p class="muted small">Save করলে amount/mode/note update হবে। Undo/Delete করলে entry remove হবে।</p>`;
+    q('editMode').value=fp.p.mode||'Cash';
+    q('actionSave').classList.remove('hidden');
+    q('actionDelete').classList.remove('hidden');
+    q('actionSave').onclick=()=>saveEntryV59();
+    q('actionDelete').onclick=()=>undoEntryV59(pid,true);
+    q('actionClose').onclick=()=>closeActionV59();
+    q('actionModal').classList.remove('hidden');
+  };
+
+  window.saveEntryV59=function(){
+    const pid=window.actionContext?.paymentId;
+    const fp=findPaymentV59(pid);
+    if(!fp) return closeActionV59();
+    const before=+fp.p.amount||0;
+    fp.p.amount=+q('editAmount').value||0;
+    fp.p.mode=q('editMode').value;
+    fp.p.receivedIn=q('editReceived').value;
+    fp.p.note=q('editNote').value;
+    fp.p.editedAt=new Date().toISOString();
+    const c=state.customers.find(x=>x.id===fp.bill.customerId);
+    if(c){
+      c.logs=c.logs||[];
+      c.logs.unshift({id:uid(),date:new Date().toISOString(),type:'edit',text:`Edited ${fp.p.mode} on ${fp.bill.billNo}: ${money(before)} → ${money(fp.p.amount)}`});
+    }
+    saveState();
+    if(activeCustomer) renderChat();
+    closeActionV59();
+    alert('Entry updated');
+  };
+
+  window.undoEntryV59=function(pid,fromModal=false){
+    const fp=findPaymentV59(pid);
+    if(!fp) return alert('Entry পাওয়া যায়নি।');
+    if(!confirm('এই payment/settlement undo/delete করবে?')) return;
+    const amt=+fp.p.amount||0, mode=fp.p.mode||'Payment';
+    fp.bill.payments=(fp.bill.payments||[]).filter(p=>p.id!==pid);
+    const c=state.customers.find(x=>x.id===fp.bill.customerId);
+    if(c){
+      c.logs=c.logs||[];
+      c.logs.unshift({id:uid(),date:new Date().toISOString(),type:'undo',text:`Undo ${mode} from ${fp.bill.billNo}: ${money(amt)}`});
+    }
+    saveState();
+    if(activeCustomer) renderChat();
+    if(fromModal) closeActionV59(); else openEntriesV59(fp.bill.customerId);
+    alert('Undo/Delete done');
+  };
+
+  window.closeActionV59=function(){
+    window.actionContext=null;
+    q('actionModal')?.classList.add('hidden');
+    if(q('actionSave')){ q('actionSave').classList.remove('hidden'); q('actionSave').onclick=()=>saveEntryV59(); }
+    if(q('actionDelete')){ q('actionDelete').classList.remove('hidden'); }
+  };
+  window.closeAction=closeActionV59;
+  window.editEntry=editEntryV59;
+  window.undoPaymentV58=undoEntryV59;
+
+  // Robust chat renderer with visible Entries + Edit/Undo controls.
+  const oldRenderChatV59=window.renderChat;
+  window.renderChat=function(){
+    const c=state.customers.find(x=>x.id===activeCustomer);
+    if(!c){ if(oldRenderChatV59) return oldRenderChatV59(); return; }
+    const set=(id,t)=>{const el=q(id); if(el) el.textContent=t;};
+    set('chatAvatar',initials(c.name)); set('chatName',c.name);
+    set('chatSub',(c.phone||'No phone')+' • '+(c.village||'No village')+' • Due '+money(customerDue(c.id)));
+    if(q('chatBill')) q('chatBill').onclick=()=>{closeChat();showPage('billPage');q('billCustomer').value=c.id;toggleManual();if(window.updatePreviousDueV55)updatePreviousDueV55(true);previewBill();};
+    if(q('chatPay')) q('chatPay').onclick=()=>directPay(c.id,false);
+    if(q('chatSettle')) q('chatSettle').onclick=()=>directPay(c.id,true);
+    if(q('chatEntries')) q('chatEntries').onclick=()=>openEntriesV59(c.id);
+    if(q('chatLedger')) q('chatLedger').onclick=()=>renderChatLedger(c.id);
+    if(q('chatEdit')) q('chatEdit').onclick=()=>openCustomer(c.id);
+    if(q('chatBack')) q('chatBack').onclick=closeChat;
+    if(q('chatCall')) q('chatCall').onclick=()=>location.href='tel:'+String(c.phone||'').replace(/\\D/g,'');
+    if(q('chatWhats')) q('chatWhats').onclick=()=>open('https://wa.me/'+String(c.phone||'').replace(/\\D/g,''),'_blank');
+    if(q('chatShare')) q('chatShare').onclick=()=>shareCustomerBill(c.id);
+    if(q('chatMore')) q('chatMore').onclick=()=>openEntriesV59(c.id);
+
+    const bills=state.bills.filter(b=>b.customerId===c.id).sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));
+    const total=bills.reduce((s,b)=>s+(+b.allTotal||0),0);
+    const paid=bills.reduce((s,b)=>s+billPaid(b),0);
+    let out=[`<div class="chat-summary"><div class="sum-card"><small>Live Due</small><b>${money(customerDue(c.id))}</b></div><div class="sum-card"><small>Total Bill</small><b>${money(total)}</b></div><div class="sum-card"><small>Collected</small><b>${money(paid)}</b></div></div>`];
+
+    if((+c.openingDue||0)>0) out.push(`<div class="bubble setB"><b>Opening Due</b><br>${money(c.openingDue)}</div>`);
+    bills.forEach(b=>{
+      out.push(`<div class="day">${esc(b.date||'')}</div><div class="bubble billB"><b>${esc(b.billNo)}</b><br>Total ${money(b.allTotal)}<br>Paid/Joma ${money(billPaid(b))}<br>Due <b>${money(billDue(b))}</b><div class="bubble-actions"><button onclick="chatViewBill('${b.id}')">View</button><button onclick="chatOpenPay('${b.id}')">Pay</button><button onclick="shareCustomerBill('${c.id}','${b.id}')">Reminder+Bill</button></div></div>`);
+      (b.payments||[]).forEach(p=>{
+        const isSet=String(p.mode||'').toLowerCase().includes('settle');
+        out.push(`<div class="bubble ${isSet?'setB':'payB'}"><b>${esc(p.mode||'Payment')}</b><br><span>${esc(p.date||'')} • ${esc(p.receivedIn||'')}</span><br><b>${money(p.amount)}</b><br><small>${esc(p.note||'')}</small><div class="entry-tools"><button onclick="editEntryV59('${p.id}')">✎ Edit</button><button class="danger-mini" onclick="undoEntryV59('${p.id}')">⌫ Undo</button></div></div>`);
+      });
+    });
+
+    if((c.logs||[]).length){
+      out.push(`<div class="chat-history-block"><div class="history-title">Edit / Undo History</div>${c.logs.slice(0,10).map(l=>`<div class="v45-log-row"><b>${esc(l.text||l.type)}</b><small>${esc(new Date(l.date).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}))}</small></div>`).join('')}</div>`);
+    }
+    q('chatBody').innerHTML=out.join('') || '<div class="bubble setB">No bill yet</div>';
+  };
+
+  const ent=q('chatEntries'); if(ent) ent.onclick=()=>openEntriesV59(activeCustomer);
+  fixStateV59();
+  setCloudV59(auth?.currentUser?.uid===OWNER_UID ? 'Cloud: ready' : 'Cloud: login needed');
 });
 })();
