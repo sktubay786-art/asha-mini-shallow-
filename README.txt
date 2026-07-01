@@ -189,3 +189,12 @@ V54 Cloud Status Fix:
   Cloud: offline mode
   Cloud: pull failed / save failed
 - App name kept as Asha Billing in manifest.
+
+
+V55 Previous Due Fix:
+- New Bill form now has Previous Due / আগের বাকি field.
+- Existing customer: Previous Due auto loads from live due.
+- New customer: entered Previous Due is saved as opening due.
+- If entered Previous Due is higher than live due, app adds only the extra difference to opening due.
+- Due reduction should be done with Pay/Settle, not by lowering Previous Due field.
+- Version cache bumped to v55.

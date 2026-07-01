@@ -3769,7 +3769,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 
 ready(function(){
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V54 Cloud Status Fix';
+  if(chip) chip.textContent='V55 Previous Due Fix';
 
   function setCloudStatus(text,type='warn'){
     const el=document.getElementById('cloudChip');
@@ -3845,5 +3845,195 @@ ready(function(){
       }
     }
   },4000);
+});
+})();
+
+
+
+/* ==== V55 Previous Due / Opening Due fix ==== */
+(function(){
+function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,900)); else setTimeout(fn,900); }
+ready(function(){
+  const q=id=>document.getElementById(id);
+  const chip=document.querySelector('.hero-chips span:last-child');
+  if(chip) chip.textContent='V55 Previous Due Fix';
+
+  function selectedCustomerV55(){
+    const sel=q('billCustomer');
+    if(!sel || sel.value==='__new') return null;
+    return state.customers.find(c=>c.id===sel.value)||null;
+  }
+
+  function autoPrevDueV55(){
+    const c=selectedCustomerV55();
+    return c ? customerDue(c.id) : 0;
+  }
+
+  window.updatePreviousDueV55=function(force=false){
+    const el=q('previousDue');
+    if(!el) return;
+    const auto=autoPrevDueV55();
+    if(force || el.dataset.userEdited!=='1'){
+      el.value=Number(auto||0).toFixed(2).replace(/\.00$/,'');
+      el.dataset.autoValue=String(auto||0);
+      el.dataset.userEdited='0';
+    }
+    const hint=q('prevDueHint');
+    if(hint){
+      const c=selectedCustomerV55();
+      hint.innerHTML = c
+        ? `Auto live due for <b>${esc(c.name)}</b>: <b>${money(auto)}</b>. বেশি পুরোনো বাকি থাকলে এখানে edit করো; কমাতে হলে Settle ব্যবহার করো।`
+        : `New customer হলে পুরোনো বাকি / opening due এখানে লিখো। Bill save করলে এটা customer-এর opening due হিসেবে থাকবে।`;
+    }
+  };
+
+  const prevInput=q('previousDue');
+  if(prevInput){
+    prevInput.addEventListener('input',()=>{prevInput.dataset.userEdited='1'; if(window.previewBill) previewBill();});
+  }
+
+  const billSel=q('billCustomer');
+  if(billSel){
+    billSel.addEventListener('change',()=>setTimeout(()=>updatePreviousDueV55(true),30));
+  }
+
+  // Rebind fields so Previous Due also refreshes preview.
+  ['billCustomer','manualName','manualPhone','manualVillage','manualAddress'].forEach(id=>{
+    const el=q(id);
+    if(el && !el.dataset.v55PrevBound){
+      el.dataset.v55PrevBound='1';
+      el.addEventListener('input',()=>setTimeout(()=>updatePreviousDueV55(id==='billCustomer'),30));
+      el.addEventListener('change',()=>setTimeout(()=>updatePreviousDueV55(true),30));
+    }
+  });
+
+  const oldShowPageV55=window.showPage;
+  if(oldShowPageV55){
+    window.showPage=function(id){
+      oldShowPageV55(id);
+      if(id==='billPage') setTimeout(()=>updatePreviousDueV55(false),80);
+    };
+  }
+
+  const oldPreviewV55=window.previewBill;
+  if(oldPreviewV55){
+    window.previewBill=function(){
+      if(q('previousDue')) updatePreviousDueV55(false);
+      return oldPreviewV55();
+    };
+  }
+
+  function currentChargeV55(land,unit,rate){
+    if(window.currentChargeV39) return currentChargeV39(land,unit,rate);
+    return (+land||0)*(+rate||0);
+  }
+
+  // Final override: Previous Due comes from the visible form field.
+  window.makeBillFromForm=function(){
+    let c=null;
+    if(q('billCustomer').value==='__new'){
+      c={id:uid(),name:q('manualName').value.trim()||'New Customer',phone:normalPhone(q('manualPhone').value),village:q('manualVillage').value.trim(),address:q('manualAddress').value.trim(),openingDue:0};
+    }else{
+      c=state.customers.find(x=>x.id===q('billCustomer').value);
+    }
+    if(!c) return null;
+
+    const unit=q('landUnit').value;
+    const land=+q('land').value||0;
+    const rate=+q('rate').value||0;
+    const bigha=landToBigha(land,unit);
+    const current=currentChargeV55(land,unit,rate);
+    const autoPrev=state.customers.find(x=>x.id===c.id) ? customerDue(c.id) : 0;
+    let prev= q('previousDue') ? (+q('previousDue').value||0) : autoPrev;
+
+    // Do not silently reduce actual live due from this field.
+    if(autoPrev>0 && prev<autoPrev && q('previousDue')){
+      prev=autoPrev;
+      q('previousDue').value=Number(autoPrev||0).toFixed(2).replace(/\.00$/,'');
+      const hint=q('prevDueHint');
+      if(hint) hint.innerHTML=`Actual live due <b>${money(autoPrev)}</b>. Due কমাতে হলে Pay/Settle tab ব্যবহার করো।`;
+    }
+
+    const paid=+q('paidNow').value||0;
+    const allTotal=current+prev;
+    return {
+      id:uid(),
+      billNo:nextBillNo(),
+      date:today(),
+      customerId:c.id,
+      customerName:c.name,
+      phone:c.phone,
+      address:c.address,
+      village:c.village,
+      season:q('season').value,
+      landAmount:land,
+      unit,
+      bigha,
+      rate,
+      rateUnit:unit,
+      current,
+      previousDue:prev,
+      autoPreviousDue:autoPrev,
+      allTotal,
+      note:q('billNote').value || state.settings.defaultBillNote || '',
+      payments:paid>0?[{id:uid(),date:today(),amount:paid,mode:q('billPayMode').value,receivedIn:q('receivedIn').value,note:'Initial payment'}]:[]
+    };
+  };
+
+  // Save bill: if manual previous due is higher than live due, add only the difference as opening due.
+  window.saveBill=function(){
+    const b=makeBillFromForm();
+    if(!b) return alert('Select/add customer');
+
+    const isNew=q('billCustomer').value==='__new';
+    if(isNew && !state.customers.find(c=>c.id===b.customerId)){
+      state.customers.push({
+        id:b.customerId,
+        name:b.customerName,
+        phone:b.phone,
+        village:b.village,
+        address:b.address,
+        openingDue:+b.previousDue||0
+      });
+    }else{
+      const c=state.customers.find(x=>x.id===b.customerId);
+      const auto=+b.autoPreviousDue||0;
+      const prev=+b.previousDue||0;
+      if(c && prev>auto){
+        c.openingDue=(+c.openingDue||0)+(prev-auto);
+      }
+    }
+
+    state.bills.push(b);
+    currentBill=b;
+    renderInvoice(b);
+    saveState();
+    if(q('previousDue')){
+      q('previousDue').dataset.userEdited='0';
+      setTimeout(()=>updatePreviousDueV55(true),120);
+    }
+    alert('Bill saved with Previous Due');
+  };
+
+  // When New Bill is opened from user menu/detail, force reload due into field.
+  const oldOpenUserMenuV55=window.openUserMenuV52;
+  if(oldOpenUserMenuV55){
+    window.openUserMenuV52=function(cid){
+      oldOpenUserMenuV55(cid);
+      setTimeout(()=>{
+        const btn=q('mNewBill');
+        if(btn && !btn.dataset.v55Prev){
+          btn.dataset.v55Prev='1';
+          const old=btn.onclick;
+          btn.onclick=function(e){
+            if(old) old.call(this,e);
+            setTimeout(()=>updatePreviousDueV55(true),300);
+          };
+        }
+      },80);
+    };
+  }
+
+  setTimeout(()=>updatePreviousDueV55(true),400);
 });
 })();
