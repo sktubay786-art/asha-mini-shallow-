@@ -3769,7 +3769,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 
 ready(function(){
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V55 Previous Due Fix';
+  if(chip) chip.textContent='V56 Previous Due Visible';
 
   function setCloudStatus(text,type='warn'){
     const el=document.getElementById('cloudChip');
@@ -3856,7 +3856,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V55 Previous Due Fix';
+  if(chip) chip.textContent='V56 Previous Due Visible';
 
   function selectedCustomerV55(){
     const sel=q('billCustomer');
@@ -4035,5 +4035,32 @@ ready(function(){
   }
 
   setTimeout(()=>updatePreviousDueV55(true),400);
+});
+})();
+
+
+
+/* ==== V56 Previous Due Top Visible finalizer ==== */
+(function(){
+function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,1200)); else setTimeout(fn,1200); }
+ready(function(){
+  const chip=document.querySelector('.hero-chips span:last-child');
+  if(chip) chip.textContent='V56 Previous Due Visible';
+  const prev=document.getElementById('previousDue');
+  if(prev){
+    prev.addEventListener('focus',()=>prev.select());
+    const hint=document.getElementById('prevDueHint');
+    if(hint && typeof customerDue==='function' && typeof state!=='undefined'){
+      const sel=document.getElementById('billCustomer');
+      const update=()=>{
+        const c=state.customers.find(x=>x.id===sel?.value);
+        if(c){
+          hint.innerHTML=`Selected customer live due: <b>${money(customerDue(c.id))}</b>. Manual old due add/change করতে হলে box-এ লিখুন।`;
+        }
+      };
+      sel?.addEventListener('change',update);
+      setTimeout(update,500);
+    }
+  }
 });
 })();

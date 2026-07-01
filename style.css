@@ -1379,3 +1379,31 @@ main{width:100%!important;max-width:1180px!important;margin:0 auto!important;box
   border-color:#8fd8b8;
   background:#fbfffc;
 }
+
+/* V56 Previous Due top visible */
+.prev-due-top{
+  margin:12px 0 14px;
+  padding:12px;
+  border:2px solid #0aa66d;
+  background:linear-gradient(180deg,#ecfdf3,#ffffff);
+  border-radius:20px;
+  box-shadow:0 10px 24px rgba(7,92,57,.10);
+}
+.prev-due-top label{
+  margin:0 0 7px;
+  font-size:14px;
+  color:#075c39;
+}
+.prev-due-top input{
+  font-size:18px;
+  font-weight:900;
+  border-color:#0aa66d;
+  background:#fff;
+}
+.prev-due-top small{
+  display:block;
+  margin-top:7px;
+  color:#075c39;
+  font-size:12px;
+  font-weight:800;
+}

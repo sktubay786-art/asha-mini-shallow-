@@ -198,3 +198,10 @@ V55 Previous Due Fix:
 - If entered Previous Due is higher than live due, app adds only the extra difference to opening due.
 - Due reduction should be done with Pay/Settle, not by lowering Previous Due field.
 - Version cache bumped to v55.
+
+
+V56 Previous Due Visible:
+- Previous Due / আগের বাকি field moved to top of New Bill form.
+- Field is now directly under Customer select, inside green highlighted box.
+- Removed duplicate previousDue field from grid to prevent hidden/duplicate ID issue.
+- Cache bumped to index.html?v=56 and service worker v56.
