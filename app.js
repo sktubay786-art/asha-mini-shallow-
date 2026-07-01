@@ -3769,7 +3769,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 
 ready(function(){
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V56 Previous Due Visible';
+  if(chip) chip.textContent='V57 Cloud Push Fix';
 
   function setCloudStatus(text,type='warn'){
     const el=document.getElementById('cloudChip');
@@ -3856,7 +3856,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V56 Previous Due Visible';
+  if(chip) chip.textContent='V57 Cloud Push Fix';
 
   function selectedCustomerV55(){
     const sel=q('billCustomer');
@@ -4045,7 +4045,7 @@ ready(function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,1200)); else setTimeout(fn,1200); }
 ready(function(){
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V56 Previous Due Visible';
+  if(chip) chip.textContent='V57 Cloud Push Fix';
   const prev=document.getElementById('previousDue');
   if(prev){
     prev.addEventListener('focus',()=>prev.select());
@@ -4062,5 +4062,169 @@ ready(function(){
       setTimeout(update,500);
     }
   }
+});
+})();
+
+
+
+/* ==== V57 Cloud Push Fix / Diagnostics ==== */
+(function(){
+function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,1400)); else setTimeout(fn,1400); }
+ready(function(){
+  const q=id=>document.getElementById(id);
+  const chip=document.querySelector('.hero-chips span:last-child');
+  if(chip) chip.textContent='V57 Cloud Push Fix';
+
+  function setCloudV57(text,type='info'){
+    const s=q('cloudStatus');
+    if(s) s.textContent=text;
+    const c=q('cloudChip');
+    if(c) c.textContent=text.replace('Cloud: ','Cloud: ');
+    console.log('[Asha Cloud]', text);
+  }
+  window.setCloudV57=setCloudV57;
+
+  // Use LOCAL persistence so login remains stable on phone/PWA.
+  try{
+    if(auth && firebase?.auth?.Auth?.Persistence?.LOCAL){
+      auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(e=>console.warn('Persistence set failed',e));
+    }
+  }catch(e){ console.warn(e); }
+
+  window.cloudDebugV57=function(){
+    const u=auth?.currentUser;
+    return {
+      firebaseLoaded: !!window.firebase,
+      authReady: !!auth,
+      firestoreReady: !!db,
+      docReady: !!DOC,
+      loggedIn: !!u,
+      email: u?.email || '',
+      uid: u?.uid || '',
+      ownerUid: typeof OWNER_UID!=='undefined'?OWNER_UID:'',
+      uidMatches: !!u && u.uid===OWNER_UID,
+      online: navigator.onLine
+    };
+  };
+
+  window.pushCloud=async function(manual=true){
+    try{
+      setCloudV57('Cloud: saving...');
+      if(!navigator.onLine){
+        setCloudV57('Cloud: offline - local saved only');
+        return false;
+      }
+      if(!auth || !db || !DOC){
+        setCloudV57('Cloud: Firebase not ready');
+        return false;
+      }
+      const u=auth.currentUser;
+      if(!u){
+        setCloudV57('Cloud: login needed');
+        if(manual) alert('Cloud save করার জন্য আবার login করো। Local save হয়ে আছে।');
+        return false;
+      }
+      if(u.uid!==OWNER_UID){
+        setCloudV57('Cloud: wrong owner account');
+        if(manual) alert('Wrong owner account. Owner email দিয়ে login করো।');
+        return false;
+      }
+
+      // Refresh token before Firestore write.
+      try{ await u.getIdToken(true); }catch(e){ console.warn('Token refresh failed',e); }
+
+      await DOC.set({
+        data: state,
+        updatedAt: new Date().toISOString(),
+        ownerUid: u.uid,
+        appVersion: 'v57'
+      }, {merge:true});
+
+      setCloudV57('Cloud: saved ✅');
+      if(manual) alert('Cloud saved ✅');
+      return true;
+    }catch(e){
+      const code=e?.code || '';
+      const msg=e?.message || String(e);
+      if(code.includes('permission') || msg.toLowerCase().includes('permission')){
+        setCloudV57('Cloud: rules/permission failed');
+        if(manual) alert('Cloud permission failed. Firebase Firestore Rules publish করো এবং owner email দিয়ে login করো।');
+      }else if(msg.toLowerCase().includes('network')){
+        setCloudV57('Cloud: network failed');
+        if(manual) alert('Network problem. Local save আছে, internet ঠিক হলে Push Cloud চাপো।');
+      }else{
+        setCloudV57('Cloud: push failed - '+msg.slice(0,80));
+        if(manual) alert('Cloud push failed: '+msg);
+      }
+      console.error('V57 pushCloud failed', e, cloudDebugV57());
+      return false;
+    }
+  };
+
+  window.pullCloud=async function(){
+    try{
+      setCloudV57('Cloud: loading...');
+      if(!auth?.currentUser){
+        setCloudV57('Cloud: login needed');
+        alert('Pull Cloud করার জন্য আবার login করো।');
+        return false;
+      }
+      if(auth.currentUser.uid!==OWNER_UID){
+        setCloudV57('Cloud: wrong owner account');
+        return false;
+      }
+      let snap=await DOC.get();
+      if(snap.exists && snap.data().data){
+        state=snap.data().data;
+        localStorage.setItem(typeof V30_KEY!=='undefined'?V30_KEY:KEY, JSON.stringify(state));
+        localStorage.setItem(KEY, JSON.stringify(state));
+        renderAll(true);
+        if(typeof loadSettings==='function') loadSettings();
+        setCloudV57('Cloud: loaded ✅');
+        return true;
+      }
+      setCloudV57('Cloud: no cloud data');
+      return false;
+    }catch(e){
+      setCloudV57('Cloud: pull failed - '+(e.message||e).slice(0,80));
+      console.error('V57 pullCloud failed', e, cloudDebugV57());
+      return false;
+    }
+  };
+
+  // Safer saveState: local save first, cloud push later. Cloud failure will not break settings save.
+  window.saveState=function(sync=true){
+    try{
+      localStorage.setItem(typeof V30_KEY!=='undefined'?V30_KEY:KEY, JSON.stringify(state));
+      localStorage.setItem(KEY, JSON.stringify(state));
+    }catch(e){ console.error('Local save failed',e); }
+    try{ renderAll(); }catch(e){ console.warn('renderAll failed',e); }
+    if(sync) setTimeout(()=>pushCloud(false),80);
+  };
+
+  // Rebind cloud buttons after old bind.
+  const pull=q('cloudPullBtn'), push=q('cloudPushBtn');
+  if(pull) pull.onclick=()=>pullCloud();
+  if(push) push.onclick=()=>pushCloud(true);
+
+  const oldSaveSettingsV57=window.saveSettings || (typeof saveSettings==='function'?saveSettings:null);
+  window.saveSettings=function(){
+    try{
+      if(oldSaveSettingsV57) oldSaveSettingsV57();
+      setTimeout(()=>pushCloud(true),250);
+    }catch(e){
+      alert('Settings save error: '+(e.message||e));
+    }
+  };
+  const saveBtn=q('saveSettingsBtn');
+  if(saveBtn) saveBtn.onclick=()=>saveSettings();
+
+  // Initial status
+  setTimeout(()=>{
+    const d=cloudDebugV57();
+    if(!d.loggedIn) setCloudV57('Cloud: login needed');
+    else if(!d.uidMatches) setCloudV57('Cloud: wrong owner');
+    else setCloudV57('Cloud: ready');
+  },900);
 });
 })();

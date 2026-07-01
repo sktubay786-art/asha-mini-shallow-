@@ -205,3 +205,12 @@ V56 Previous Due Visible:
 - Field is now directly under Customer select, inside green highlighted box.
 - Removed duplicate previousDue field from grid to prevent hidden/duplicate ID issue.
 - Cache bumped to index.html?v=56 and service worker v56.
+
+
+V57 Cloud Push Fix:
+- Settings/local save remains safe even if cloud push fails.
+- pushCloud now checks internet, Firebase readiness, login, UID match, and rules/permission errors separately.
+- Auth persistence changed to LOCAL for stable PWA login.
+- Firestore rules included again for owner UID only.
+- Cloud buttons rebound after old code.
+- Open with index.html?v=57 after upload.
