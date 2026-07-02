@@ -3769,7 +3769,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 
 ready(function(){
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V61 Manual Chat + Bugfix';
+  if(chip) chip.textContent='V62 Cache Killer + Manual Chat';
 
   function setCloudStatus(text,type='warn'){
     const el=document.getElementById('cloudChip');
@@ -3856,7 +3856,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V61 Manual Chat + Bugfix';
+  if(chip) chip.textContent='V62 Cache Killer + Manual Chat';
 
   function selectedCustomerV55(){
     const sel=q('billCustomer');
@@ -4045,7 +4045,7 @@ ready(function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,1200)); else setTimeout(fn,1200); }
 ready(function(){
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V61 Manual Chat + Bugfix';
+  if(chip) chip.textContent='V62 Cache Killer + Manual Chat';
   const prev=document.getElementById('previousDue');
   if(prev){
     prev.addEventListener('focus',()=>prev.select());
@@ -4067,13 +4067,13 @@ ready(function(){
 
 
 
-/* ==== V61 Manual Chat + Bugfix / Diagnostics ==== */
+/* ==== V62 Cache Killer + Manual Chat / Diagnostics ==== */
 (function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,1400)); else setTimeout(fn,1400); }
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V61 Manual Chat + Bugfix';
+  if(chip) chip.textContent='V62 Cache Killer + Manual Chat';
 
   function setCloudV57(text,type='info'){
     const s=q('cloudStatus');
@@ -4237,7 +4237,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V61 Manual Chat + Bugfix';
+  if(chip) chip.textContent='V62 Cache Killer + Manual Chat';
 
   const RULES_TEXT=`rules_version = '2';
 service cloud.firestore {
@@ -4472,7 +4472,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V61 Manual Chat + Bugfix';
+  if(chip) chip.textContent='V62 Cache Killer + Manual Chat';
 
   function setCloudV59(text){
     const s=q('cloudStatus'); if(s) s.textContent=text;
@@ -4788,7 +4788,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V61 Manual Chat + Bugfix';
+  if(chip) chip.textContent='V62 Cache Killer + Manual Chat';
   const safeNum=v=>Number(v||0)||0;
 
   window.rateLineV60=function(b){
@@ -4948,7 +4948,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V61 Manual Chat + Bugfix';
+  if(chip) chip.textContent='V62 Cache Killer + Manual Chat';
 
   function ensureCustomerChatV61(c){
     if(!c) return [];
@@ -5155,5 +5155,25 @@ ready(function(){
 
   // Run once after boot.
   setTimeout(()=>{try{if(activeCustomer)renderChat()}catch(e){}},700);
+});
+})();
+
+
+
+/* ==== V62 Cache Killer Finalizer ==== */
+(function(){
+function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,800)); else setTimeout(fn,800); }
+ready(function(){
+  const chip=document.querySelector('.hero-chips span:last-child');
+  if(chip) chip.textContent='V62 Cache Killer + Manual Chat';
+  window.ASHA_BUILD='V62 Cache Killer + Manual Chat';
+  console.log('ASHA_BUILD', window.ASHA_BUILD);
+
+  // Force update service worker when the new code is actually loaded.
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.getRegistrations?.().then(regs=>{
+      regs.forEach(r=>{ try{ r.update(); }catch(e){} });
+    });
+  }
 });
 })();

@@ -258,3 +258,10 @@ V61 Manual Chat + Bugfix:
 - Bill+Reminder menu binding strengthened.
 - Share fallback improved: if image share fails, bill image downloads and WhatsApp text opens.
 - Version cache bumped to v61.
+
+
+V62 Cache Killer:
+- Updated visible build chip to V62 Cache Killer + Manual Chat.
+- index.html now loads ./style.css?v=62, ./app.js?v=62, ./manifest.json?v=62.
+- Service worker cache bumped to v62 and uses network-first/no-store for index/app/style/manifest.
+- If phone still shows V59, the GitHub repo files were not replaced or Chrome/PWA site data is serving old app.
