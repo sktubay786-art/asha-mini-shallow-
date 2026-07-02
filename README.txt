@@ -234,3 +234,27 @@ V59 Sanitize + Entries Fix:
 - Entries panel shows all payments and settlements with Edit and Undo/Delete.
 - Edit/Undo buttons also shown directly on payment bubbles.
 - Updated start_url to index.html?v=59 and service worker cache v59.
+
+
+V60 Share QR Note Rate Fix:
+- Bill share captures only the full invoice image, not a clipped preview area.
+- Dynamic QR is rendered locally with QRCode.js and converted to image before html2canvas capture.
+- Three-dot menu Bill + Reminder opens preview with Share Image + Text.
+- Customer profile supports Customer Note / জমির নোট.
+- Customer note displays in customer list and invoice.
+- Manual rate unit fix: katha rate converts to bigha rate as rate*20; decimal rate converts as rate*40.
+- Bill rate line now follows manual bill rate, not old settings rate.
+- Version cache bumped to v60.
+
+
+V61 Manual Chat + Bugfix:
+- Added per-customer manual chat/note system inside each user ledger.
+- Chat screen has a manual message input and Send button.
+- User chat action bar has Chat button to manage all manual notes.
+- Manual messages appear only inside that customer's chat.
+- Manual messages can be edited and deleted.
+- Manual chat actions are logged in customer history.
+- Customer note save fallback improved.
+- Bill+Reminder menu binding strengthened.
+- Share fallback improved: if image share fails, bill image downloads and WhatsApp text opens.
+- Version cache bumped to v61.

@@ -1,289 +1,320 @@
-```html
 <!doctype html>
 <html lang="bn">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>Asha Billing | আশা মিনি শ্যালো</title>
-  <meta name="theme-color" content="#075c39">
+  <title>Asha Billing</title>
+  <meta name="theme-color" content="#0b7a4d">
   <link rel="manifest" href="./manifest.json">
   <link rel="stylesheet" href="./style.css">
-  
-  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-  
-  <!-- html2canvas for Screenshot & qrcode-generator for Dynamic Base64 QR -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </head>
 <body>
-  
-  <!-- Login Container -->
   <div id="login" class="login">
-    <div class="login-card animate-fade">
+    <div class="login-card">
       <div class="brand-row">
-        <div class="brand-logo-circle">আশা</div>
+        <img src="./icon-192.png" class="brand-icon" alt="">
         <div>
-          <h1>আশা বিলিং পোর্টাল</h1>
-          <p>মালিকের নিরাপদ লগইন</p>
+          <h1>Asha Billing</h1>
+          <p>Secure owner login</p>
         </div>
       </div>
-      <div class="login-body">
-        <label>পাসওয়ার্ড দিন (Password)</label>
-        <input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password">
-        <div id="loginErr" class="error hidden">ভুল পাসওয়ার্ড! আবার চেষ্টা করুন।</div>
-        <button id="loginBtn" class="btn primary full">লগইন করুন</button>
-      </div>
+      <label>Email</label>
+      <input id="email" type="email" placeholder="Email">
+      <label>Password</label>
+      <input id="password" type="password" placeholder="Password">
+      <label class="remember-line"><input id="rememberLogin" type="checkbox"> Remember login on this device</label>
+      <button class="btn primary full" id="loginBtn">Login</button>
+      <p id="loginMsg" class="error"></p>
     </div>
   </div>
 
-  <!-- Main Application Dashboard -->
-  <div id="app" class="app-layout hidden">
-    <!-- Header Area -->
-    <header class="main-header">
-      <div class="logo-area">
-        <span class="logo-dot"></span>
-        <h2 id="headerTitle">আশা মিনি শ্যালো</h2>
+  <div id="app" class="app hidden">
+    <header class="hero">
+      <div class="hero-top">
+        <img src="./icon-192.png" class="hero-icon" alt="">
+        <div class="hero-title">
+          <h1 id="companyTitle">আশা মিনি শ্যালো</h1>
+          <p id="companySub">Premium irrigation billing system</p>
+        </div>
+        <button class="circle" id="installBtn">↓</button>
       </div>
-      <div class="header-actions">
-        <button id="syncStatusBtn" class="sync-badge" title="Cloud Sync Status">
-          <span class="status-indicator online"></span> Local Active
-        </button>
-        <button id="navSettingsBtn" class="icon-btn" title="Settings">⚙️</button>
+      <div class="hero-chips">
+        <span id="cloudChip">Cloud: checking</span>
+        <span>V61 Manual Chat + Bugfix</span>
       </div>
     </header>
 
-    <!-- Navigation Tabs -->
-    <div class="tab-bar">
-      <button id="tabCustomers" class="tab-btn active">👥 গ্রাহক তালিকা</button>
-      <button id="tabLogs" class="tab-btn">📋 কাজের ইতিহাস</button>
-    </div>
-
-    <!-- Tab Contents -->
-    <main class="content-area">
-      <!-- Customers Panel -->
-      <section id="paneCustomers" class="pane">
-        <div class="search-bar-row">
-          <div class="search-box">
-            <span class="search-icon">🔍</span>
-            <input id="searchCust" type="text" placeholder="নাম, ফোন বা গ্রাম দিয়ে খুঁজুন...">
-          </div>
-          <button id="addCustBtn" class="btn primary rounded-full">+ নতুন গ্রাহক</button>
-        </div>
-
-        <!-- Dashboard Overviews -->
-        <div class="stats-grid">
-          <div class="stat-card">
-            <span class="stat-lbl">মোট বকেয়া (Total Due)</span>
-            <h3 id="statTotalDue">৳ ০.০০</h3>
-          </div>
-          <div class="stat-card">
-            <span class="stat-lbl">মোট গ্রাহক (Customers)</span>
-            <h3 id="statTotalCust">০ জন</h3>
+    <main>
+      <section id="homePage" class="page active">
+        <div class="card">
+          <h2>Dashboard</h2>
+          <p class="muted">Live collection, due and customer summary</p>
+          <div class="filter-row">
+            <select id="homeVillage"></select>
+            <input id="homeMonth" type="month">
           </div>
         </div>
-
-        <!-- Scrollable Customer List -->
-        <div id="customerList" class="customer-list">
-          <div class="loading-state">গ্রাহক তালিকা লোড হচ্ছে...</div>
+        <div class="metrics" id="metrics"></div>
+        <div class="quick-actions">
+          <button data-page="billPage">🧾<b>New Bill</b><small>Manual / saved user</small></button>
+          <button data-page="customersPage">👥<b>Users</b><small>Chat ledger</small></button>
+          <button data-page="payPage">₹<b>Pay / Settle</b><small>Due, partial, settle</small></button>
+          <button data-page="reportsPage">📊<b>Reports</b><small>Bank / village / month</small></button>
+          <button data-page="calcPage">🧮<b>Scientific Calc</b><small>iOS-like calculator</small></button>
         </div>
       </section>
 
-      <!-- Logs Diagnostics Panel -->
-      <section id="paneLogs" class="pane hidden">
-        <div class="pane-header">
-          <h3>সিস্টেম লগ এবং ক্লাউড ডক্টর</h3>
-          <button id="btnForceSync" class="btn secondary mini">🔄 ফোর্স ক্লাউড পুশ</button>
+      <section id="customersPage" class="page">
+        <div class="card row-head">
+          <div><h2>Users</h2><p class="muted">WhatsApp-style customer list</p></div>
+          <button class="btn primary" id="addCustomerBtn">+ Add</button>
         </div>
-        <div class="doctor-card">
-          <h4>🏥 ক্লাউড সিঙ্ক ডায়াগনস্টিকস</h4>
-          <div id="doctorLog" class="v58-doctor">কোনো ডায়াগনস্টিক তথ্য নেই।</div>
+        <input id="customerSearch" class="search" placeholder="Search name, village, phone">
+        <div id="customerList" class="customer-list"></div>
+      </section>
+
+      <section id="billPage" class="page bill-grid">
+        <div class="card bill-form">
+          <h2>New Bill</h2>
+          <label>Customer</label>
+          <select id="billCustomer"></select>
+          <div class="prev-due-top">
+            <label>Previous Due / আগের বাকি</label>
+            <input id="previousDue" type="number" value="0" step="0.01" placeholder="আগের বাকি লিখুন">
+            <small id="prevDueHint">Customer select করলে আগের বাকি auto আসবে। নতুন customer হলে এখানে পুরোনো বাকি লিখুন।</small>
+          </div>
+
+
+          <div id="manualCustomer" class="manual-box">
+            <b>New Customer in Bill</b>
+            <div class="two">
+              <input id="manualName" placeholder="Name">
+              <input id="manualPhone" placeholder="Phone">
+              <input id="manualVillage" placeholder="Village">
+              <input id="manualAddress" placeholder="Address">
+            </div>
+          </div>
+
+          <div class="two">
+            <div><label>Season</label><select id="season"><option>খরা</option><option>বর্ষা</option><option>বোরো</option><option>আমন</option></select></div>
+            <div><label>Land Unit</label><select id="landUnit"><option value="bigha">বিঘা</option><option value="katha">কাঠা</option><option value="decimal">ডেসিমেল</option></select></div>
+            <div><label>Land</label><input id="land" type="number" step="0.01" value="0"></div>
+            <div><label>Rate / Bigha</label><input id="rate" type="number" value="2200"></div>
+            <div><label>Paid Now</label><input id="paidNow" type="number" value="0"></div>
+            <div><label>Mode</label><select id="billPayMode"><option>Cash</option><option>UPI</option><option>Bank</option><option>Online</option></select></div>
+          </div>
+          <label>Received In / Bank</label>
+          <input id="receivedIn" value="Cash">
+          <label>Note</label>
+          <input id="billNote" placeholder="Optional note">
+
+          <div class="two">
+            <div><label>Bill Design / Billing Mode</label><select id="template">
+<option value="classic">Classic Official Bill</option>
+<option value="premium">Premium Green Bill</option>
+<option value="boxed">Boxed Modern Bill</option>
+<option value="bengali">Bengali Heavy Bill</option>
+<option value="qrfirst">QR Focused Bill</option>
+<option value="standard">Standard Clean Bill</option>
+<option value="normal">Normal Black Bill</option>
+<option value="thermal">Thermal Compact Bill</option>
+<option value="compact">Compact A6 Bill</option>
+<option value="phone">Phone View Compact</option>
+<option value="mini">Mini Compact Bill</option>
+</select></div>
+            <div><label>Print Size</label><select id="printMode"><option value="thermal80">Thermal 80mm</option><option value="a4two">2 Bills on A4 (A5)</option><option value="a4four">4 Bills on A4 (A6)</option><option value="a4side">A4 Side Half</option><option value="a4land">A4 Landscape Half</option><option value="a4half">A4 Half</option><option value="a4quarter">A4 Quarter</option><option value="phoneview">Phone View Image</option></select></div>
+          </div>
+
+          <div class="action-bar">
+            <button class="btn primary" id="saveBillBtn">Save Bill</button>
+            <button class="btn" id="previewBtn">Preview</button>
+          </div>
+          <div id="billDesignHint" class="bill-design-hint">Bill Design এবং Print Size এখান থেকেই preview করে বেছে নিতে পারবেন।</div>
         </div>
-        <div class="history-list" id="globalLogs"></div>
+
+        <div class="preview-panel">
+          <div id="billPreviewWrap" class="preview-wrap">
+            <div id="billPreview"></div>
+          </div>
+          <div class="action-bar sticky-actions">
+            <button class="btn" id="printBtn">🖨 Print</button>
+            <button class="btn" id="shareBtn">📤 Reminder + Bill</button>
+            <button class="btn" id="pdfBtn">📄 PDF</button>
+            <button class="btn" id="waTextBtn">WhatsApp Text</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="payPage" class="page">
+        <div class="card">
+          <h2>Pay / Receive Due / Settle</h2>
+          <label>Bill</label>
+          <select id="payBill"></select>
+          <div id="payInfo" class="info-box">Select bill</div>
+          <div class="two">
+            <div><label>Amount</label><input id="payAmount" type="number" placeholder="Amount"></div>
+            <div><label>Mode</label><select id="payMode"><option>Cash</option><option>UPI</option><option>Bank</option><option>Online</option></select></div>
+          </div>
+          <label>Received In / Bank</label>
+          <input id="payIn" value="Cash">
+          <div class="pay-buttons">
+            <button class="btn" id="fillDueBtn">Full Due</button>
+            <button class="btn" id="cashBtn">Cash</button>
+            <button class="btn" id="onlineBtn">Online</button>
+          </div>
+          <div class="action-bar">
+            <button class="btn primary" id="receiveBtn">Receive Payment</button>
+            <button class="btn warning" id="settleBtn">Settle Amount</button>
+            <button class="btn" id="dueReceiptBtn">Due Receipt</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="historyPage" class="page">
+        <div class="card"><h2>History</h2><p class="muted">All bills and payments</p></div>
+        <div id="historyList"></div>
+      </section>
+
+      <section id="reportsPage" class="page">
+        <div class="card">
+          <h2>Reports</h2>
+          <div class="two">
+            <input id="reportMonth" type="month">
+            <select id="reportVillage"></select>
+          </div>
+        </div>
+        <div id="reportBox"></div>
+        <div class="action-bar">
+          <button class="btn" id="csvBtn">Export CSV</button>
+          <button class="btn" id="backupBtn">Backup JSON</button>
+          <button class="btn" id="importBtn">Import</button>
+        </div>
+      </section>
+
+      <section id="calcPage" class="page">
+        <div class="card"><h2>Calculator</h2>
+          <div class="calc">
+            <div id="calcScreen">0</div>
+            <div id="calcKeys"></div>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Land Calculator</h2>
+          <div class="two">
+            <input id="calcLand" type="number" placeholder="Land">
+            <select id="calcUnit"><option value="bigha">বিঘা</option><option value="katha">কাঠা</option><option value="decimal">ডেসিমেল</option></select>
+            <input id="calcRate" type="number" value="2200" placeholder="Rate">
+          </div>
+          <div id="landCalcResult" class="info-box"></div>
+        </div>
+      </section>
+
+      <section id="settingsPage" class="page">
+        <div class="card">
+          <h2>Settings</h2>
+          <label>Company Name</label><input id="setCompany">
+          <label>Owner / Proprietor</label><input id="setOwner">
+          <label>Contact</label><input id="setContact">
+          <label>Address</label><textarea id="setAddress"></textarea>
+          <div class="two">
+            <div><label>UPI ID</label><input id="setUpi"></div>
+            <div><label>App Theme Colour</label><input id="setAccent" type="color"></div>
+          </div>
+          <input id="setPayee" type="hidden">
+          <input id="setCountry" type="hidden" value="+91">
+          <label>QR Mode</label>
+          <select id="setQrMode"><option value="dynamic">Dynamic amount QR</option><option value="static">Uploaded static QR</option></select>
+          <label>Upload / Change QR Image</label>
+          <input id="setQrImage" type="file" accept="image/*">
+          <div class="action-bar"><button class="btn" id="removeQrBtn">Remove QR</button></div>
+          <label>Default Print Size</label><select id="setPrint"></select>
+          <label>Default Bill Template</label><select id="setTemplate"></select>
+          <div class="action-bar">
+            <button class="btn primary" id="saveSettingsBtn">Save Settings</button>
+            <button class="btn" id="cloudPullBtn">Pull Cloud</button>
+            <button class="btn" id="cloudPushBtn">Push Cloud</button>
+            <button class="btn" id="cloudDoctorBtn">Cloud Doctor</button>
+            <button class="btn danger" id="logoutBtn">Logout</button>
+          </div>
+          <p id="cloudStatus" class="muted"></p>
+        </div>
       </section>
     </main>
+
+    <nav class="tabbar">
+      <button data-page="homePage" class="active"><i>⌂</i><span>Home</span></button>
+      <button data-page="customersPage"><i>◉</i><span>Users</span></button>
+      <button data-page="billPage"><i>▤</i><span>Bill</span></button>
+      <button data-page="payPage"><i>₹</i><span>Pay</span></button>
+      <button data-page="historyPage"><i>◷</i><span>History</span></button>
+      <button data-page="reportsPage"><i>▥</i><span>Report</span></button>
+      <button data-page="calcPage"><i>⌗</i><span>Calc</span></button>
+      <button data-page="settingsPage"><i>⚙</i><span>Set</span></button>
+    </nav>
   </div>
 
-  <!-- Customer Ledger Screen -->
-  <div id="chatScreen" class="chat-screen hidden">
-    <!-- Chat Header -->
-    <header class="chat-header">
-      <button id="chatBackBtn" class="back-btn">⬅</button>
-      <div class="chat-user-info">
-        <h3 id="chatCustName">গ্রাহকের নাম</h3>
-        <span id="chatCustSub" class="chat-subtext">ফোন নম্বর • গ্রাম</span>
-        <!-- Note / Land info pill badge -->
-        <div id="chatCustLandNote" class="chat-land-pill hidden">🌾 জমির তথ্য: কোনো নোট নেই</div>
-      </div>
-      <button id="chatMoreMenuBtn" class="icon-btn">⋮</button>
-    </header>
-
-    <!-- Balance Summary Band -->
-    <div class="chat-summary-strip">
-      <div class="summary-item">
-        <span>মোট বিল</span>
-        <strong id="chatTotalBilled">৳ ০</strong>
-      </div>
-      <div class="summary-item">
-        <span>মোট জমা</span>
-        <strong id="chatTotalPaid" class="text-ok">৳ ০</strong>
-      </div>
-      <div class="summary-item">
-        <span>অবশিষ্ট বকেয়া</span>
-        <strong id="chatTotalDue" class="text-bad">৳ ০</strong>
-      </div>
+  <div id="chatModal" class="chat-modal hidden">
+    <div class="chat-head">
+      <button id="chatBack">‹</button>
+      <div class="avatar" id="chatAvatar">?</div>
+      <div class="chat-title"><b id="chatName">Customer</b><span id="chatSub">Phone</span></div>
+      <button id="chatShare">⤴</button>
+      <button id="chatCall">✆</button>
+      <button id="chatWhats">W</button>
     </div>
-
-    <!-- Message History Bubbles -->
-    <div id="chatMessages" class="chat-messages"></div>
-
-    <!-- Sticky Floating Action Panel -->
-    <div class="chat-action-panel">
-      <button id="chatNewBill" class="chat-act-btn bill-btn">📝 বিল তৈরি</button>
-      <button id="chatDirectPay" class="chat-act-btn pay-btn">💵 টাকা জমা</button>
-      <button id="chatSettle" class="chat-act-btn settle-btn">🤝 রফা করুন</button>
+    <div id="chatBody" class="chat-body"></div>
+    <div id="manualChatBar" class="manual-chat-bar">
+      <input id="manualChatInput" placeholder="এই customer-এর জন্য manual note/message লিখুন">
+      <button id="manualChatSend">Send</button>
+    </div>
+    <div class="chat-actions">
+      <button id="chatBill">Bill</button>
+      <button id="chatPay">Pay</button>
+      <button id="chatSettle">Settle</button>
+      <button id="chatEntries">Entries</button>
+      <button id="chatManual">Chat</button>
+      <button id="chatLedger">Ledger</button>
+      <button id="chatEdit">Edit</button>
+      <button id="chatMore">⋯</button>
     </div>
   </div>
 
-  <!-- Customer Entry Modal -->
   <div id="customerModal" class="modal hidden">
-    <div class="modal-card animate-slide-up">
-      <div class="modal-header">
-        <h2 id="custModalTitle">গ্রাহক যোগ করুন</h2>
-        <button class="close-modal-btn" onclick="closeCustModal()">✕</button>
-      </div>
-      <div class="modal-body">
-        <input id="custId" type="hidden">
-        
-        <label>গ্রাহকের নাম *</label>
-        <input id="custName" type="text" placeholder="যেমন: রহিম শেখ">
-        
-        <label>মোবাইল নম্বর</label>
-        <input id="custPhone" type="tel" placeholder="যেমন: 9564xxxxxx">
-        
-        <label>গ্রাম</label>
-        <input id="custVillage" type="text" placeholder="যেমন: রঘুনাথপুর">
-        
-        <label>ঠিকানা (ঐচ্ছিক)</label>
-        <textarea id="custAddress" placeholder="বিস্তারিত ঠিকানা লিখুন..."></textarea>
-        
-        <!-- Land details / notes field -->
-        <label>জমির বিবরণ / নোট (নোট বা বিঘার পরিমাণ) 🌾</label>
-        <textarea id="custNote" placeholder="যেমন: ৫ বিঘা ৪ কাঠা, ক্যানেলপাড়ের জমি..."></textarea>
-        
-        <label>পূর্বের বকেয়া (Opening Due) [টাকা]</label>
-        <input id="custOpening" type="number" value="0" placeholder="0">
-        
-        <div class="action-bar pt-4">
-          <button class="btn secondary" onclick="closeCustModal()">বাতিল</button>
-          <button class="btn primary" id="saveCustomerBtn">সংরক্ষণ করুন</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Settings Area Modal -->
-  <div id="settingsModal" class="modal hidden">
-    <div class="modal-card max-w-lg">
-      <div class="modal-header">
-        <h2>⚙️ সেটিংস ও রেট তালিকা</h2>
-        <button class="close-modal-btn" onclick="closeSettingsModal()">✕</button>
-      </div>
-      <div class="modal-body">
-        <section class="settings-section">
-          <h3>🏢 কোম্পানির তথ্য</h3>
-          <label>কোম্পানির নাম</label>
-          <input id="setCompany">
-          
-          <label>মালিকের নাম</label>
-          <input id="setOwner">
-          
-          <label>যোগাযোগের নম্বর</label>
-          <input id="setContact">
-          
-          <label>ঠিকানা</label>
-          <textarea id="setAddress"></textarea>
-        </section>
-
-        <section class="settings-section mt-4">
-          <h3>💰 ডিফল্ট রেট নির্ধারণ (আশা মিনি শ্যালো)</h3>
-          <div class="two">
-            <div>
-              <label>রেট প্রতি বিঘা (টাকা)</label>
-              <input id="setRateBigha" type="number" step="any">
-            </div>
-            <div>
-              <label>রেট প্রতি কাঠা (টাকা)</label>
-              <input id="setRateKatha" type="number" step="any">
-            </div>
-          </div>
-          <p class="helper-text">* ১ বিঘা = ২০ কাঠা। সেই অনুপাতে রেট বসান।</p>
-        </section>
-
-        <section class="settings-section mt-4">
-          <h3>💳 UPI পেমেন্ট ডিটেইলস (QR কোড পেমেন্টের জন্য)</h3>
-          <label>UPI ID (যেমন: yourname@upi)</label>
-          <input id="setUpi">
-          
-          <label>Payee Name (অ্যাকাউন্ট হোল্ডার)</label>
-          <input id="setPayee">
-        </section>
-
-        <section class="settings-section mt-4">
-          <h3>📝 শেয়ার মেসেজ টেমপ্লেট</h3>
-          <label>হোয়াটসঅ্যাপ রিমাইন্ডার টেক্সট</label>
-          <textarea id="setReminderTemplate" class="code-font"></textarea>
-          <span class="helper-text">{name}, {due}, {company}, {upi} ইত্যাদি অটো আপডেট হবে।</span>
-        </section>
-
-        <div class="action-bar mt-6">
-          <button class="btn secondary" onclick="closeSettingsModal()">বন্ধ করুন</button>
-          <button class="btn primary" id="saveSettingsBtn">সেটিংস সেভ করুন</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Dynamic Form Dialog (Action Modal) -->
-  <div id="actionModal" class="modal hidden">
-    <div class="modal-card animate-slide-up">
-      <div class="modal-header">
-        <h2 id="actionTitle">অ্যাকশন ফর্ম</h2>
-        <button class="close-modal-btn" onclick="closeActionModal()">✕</button>
-      </div>
-      <div id="actionBody" class="modal-body"></div>
+    <div class="modal-card">
+      <h2>Customer</h2>
+      <input id="custId" type="hidden">
+      <label>Name</label><input id="custName">
+      <label>Phone</label><input id="custPhone">
+      <label>Village</label><input id="custVillage">
+      <label>Address</label><textarea id="custAddress"></textarea>
+      <label>Opening Due</label><input id="custOpening" type="number" value="0">
+        <label>Customer Note / জমির নোট</label>
+        <textarea id="custNote" placeholder="জমির পরিমাণ, plot/location, special note"></textarea>
       <div class="action-bar">
-        <button class="btn danger" id="actionDelete">মুছে ফেলুন</button>
-        <button class="btn secondary" onclick="closeActionModal()">বাতিল</button>
-        <button class="btn primary" id="actionSave">সংরক্ষণ</button>
+        <button class="btn primary" id="saveCustomerBtn">Save</button>
+        <button class="btn" id="closeCustomerBtn">Cancel</button>
       </div>
     </div>
   </div>
 
-  <!-- Bottom Sheet Actions Drawer (More Menu ⋮) -->
-  <div id="actionSheet" class="action-sheet">
-    <div class="action-sheet-backdrop" id="sheetBackdrop"></div>
-    <div class="action-sheet-content">
-      <div class="sheet-header">
-        <h3 id="sheetTitle">গ্রাহক অ্যাকশন</h3>
-        <button class="close-sheet-btn" id="closeSheetBtn">✕</button>
-      </div>
-      <div class="sheet-buttons">
-        <button id="sheetCall" class="sheet-btn">📞 সরাসরি কল করুন</button>
-        <button id="sheetWhatsapp" class="sheet-btn">💬 হোয়াটসঅ্যাপ চ্যাট</button>
-        <button id="sheetReminderBill" class="sheet-btn highlight">📄 বিল + রিমাইন্ডার শেয়ার</button>
-        <button id="sheetEditCust" class="sheet-btn">✏️ প্রোফাইল এডিট (নোট সংশোধন)</button>
-        <button id="sheetClearAll" class="sheet-btn text-danger">⚠️ সমস্ত ডাটা সাফ করুন</button>
+  <div id="actionModal" class="modal hidden">
+    <div class="modal-card">
+      <h2 id="actionTitle">Action</h2>
+      <div id="actionBody"></div>
+      <div class="action-bar">
+        <button class="btn primary" id="actionSave">Save</button>
+        <button class="btn danger" id="actionDelete">Delete</button>
+        <button class="btn" id="actionClose">Cancel</button>
       </div>
     </div>
   </div>
-
-  <!-- Offscreen Capture Container (বিলের নিখুঁত স্ক্রিনশট নেওয়ার জন্য অদৃশ্য মোড়ক) -->
-  <div id="captureTempWrapper" style="position: absolute; left: -9999px; top: -9999px; width: 450px; z-index: -999999;"></div>
-
+  <input id="importFile" type="file" accept=".json" hidden>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="./app.js"></script>
 </body>
 </html>
-
-```
