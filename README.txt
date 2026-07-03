@@ -281,3 +281,16 @@ V63 Full App Rebuild:
 - Calculator rebuilt compact with 2nd key for scientific/trigonometry keys.
 - Firestore data sanitized before push to avoid undefined field errors.
 - Cache killer: index loads app.js?v=63, style.css?v=63, manifest.json?v=63.
+
+
+V64 User Center + Bill Modes:
+- User fixes now appear inside each user chat/detail screen through a user-specific tools panel:
+  Chat, Entries, Bill, Note/Edit.
+- Payment/Settlement Edit and Undo are available inside that selected user's Entries panel.
+- Manual chat/note is owner-only and per-customer.
+- Bill design changed from ruled/notebook style to professional invoice cards.
+- Bill modes are now visibly different:
+  premium, classic, boxed, bengali, qrfirst, standard, normal, thermal, compact, phone, mini.
+- Changing Bill Design/Mode now changes the preview and shared bill image.
+- Dedicated QR rendering for each bill mode.
+- Cache bumped to v64.

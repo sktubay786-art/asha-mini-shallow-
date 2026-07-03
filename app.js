@@ -3769,7 +3769,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 
 ready(function(){
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V63 Full App Rebuild';
+  if(chip) chip.textContent='V64 User Center + Bill Modes';
 
   function setCloudStatus(text,type='warn'){
     const el=document.getElementById('cloudChip');
@@ -3856,7 +3856,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V63 Full App Rebuild';
+  if(chip) chip.textContent='V64 User Center + Bill Modes';
 
   function selectedCustomerV55(){
     const sel=q('billCustomer');
@@ -4045,7 +4045,7 @@ ready(function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,1200)); else setTimeout(fn,1200); }
 ready(function(){
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V63 Full App Rebuild';
+  if(chip) chip.textContent='V64 User Center + Bill Modes';
   const prev=document.getElementById('previousDue');
   if(prev){
     prev.addEventListener('focus',()=>prev.select());
@@ -4067,13 +4067,13 @@ ready(function(){
 
 
 
-/* ==== V63 Full App Rebuild / Diagnostics ==== */
+/* ==== V64 User Center + Bill Modes / Diagnostics ==== */
 (function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,1400)); else setTimeout(fn,1400); }
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V63 Full App Rebuild';
+  if(chip) chip.textContent='V64 User Center + Bill Modes';
 
   function setCloudV57(text,type='info'){
     const s=q('cloudStatus');
@@ -4237,7 +4237,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V63 Full App Rebuild';
+  if(chip) chip.textContent='V64 User Center + Bill Modes';
 
   const RULES_TEXT=`rules_version = '2';
 service cloud.firestore {
@@ -4472,7 +4472,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V63 Full App Rebuild';
+  if(chip) chip.textContent='V64 User Center + Bill Modes';
 
   function setCloudV59(text){
     const s=q('cloudStatus'); if(s) s.textContent=text;
@@ -4788,7 +4788,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V63 Full App Rebuild';
+  if(chip) chip.textContent='V64 User Center + Bill Modes';
   const safeNum=v=>Number(v||0)||0;
 
   window.rateLineV60=function(b){
@@ -4948,7 +4948,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V63 Full App Rebuild';
+  if(chip) chip.textContent='V64 User Center + Bill Modes';
 
   function ensureCustomerChatV61(c){
     if(!c) return [];
@@ -5165,8 +5165,8 @@ ready(function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,800)); else setTimeout(fn,800); }
 ready(function(){
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V63 Full App Rebuild';
-  window.ASHA_BUILD='V63 Full App Rebuild';
+  if(chip) chip.textContent='V64 User Center + Bill Modes';
+  window.ASHA_BUILD='V64 User Center + Bill Modes';
   console.log('ASHA_BUILD', window.ASHA_BUILD);
 
   // Force update service worker when the new code is actually loaded.
@@ -5185,7 +5185,7 @@ ready(function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,3600)); else setTimeout(fn,3600); }
 ready(function(){
   const q=id=>document.getElementById(id);
-  const build='V63 Full App Rebuild';
+  const build='V64 User Center + Bill Modes';
   window.ASHA_BUILD=build;
   const chip=document.querySelector('.hero-chips span:last-child');
   if(chip) chip.textContent=build;
@@ -5557,5 +5557,332 @@ ready(function(){
   if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations?.().then(rs=>rs.forEach(r=>r.update().catch(()=>{}))).catch(()=>{});}
   fixStateV63();
   setTimeout(()=>{try{renderCustomers(); if(activeCustomer)renderChat(); if(currentBill)renderInvoice(currentBill);}catch(e){}},700);
+});
+})();
+
+
+
+/* ===================== V64 USER-CENTERED TOOLS + REAL BILL MODES ===================== */
+(function(){
+function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,4200)); else setTimeout(fn,4200); }
+ready(function(){
+  const q=id=>document.getElementById(id);
+  const build='V64 User Center + Bill Modes';
+  window.ASHA_BUILD=build;
+  const chip=document.querySelector('.hero-chips span:last-child');
+  if(chip) chip.textContent=build;
+  console.log('ASHA_BUILD',build);
+
+  const num=v=>Number(v||0)||0;
+  const getC=id=>state.customers.find(c=>c.id===id);
+  const now=()=>new Date().toISOString();
+  const fmt=d=>{try{return new Date(d).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'})}catch(e){return d||''}};
+  const latest=cid=>state.bills.filter(b=>b.customerId===cid).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))||String(b.billNo||'').localeCompare(String(a.billNo||'')))[0];
+
+  function log(cid,type,text,amount=0){
+    const c=getC(cid); if(!c)return;
+    c.logs=c.logs||[];
+    c.logs.unshift({id:uid(),date:now(),type,text,amount});
+  }
+  function manual(c){if(!c.manualChats)c.manualChats=[]; return c.manualChats;}
+  function modeName(){
+    const t=q('template')?.value || state.settings.template || 'premium';
+    return String(t||'premium').toLowerCase();
+  }
+  function modeClass(t){
+    t=String(t||'premium').toLowerCase();
+    if(['classic','boxed','bengali','qrfirst','standard','normal','thermal','compact','phone','mini'].includes(t)) return 'v64-'+t;
+    return 'v64-premium';
+  }
+  function cleanMode(t){
+    t=String(t||'premium').toLowerCase();
+    if(['classic','boxed','bengali','qrfirst','standard','normal','thermal','compact','phone','mini'].includes(t)) return t;
+    return 'premium';
+  }
+
+  // Store chosen bill template with bill.
+  const oldMakeV64=window.makeBillFromForm;
+  window.makeBillFromForm=function(){
+    let b=oldMakeV64?oldMakeV64():null; if(!b)return b;
+    const unit=q('landUnit')?.value||b.unit||'bigha';
+    const land=num(q('land')?.value??b.landAmount);
+    const rate=num(q('rate')?.value??b.rate);
+    const prev=num(q('previousDue')?.value??b.previousDue);
+    b.unit=unit; b.rateUnit=unit; b.landAmount=land; b.rate=rate;
+    b.bigha=landToBigha(land,unit);
+    b.current=land*rate; b.previousDue=prev; b.allTotal=b.current+prev;
+    b.template=modeName();
+    b.printMode=q('printMode')?.value||state.settings.print||'thermal80';
+    return b;
+  };
+
+  window.v64RateLine=function(b){
+    const r=num(b.rate), u=b.rateUnit||b.unit||'bigha';
+    if(u==='katha') return `${money(r)}/কাঠা • বিঘা ${money(r*20)}`;
+    if(u==='decimal') return `${money(r)}/ডেসিমেল • বিঘা ${money(r*40)}`;
+    return `${money(r)}/বিঘা`;
+  };
+  window.v64Upi=function(amount,billNo){
+    return `upi://pay?pa=${encodeURIComponent(state.settings.upi||'')}&pn=${encodeURIComponent(state.settings.owner||state.settings.payee||'Asha')}&am=${Number(amount||0).toFixed(2)}&cu=INR&tn=${encodeURIComponent(billNo||'Asha Bill')}`;
+  };
+
+  window.v64BillHTML=function(b,forcedMode=''){
+    const c=getC(b.customerId)||{};
+    const paid=billPaid(b), due=billDue(b), qrAmount=due>0?due:b.allTotal;
+    const t=cleanMode(forcedMode || q('template')?.value || b.template || state.settings.template || 'premium');
+    const cls=modeClass(t);
+    const note=c.note||c.landNote||'';
+    return `<div class="v64-bill ${cls}" data-mode="${t}" data-bill="${esc(b.billNo)}">
+      <div class="v64-top-qr"><b>Scan & Pay ${money(qrAmount)}</b><div class="v64-qr" data-amount="${qrAmount}" data-bill="${esc(b.billNo)}"></div></div>
+      <div class="v64-head">
+        <h2>${esc(state.settings.company)}</h2>
+        <p>${esc(state.settings.address)}</p>
+        <p>☎ ${esc(state.settings.contact)} • UPI: ${esc(state.settings.upi)}</p>
+      </div>
+      <div class="v64-meta">
+        <div class="v64-chip"><small>Bill No</small><b>${esc(b.billNo)}</b></div>
+        <div class="v64-chip"><small>Date</small><b>${esc(b.date)}</b></div>
+      </div>
+      <div class="v64-block">
+        <div class="v64-title">Customer Details</div>
+        <div class="v64-line"><span>Name</span><b>${esc(b.customerName)}</b></div>
+        <div class="v64-line"><span>Phone</span><b>${esc(b.phone||'')}</b></div>
+        <div class="v64-line"><span>Village</span><b>${esc(b.village||'')}</b></div>
+        <div class="v64-line"><span>Address</span><b>${esc(b.address||'')}</b></div>
+        ${note?`<div class="v64-note"><b>Note:</b> ${esc(note)}</div>`:''}
+      </div>
+      <div class="v64-block">
+        <div class="v64-title">Charge Details</div>
+        <div class="v64-line"><span>Season</span><b>${esc(b.season||'')}</b></div>
+        <div class="v64-line"><span>Land</span><b>${esc(b.landAmount)} ${esc(b.unit)} (${Number(b.bigha||0).toFixed(2)} বিঘা)</b></div>
+        <div class="v64-line"><span>Rate</span><b>${esc(v64RateLine(b))}</b></div>
+        <div class="v64-line"><span>Current Bill</span><b>${money(b.current)}</b></div>
+      </div>
+      <div class="v64-block v64-summary">
+        <div class="v64-title">Payment Summary</div>
+        <div class="v64-line"><span>Previous Due</span><b>${money(b.previousDue)}</b></div>
+        <div class="v64-line"><span>Total Amount</span><b>${money(b.allTotal)}</b></div>
+        <div class="v64-line"><span>Paid / Joma</span><b>${money(paid)}</b></div>
+        <div class="v64-line v64-due-line"><span>Payable Due</span><b>${money(due)}</b></div>
+      </div>
+      <div class="v64-block v64-normal-qr" style="text-align:center">
+        <div class="v64-title">Payment QR</div>
+        <div class="v64-qr" data-amount="${qrAmount}" data-bill="${esc(b.billNo)}"></div>
+        <b>Scan & Pay ${money(qrAmount)}</b>
+      </div>
+      <div class="v64-footer">${esc(state.settings.reminderTemplate||'আপনাকে পুরো বিল শীঘ্রই পরিশোধের জন্য বলা হচ্ছে')}<br>Owner: ${esc(state.settings.owner)} • Thank you</div>
+    </div>`;
+  };
+
+  window.v64RenderQR=async function(root=document){
+    const boxes=[...root.querySelectorAll('.v64-qr')];
+    for(const box of boxes){
+      const amount=num(box.dataset.amount), bill=box.dataset.bill||'Asha Bill';
+      box.innerHTML='';
+      if(state.settings.qrMode==='static' && state.settings.qrImage){
+        const img=new Image(); img.src=state.settings.qrImage; box.appendChild(img);
+      }else if(window.QRCode){
+        new QRCode(box,{text:v64Upi(amount,bill),width:126,height:126,correctLevel:QRCode.CorrectLevel.M});
+      }else{
+        const img=new Image(); img.crossOrigin='anonymous'; img.src='https://api.qrserver.com/v1/create-qr-code/?size=180x180&data='+encodeURIComponent(v64Upi(amount,bill)); box.appendChild(img);
+      }
+    }
+    await new Promise(r=>setTimeout(r,450));
+    boxes.forEach(box=>{const canvas=box.querySelector('canvas'); if(canvas){const img=new Image(); img.src=canvas.toDataURL('image/png'); box.innerHTML=''; box.appendChild(img);}});
+    await new Promise(r=>setTimeout(r,100));
+  };
+
+  window.renderInvoice=function(b){
+    currentBill=b;
+    const target=q('billPreview');
+    if(target){
+      target.innerHTML=v64BillHTML(b);
+      v64RenderQR(target);
+    }
+  };
+  window.v64BillBlob=async function(b,mode=''){
+    let root=q('v63ShareRoot');
+    if(!root){document.body.insertAdjacentHTML('beforeend','<div id="v63ShareRoot" class="v63-share-root"></div>');root=q('v63ShareRoot');}
+    root.innerHTML=v64BillHTML(b,mode);
+    await v64RenderQR(root);
+    const bill=root.querySelector('.v64-bill');
+    const canvas=await html2canvas(bill,{scale:3,useCORS:true,allowTaint:true,backgroundColor:'#ffffff',scrollX:0,scrollY:0});
+    return await new Promise(r=>canvas.toBlob(r,'image/png',0.98));
+  };
+  window.invoiceBlob=async function(){if(!currentBill)throw new Error('No bill');return v64BillBlob(currentBill);};
+  window.shareBill=async function(){
+    if(!currentBill)return alert('Preview bill first');
+    const blob=await v64BillBlob(currentBill);
+    const file=new File([blob],`${currentBill.billNo}.png`,{type:'image/png'});
+    const text=reminderTextByBill(currentBill);
+    try{
+      if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})) await navigator.share({files:[file],text,title:'Asha Bill Reminder'});
+      else{downloadBlob(blob,`${currentBill.billNo}.png`);openWhatsApp(currentBill.phone,text);}
+    }catch(e){downloadBlob(blob,`${currentBill.billNo}.png`);openWhatsApp(currentBill.phone,text);}
+  };
+
+  window.v64BillReminder=async function(cid,bid=''){
+    const c=getC(cid); if(!c)return alert('User not found');
+    const b=bid?state.bills.find(x=>x.id===bid):latest(cid);
+    if(!b)return alert('এই user-এর bill নেই। আগে New Bill তৈরি করুন।');
+    currentBill=b;
+    const blob=await v64BillBlob(b);
+    const url=URL.createObjectURL(blob);
+    q('actionTitle').textContent='Bill + Reminder';
+    q('actionBody').innerHTML=`<p class="muted"><b>${esc(c.name)}</b> • ${esc(b.billNo)} • Due <b>${money(billDue(b))}</b></p>
+      <img class="v63-preview-img" src="${url}">
+      <div class="action-bar"><button class="btn primary" id="v64ShareNow">Share Image + Text</button><button class="btn" id="v64WaOnly">WhatsApp Text Only</button><button class="btn" id="v64Download">Download Image</button></div>`;
+    q('actionSave')?.classList.add('hidden');q('actionDelete')?.classList.add('hidden');q('actionModal').classList.remove('hidden');
+    q('v64ShareNow').onclick=async()=>{const file=new File([blob],`${b.billNo}.png`,{type:'image/png'});try{if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]}))await navigator.share({files:[file],text:reminderTextByBill(b),title:'Asha Bill Reminder'});else{downloadBlob(blob,`${b.billNo}.png`);openWhatsApp(c.phone,reminderTextByBill(b));}}catch(e){downloadBlob(blob,`${b.billNo}.png`);openWhatsApp(c.phone,reminderTextByBill(b));}};
+    q('v64WaOnly').onclick=()=>openWhatsApp(c.phone,reminderTextByBill(b));
+    q('v64Download').onclick=()=>downloadBlob(blob,`${b.billNo}.png`);
+  };
+  window.shareCustomerBill=function(cid,bid=''){return v64BillReminder(cid,bid);};
+  window.v53BillReminder=function(cid){return v64BillReminder(cid);};
+
+  // Payment edit/undo final
+  function findPay(pid){
+    for(const b of state.bills){const p=(b.payments||[]).find(x=>x.id===pid);if(p)return{b,p};}
+    return null;
+  }
+  window.editEntry=function(pid){
+    const fp=findPay(pid); if(!fp)return alert('Entry not found');
+    window.actionContext={type:'v64editPay',pid};
+    q('actionTitle').textContent=String(fp.p.mode||'').toLowerCase().includes('settle')?'Edit Settlement':'Edit Payment';
+    q('actionBody').innerHTML=`<label>Amount</label><input id="editAmount" type="number" value="${num(fp.p.amount)}"><label>Mode</label><select id="editMode"><option>Cash</option><option>UPI</option><option>Bank</option><option>Online</option><option>Settlement</option></select><label>Received In</label><input id="editReceived" value="${esc(fp.p.receivedIn||'')}"><label>Note</label><input id="editNote" value="${esc(fp.p.note||'')}">`;
+    q('editMode').value=fp.p.mode||'Cash';
+    q('actionSave')?.classList.remove('hidden');q('actionDelete')?.classList.remove('hidden');q('actionModal').classList.remove('hidden');
+    q('actionSave').onclick=()=>savePayV64();
+    q('actionDelete').onclick=()=>undoPayV64(pid,true);
+  };
+  window.savePayV64=function(){
+    const fp=findPay(window.actionContext?.pid); if(!fp)return closeAction();
+    const before=num(fp.p.amount);
+    fp.p.amount=num(q('editAmount').value);fp.p.mode=q('editMode').value;fp.p.receivedIn=q('editReceived').value;fp.p.note=q('editNote').value;fp.p.editedAt=now();
+    log(fp.b.customerId,'edit',`Edited ${fp.p.mode} on ${fp.b.billNo}: ${money(before)} → ${money(fp.p.amount)}`,fp.p.amount);
+    saveState(); if(activeCustomer)renderChat(); closeAction(); alert('Entry updated');
+  };
+  window.undoPayV64=function(pid,fromModal=false){
+    const fp=findPay(pid); if(!fp)return alert('Entry not found');
+    if(!confirm('এই payment/settlement undo/delete করবে?'))return;
+    const amt=num(fp.p.amount), mode=fp.p.mode||'Payment';
+    fp.b.payments=(fp.b.payments||[]).filter(x=>x.id!==pid);
+    log(fp.b.customerId,'undo',`Undo ${mode} from ${fp.b.billNo}: ${money(amt)}`,amt);
+    saveState(); if(activeCustomer)renderChat(); if(fromModal)closeAction();
+  };
+
+  // Manual chat inside same user
+  window.addManualChatV64=function(cid=activeCustomer,text=''){
+    const c=getC(cid); if(!c)return;
+    const msg=String(text||q('manualChatInput')?.value||'').trim(); if(!msg)return;
+    manual(c).push({id:uid(),text:msg,date:now(),sender:'owner'});
+    log(cid,'chat','Manual message added',0);
+    if(q('manualChatInput'))q('manualChatInput').value='';
+    saveState(); if(activeCustomer===cid)renderChat();
+  };
+  window.editManualChatV64=function(cid,mid){
+    const c=getC(cid), m=c&&manual(c).find(x=>x.id===mid); if(!m)return;
+    window.actionContext={type:'v64manual',cid,mid};
+    q('actionTitle').textContent='Edit Chat / Note';
+    q('actionBody').innerHTML=`<label>Message</label><textarea id="manualEditText">${esc(m.text)}</textarea>`;
+    q('actionSave')?.classList.remove('hidden');q('actionDelete')?.classList.remove('hidden');q('actionModal').classList.remove('hidden');
+    q('actionSave').onclick=()=>{m.text=q('manualEditText').value.trim();m.editedAt=now();log(cid,'chat-edit','Manual message edited',0);saveState();renderChat();closeAction();};
+    q('actionDelete').onclick=()=>deleteManualChatV64(cid,mid,true);
+  };
+  window.deleteManualChatV64=function(cid,mid,fromModal=false){
+    const c=getC(cid); if(!c)return; if(!confirm('Delete this message/note?'))return;
+    c.manualChats=manual(c).filter(x=>x.id!==mid);
+    log(cid,'chat-delete','Manual message deleted',0);
+    saveState(); if(activeCustomer===cid)renderChat(); if(fromModal)closeAction();
+  };
+  window.openManualChatV64=function(cid=activeCustomer){
+    const c=getC(cid); if(!c)return;
+    const chats=manual(c).slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+    q('actionTitle').textContent='Manual Chat / Notes';
+    q('actionBody').innerHTML=`<p class="muted">এই note/chat শুধু <b>${esc(c.name)}</b> user-এর ভিতরেই থাকবে।</p><div class="v64-inline-chat"><input id="manualModalInput" placeholder="Message/note লিখুন"><button id="manualModalSend">Send</button></div><div class="v64-user-panel">${chats.length?chats.map(m=>`<div class="v64-note-row"><div class="v64-row-top"><b>${esc(m.text)}</b><small>${esc(fmt(m.date))}</small></div><div class="v64-actions"><button onclick="editManualChatV64('${c.id}','${m.id}')">Edit</button><button class="danger" onclick="deleteManualChatV64('${c.id}','${m.id}')">Delete</button></div></div>`).join(''):'<div class="muted">No message yet.</div>'}</div>`;
+    q('actionSave')?.classList.add('hidden');q('actionDelete')?.classList.add('hidden');q('actionModal').classList.remove('hidden');
+    q('manualModalSend').onclick=()=>{addManualChatV64(c.id,q('manualModalInput').value);openManualChatV64(c.id);};
+  };
+
+  // Tools inside user itself
+  window.renderUserToolsV64=function(cid){
+    const c=getC(cid); if(!c||!q('chatBody'))return;
+    q('chatBody').querySelector('#v64UserTools')?.remove();
+    q('chatBody').insertAdjacentHTML('afterbegin',`<div id="v64UserTools"><div class="v64-user-tools">
+      <button class="primary" id="v64ToolChat">💬 Chat</button>
+      <button id="v64ToolEntries">₹ Entries</button>
+      <button id="v64ToolBill">⏰ Bill</button>
+      <button id="v64ToolEdit">✎ Note/Edit</button>
+    </div><div id="v64UserPanel" class="v64-user-panel hidden"></div></div>`);
+    q('v64ToolChat').onclick=()=>showChatPanelV64(cid);
+    q('v64ToolEntries').onclick=()=>showEntriesPanelV64(cid);
+    q('v64ToolBill').onclick=()=>v64BillReminder(cid);
+    q('v64ToolEdit').onclick=()=>{openCustomer(cid);};
+  };
+  window.showChatPanelV64=function(cid){
+    const c=getC(cid), panel=q('v64UserPanel'); if(!c||!panel)return;
+    const chats=manual(c).slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+    panel.classList.remove('hidden');
+    panel.innerHTML=`<h4>Manual Chat / Notes</h4><div class="v64-inline-chat"><input id="v64InlineMsg" placeholder="এই user-এর জন্য note/message"><button id="v64InlineSend">Send</button></div>${chats.length?chats.map(m=>`<div class="v64-note-row"><div class="v64-row-top"><b>${esc(m.text)}</b><small>${esc(fmt(m.date))}</small></div><div class="v64-actions"><button onclick="editManualChatV64('${cid}','${m.id}')">Edit</button><button class="danger" onclick="deleteManualChatV64('${cid}','${m.id}')">Delete</button></div></div>`).join(''):'<p class="muted">No chat/note yet.</p>'}`;
+    q('v64InlineSend').onclick=()=>{addManualChatV64(cid,q('v64InlineMsg').value);showChatPanelV64(cid);};
+  };
+  window.showEntriesPanelV64=function(cid){
+    const c=getC(cid), panel=q('v64UserPanel'); if(!c||!panel)return;
+    let tx=[];
+    state.bills.filter(b=>b.customerId===cid).forEach(b=>(b.payments||[]).forEach(p=>tx.push({b,p})));
+    tx=tx.sort((a,b)=>String(b.p.date||'').localeCompare(String(a.p.date||'')));
+    panel.classList.remove('hidden');
+    panel.innerHTML=`<h4>Payment / Settlement Entries</h4>${tx.length?tx.map(({b,p})=>`<div class="v64-entry-row"><div class="v64-row-top"><div><b>${esc(p.mode||'Payment')}</b><br><small>${esc(b.billNo)} • ${esc(p.date||'')}</small></div><b>${money(p.amount)}</b></div><small>${esc(p.receivedIn||'')} ${p.note?'• '+esc(p.note):''}</small><div class="v64-actions"><button onclick="editEntry('${p.id}')">Edit</button><button class="danger" onclick="undoPayV64('${p.id}')">Undo</button></div></div>`).join(''):'<p class="muted">No entry.</p>'}`;
+  };
+
+  const oldRenderChatV64=window.renderChat;
+  window.renderChat=function(){
+    if(oldRenderChatV64)oldRenderChatV64();
+    const c=getC(activeCustomer); if(!c)return;
+    if(q('chatMore'))q('chatMore').onclick=()=>openUserMenuV52(c.id);
+    if(q('chatManual'))q('chatManual').onclick=()=>showChatPanelV64(c.id);
+    if(q('manualChatSend'))q('manualChatSend').onclick=()=>addManualChatV64(c.id);
+    if(q('manualChatInput'))q('manualChatInput').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();addManualChatV64(c.id);}};
+    renderUserToolsV64(c.id);
+    q('chatBody')?.querySelectorAll('.entry-tools button').forEach(btn=>{
+      const on=btn.getAttribute('onclick')||'';
+      const pid=(on.match(/editEntry\('([^']+)'\)/)||[])[1];
+      if(pid && /undo/i.test(btn.textContent||''))btn.onclick=()=>undoPayV64(pid);
+      if(pid && /edit/i.test(btn.textContent||''))btn.onclick=()=>editEntry(pid);
+    });
+    q('chatBody')?.querySelector('.v64-manual-wrap')?.remove();
+    const chats=manual(c).slice().sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+    if(chats.length){
+      q('chatBody').insertAdjacentHTML('beforeend',`<div class="v64-manual-wrap" style="display:flex;flex-direction:column;gap:10px">${chats.map(m=>`<div class="bubble manualB"><b>Owner Message</b><br>${esc(m.text)}<br><small>${esc(fmt(m.date))}${m.editedAt?' • Edited':''}</small><div class="msg-tools"><button onclick="editManualChatV64('${c.id}','${m.id}')">Edit</button><button class="danger-mini" onclick="deleteManualChatV64('${c.id}','${m.id}')">Delete</button></div></div>`).join('')}</div>`);
+    }
+  };
+
+  // User menu still exists, but all user fixes also inside user chat
+  const oldMenuV64=window.openUserMenuV52;
+  window.openUserMenuV52=function(cid){
+    if(oldMenuV64)oldMenuV64(cid);
+    setTimeout(()=>{
+      if(q('mChat'))q('mChat').onclick=()=>openManualChatV64(cid);
+      if(q('mBillReminder'))q('mBillReminder').onclick=()=>v64BillReminder(cid);
+      if(q('mEdit'))q('mEdit').onclick=()=>openCustomer(cid);
+    },120);
+  };
+
+  const oldRenderCustomersV64=window.renderCustomers;
+  window.renderCustomers=function(){
+    if(oldRenderCustomersV64)oldRenderCustomersV64();
+    setTimeout(()=>document.querySelectorAll('.customer-row').forEach(row=>{
+      const name=row.querySelector('.cust-name')?.textContent||'';
+      const c=state.customers.find(x=>x.name===name);
+      if(c&&(c.note||c.landNote)&&!row.querySelector('.customer-note-line')) row.querySelector('.cust-main')?.insertAdjacentHTML('beforeend',`<div class="customer-note-line">${esc(c.note||c.landNote)}</div>`);
+    }),0);
+  };
+
+  // force preview updates when mode changes
+  q('template')?.addEventListener('change',()=>{if(currentBill)renderInvoice(currentBill); else previewBill();});
+  q('printMode')?.addEventListener('change',()=>{if(currentBill)renderInvoice(currentBill); else previewBill();});
+
+  if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations?.().then(rs=>rs.forEach(r=>r.update().catch(()=>{}))).catch(()=>{});}
+  setTimeout(()=>{try{if(currentBill)renderInvoice(currentBill);if(activeCustomer)renderChat();renderCustomers();}catch(e){console.warn(e)}},700);
 });
 })();
