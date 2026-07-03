@@ -3769,7 +3769,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 
 ready(function(){
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V62 Cache Killer + Manual Chat';
+  if(chip) chip.textContent='V63 Full App Rebuild';
 
   function setCloudStatus(text,type='warn'){
     const el=document.getElementById('cloudChip');
@@ -3856,7 +3856,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V62 Cache Killer + Manual Chat';
+  if(chip) chip.textContent='V63 Full App Rebuild';
 
   function selectedCustomerV55(){
     const sel=q('billCustomer');
@@ -4045,7 +4045,7 @@ ready(function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,1200)); else setTimeout(fn,1200); }
 ready(function(){
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V62 Cache Killer + Manual Chat';
+  if(chip) chip.textContent='V63 Full App Rebuild';
   const prev=document.getElementById('previousDue');
   if(prev){
     prev.addEventListener('focus',()=>prev.select());
@@ -4067,13 +4067,13 @@ ready(function(){
 
 
 
-/* ==== V62 Cache Killer + Manual Chat / Diagnostics ==== */
+/* ==== V63 Full App Rebuild / Diagnostics ==== */
 (function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,1400)); else setTimeout(fn,1400); }
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V62 Cache Killer + Manual Chat';
+  if(chip) chip.textContent='V63 Full App Rebuild';
 
   function setCloudV57(text,type='info'){
     const s=q('cloudStatus');
@@ -4237,7 +4237,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V62 Cache Killer + Manual Chat';
+  if(chip) chip.textContent='V63 Full App Rebuild';
 
   const RULES_TEXT=`rules_version = '2';
 service cloud.firestore {
@@ -4472,7 +4472,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V62 Cache Killer + Manual Chat';
+  if(chip) chip.textContent='V63 Full App Rebuild';
 
   function setCloudV59(text){
     const s=q('cloudStatus'); if(s) s.textContent=text;
@@ -4788,7 +4788,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V62 Cache Killer + Manual Chat';
+  if(chip) chip.textContent='V63 Full App Rebuild';
   const safeNum=v=>Number(v||0)||0;
 
   window.rateLineV60=function(b){
@@ -4948,7 +4948,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V62 Cache Killer + Manual Chat';
+  if(chip) chip.textContent='V63 Full App Rebuild';
 
   function ensureCustomerChatV61(c){
     if(!c) return [];
@@ -5165,8 +5165,8 @@ ready(function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,800)); else setTimeout(fn,800); }
 ready(function(){
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V62 Cache Killer + Manual Chat';
-  window.ASHA_BUILD='V62 Cache Killer + Manual Chat';
+  if(chip) chip.textContent='V63 Full App Rebuild';
+  window.ASHA_BUILD='V63 Full App Rebuild';
   console.log('ASHA_BUILD', window.ASHA_BUILD);
 
   // Force update service worker when the new code is actually loaded.
@@ -5175,5 +5175,387 @@ ready(function(){
       regs.forEach(r=>{ try{ r.update(); }catch(e){} });
     });
   }
+});
+})();
+
+
+
+/* ===================== V63 FULL APP REBUILD FINAL LAYER ===================== */
+(function(){
+function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,3600)); else setTimeout(fn,3600); }
+ready(function(){
+  const q=id=>document.getElementById(id);
+  const build='V63 Full App Rebuild';
+  window.ASHA_BUILD=build;
+  const chip=document.querySelector('.hero-chips span:last-child');
+  if(chip) chip.textContent=build;
+  console.log('ASHA_BUILD',build);
+
+  function n(v){return Number(v||0)||0}
+  function nowISO(){return new Date().toISOString()}
+  function fmtDate(d){try{return new Date(d).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});}catch(e){return d||''}}
+  function cust(id){return state.customers.find(x=>x.id===id)}
+  function latestBillV63(cid){
+    return state.bills.filter(b=>b.customerId===cid).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')) || String(b.billNo||'').localeCompare(String(a.billNo||'')))[0];
+  }
+  function ensureLogs(c){ if(c && !Array.isArray(c.logs)) c.logs=[]; return c?.logs||[]; }
+  function logV63(cid,type,text,amount=0){
+    const c=cust(cid); if(!c) return;
+    ensureLogs(c).unshift({id:uid(),date:nowISO(),type,text,amount});
+  }
+  function ensureManual(c){ if(c && !Array.isArray(c.manualChats)) c.manualChats=[]; return c?.manualChats||[]; }
+
+  // ---------- Firestore sanitize ----------
+  function sanitize(v){
+    if(v===undefined) return null;
+    if(v===null) return null;
+    if(typeof v==='number') return Number.isFinite(v)?v:0;
+    if(typeof v==='string'||typeof v==='boolean') return v;
+    if(v instanceof Date) return v.toISOString();
+    if(Array.isArray(v)) return v.map(sanitize);
+    if(typeof v==='object'){const o={};Object.keys(v).forEach(k=>o[k]=sanitize(v[k]));return o;}
+    return null;
+  }
+  window.fixStateV63=function(){
+    if(!state.settings) state.settings={};
+    const def={company:'আশা মিনি শ্যালো',owner:'SK EKRAMUL Haque',contact:'9564061920',address:'Raghunathpur, Chaklachipur, Ghatal, Paschim Medinipur, 721232',upi:'8710065540@axl',payee:'SK ENAMUL HAQUE',country:'+91',accent:'#075c39',print:'thermal80',template:'premium',qrMode:'dynamic',qrImage:'',reminderTemplate:'আপনাকে পুরো বিল শীঘ্রই পরিশোধের জন্য বলা হচ্ছে',defaultBillNote:'',appFont:'',billFont:'',compactMeta:true};
+    Object.keys(def).forEach(k=>{ if(state.settings[k]===undefined||state.settings[k]===null) state.settings[k]=def[k]; });
+    (state.customers||[]).forEach(c=>{ ensureLogs(c); ensureManual(c); if(c.note===undefined)c.note=c.landNote||''; if(c.landNote===undefined)c.landNote=c.note||''; });
+    state=sanitize(state);
+    return state;
+  };
+  const oldSaveStateV63=window.saveState;
+  window.saveState=function(sync=true){
+    try{fixStateV63(); const s=JSON.stringify(state); localStorage.setItem(typeof V30_KEY!=='undefined'?V30_KEY:KEY,s); localStorage.setItem(KEY,s);}catch(e){alert('Local save failed: '+(e.message||e));}
+    try{renderAll();}catch(e){console.warn(e);}
+    if(sync) setTimeout(()=>{try{pushCloud(false)}catch(e){}},100);
+  };
+  window.pushCloud=async function(manual=true){
+    try{
+      fixStateV63();
+      if(!auth||!db||!DOC) { if(manual) alert('Firebase not ready. Local save done.'); return false; }
+      const u=auth.currentUser;
+      if(!u){ if(manual) alert('Cloud login needed. Local save done.'); if(q('cloudStatus'))q('cloudStatus').textContent='Cloud: login needed'; return false; }
+      if(u.uid!==OWNER_UID){ if(manual) alert('Wrong owner login. Local save done.'); if(q('cloudStatus'))q('cloudStatus').textContent='Cloud: wrong owner'; return false; }
+      await DOC.set({data:sanitize(state),updatedAt:new Date().toISOString(),ownerUid:u.uid,appVersion:'v63'},{merge:true});
+      if(q('cloudStatus'))q('cloudStatus').textContent='Cloud: saved ✅';
+      if(q('cloudChip'))q('cloudChip').textContent='Cloud: saved ✅';
+      if(manual) alert('Cloud saved ✅');
+      return true;
+    }catch(e){
+      const msg=(e.code?e.code+': ':'')+(e.message||e);
+      if(q('cloudStatus'))q('cloudStatus').textContent='Cloud: local saved / cloud failed - '+msg.slice(0,90);
+      if(manual) alert('Cloud push failed: '+msg);
+      console.error('V63 cloud push failed',e);
+      return false;
+    }
+  };
+
+  // ---------- Customer Edit + Note ----------
+  const oldOpenCustomerV63=window.openCustomer;
+  window.openCustomer=function(id=''){
+    if(oldOpenCustomerV63) oldOpenCustomerV63(id);
+    setTimeout(()=>{
+      const c=id?cust(id):null;
+      if(q('custNote')) q('custNote').value=c?.note||c?.landNote||'';
+    },80);
+  };
+  const oldSaveCustomerV63=window.saveCustomer;
+  window.saveCustomer=function(){
+    const idBefore=q('custId')?.value||'';
+    const note=q('custNote')?.value?.trim()||'';
+    if(oldSaveCustomerV63) oldSaveCustomerV63();
+    setTimeout(()=>{
+      let c=idBefore?cust(idBefore):state.customers[state.customers.length-1];
+      if(c){ c.note=note; c.landNote=note; logV63(c.id,'edit','Edited user profile/note',0); saveState(); }
+    },100);
+  };
+
+  // ---------- Rate / bill calculation ----------
+  window.v63RateLine=function(b){
+    const r=n(b.rate), u=b.rateUnit||b.unit||'bigha';
+    if(u==='katha') return `${money(r)}/কাঠা; বিঘা rate ${money(r*20)}/বিঘা`;
+    if(u==='decimal') return `${money(r)}/ডেসিমেল; বিঘা rate ${money(r*40)}/বিঘা`;
+    return `${money(r)}/বিঘা`;
+  };
+  const oldMakeBillV63=window.makeBillFromForm;
+  window.makeBillFromForm=function(){
+    let b=oldMakeBillV63?oldMakeBillV63():null; if(!b)return b;
+    const unit=q('landUnit')?.value||b.unit||'bigha';
+    const land=n(q('land')?.value??b.landAmount);
+    const rate=n(q('rate')?.value??b.rate);
+    const prev=n(q('previousDue')?.value??b.previousDue);
+    b.unit=unit; b.rateUnit=unit; b.landAmount=land; b.rate=rate; b.bigha=landToBigha(land,unit); b.current=land*rate; b.previousDue=prev; b.allTotal=b.current+prev;
+    return b;
+  };
+
+  // ---------- V63 premium compact bill & QR ----------
+  window.v63Upi=function(amount,billNo){
+    return `upi://pay?pa=${encodeURIComponent(state.settings.upi||'')}&pn=${encodeURIComponent(state.settings.owner||state.settings.payee||'Asha')}&am=${Number(amount||0).toFixed(2)}&cu=INR&tn=${encodeURIComponent(billNo||'Asha Bill')}`;
+  };
+  window.v63BillHTML=function(b){
+    const c=cust(b.customerId)||{};
+    const paid=billPaid(b), due=billDue(b), qrAmount=due>0?due:b.allTotal;
+    const note=c.note||c.landNote||'';
+    return `<div class="v63-bill" data-bill="${esc(b.billNo)}">
+      <div class="v63-head"><h2>${esc(state.settings.company)}</h2><p>${esc(state.settings.address)}</p><p>☎ ${esc(state.settings.contact)} • UPI: ${esc(state.settings.upi)}</p></div>
+      <div class="v63-section v63-customer"><div class="v63-sec-title">Customer</div>
+        <div class="v63-row"><span>Name</span><b>${esc(b.customerName)}</b></div>
+        <div class="v63-row"><span>Phone</span><b>${esc(b.phone||'')}</b></div>
+        <div class="v63-row"><span>Village</span><b>${esc(b.village||'')}</b></div>
+        <div class="v63-row"><span>Address</span><b>${esc(b.address||'')}</b></div>
+        ${note?`<div class="v63-note"><b>Note:</b> ${esc(note)}</div>`:''}
+      </div>
+      <div class="v63-section"><div class="v63-sec-title">Bill Details</div>
+        <div class="v63-row"><span>Bill No</span><b>${esc(b.billNo)}</b></div>
+        <div class="v63-row"><span>Date</span><b>${esc(b.date)}</b></div>
+        <div class="v63-row"><span>Season</span><b>${esc(b.season||'')}</b></div>
+        <div class="v63-row"><span>Land</span><b>${esc(b.landAmount)} ${esc(b.unit)} = ${Number(b.bigha||0).toFixed(2)} বিঘা</b></div>
+        <div class="v63-row"><span>Rate</span><b>${esc(v63RateLine(b))}</b></div>
+        <div class="v63-row"><span>Current Bill</span><b>${money(b.current)}</b></div>
+      </div>
+      <div class="v63-section v63-total"><div class="v63-sec-title">Payment Summary</div>
+        <div class="v63-row"><span>Previous Due</span><b>${money(b.previousDue)}</b></div>
+        <div class="v63-row"><span>All Total</span><b>${money(b.allTotal)}</b></div>
+        <div class="v63-row"><span>Paid / Joma</span><b>${money(paid)}</b></div>
+        <div class="v63-row v63-due"><span>Payable Due</span><b>${money(due)}</b></div>
+      </div>
+      <div class="v63-section" style="text-align:center"><div class="v63-sec-title">Scan & Pay</div>
+        <div class="v63-qr" data-amount="${qrAmount}" data-bill="${esc(b.billNo)}"></div>
+        <b>${money(qrAmount)}</b>
+      </div>
+      <div class="v63-foot">${esc(state.settings.reminderTemplate||'আপনাকে পুরো বিল শীঘ্রই পরিশোধের জন্য বলা হচ্ছে')}<br>Owner: ${esc(state.settings.owner)} • Thank you</div>
+    </div>`;
+  };
+  window.v63RenderQR=async function(root=document){
+    const boxes=[...root.querySelectorAll('.v63-qr')];
+    for(const box of boxes){
+      const amount=n(box.dataset.amount), bill=box.dataset.bill||'Asha Bill';
+      box.innerHTML='';
+      if(state.settings.qrMode==='static'&&state.settings.qrImage){
+        const img=new Image(); img.src=state.settings.qrImage; box.appendChild(img);
+      }else if(window.QRCode){
+        new QRCode(box,{text:v63Upi(amount,bill),width:112,height:112,correctLevel:QRCode.CorrectLevel.M});
+      }else{
+        const img=new Image(); img.crossOrigin='anonymous'; img.src='https://api.qrserver.com/v1/create-qr-code/?size=180x180&data='+encodeURIComponent(v63Upi(amount,bill)); box.appendChild(img);
+      }
+    }
+    await new Promise(r=>setTimeout(r,450));
+    boxes.forEach(box=>{const canvas=box.querySelector('canvas'); if(canvas){const img=new Image(); img.src=canvas.toDataURL('image/png'); img.width=112; img.height=112; box.innerHTML=''; box.appendChild(img);}});
+    await new Promise(r=>setTimeout(r,100));
+  };
+  const oldRenderInvoiceV63=window.renderInvoice;
+  window.renderInvoice=function(b){
+    currentBill=b;
+    const target=q('billPreview');
+    if(target){ target.innerHTML=v63BillHTML(b); v63RenderQR(target); return; }
+    if(oldRenderInvoiceV63) oldRenderInvoiceV63(b);
+  };
+  window.v63BillBlob=async function(b){
+    const root=q('v63ShareRoot')||document.body;
+    root.innerHTML=v63BillHTML(b);
+    await v63RenderQR(root);
+    const bill=root.querySelector('.v63-bill');
+    const canvas=await html2canvas(bill,{scale:3,useCORS:true,allowTaint:true,backgroundColor:'#ffffff',scrollX:0,scrollY:0});
+    return await new Promise(r=>canvas.toBlob(r,'image/png',0.98));
+  };
+  window.invoiceBlob=async function(){ if(!currentBill)throw new Error('No bill'); return v63BillBlob(currentBill); };
+  window.shareBill=async function(){
+    if(!currentBill)return alert('Preview bill first');
+    const blob=await v63BillBlob(currentBill);
+    const file=new File([blob],`${currentBill.billNo}.png`,{type:'image/png'});
+    const text=reminderTextByBill(currentBill);
+    try{
+      if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})) await navigator.share({files:[file],text,title:'Asha Bill Reminder'});
+      else {downloadBlob(blob,`${currentBill.billNo}.png`); openWhatsApp(currentBill.phone,text);}
+    }catch(e){downloadBlob(blob,`${currentBill.billNo}.png`); openWhatsApp(currentBill.phone,text);}
+  };
+  window.v63BillReminder=async function(cid,billId=''){
+    const c=cust(cid); if(!c)return alert('User not found');
+    const b=billId?state.bills.find(x=>x.id===billId):latestBillV63(cid);
+    if(!b)return alert('এই user-এর bill নেই। আগে New Bill তৈরি করুন।');
+    currentBill=b;
+    const blob=await v63BillBlob(b);
+    const url=URL.createObjectURL(blob);
+    const html=`<p class="muted"><b>${esc(c.name)}</b> • ${esc(b.billNo)} • Due <b>${money(billDue(b))}</b></p>
+      <img class="v63-preview-img" src="${url}">
+      <div class="action-bar"><button class="btn primary" id="v63ShareNow">Share Image + Text</button><button class="btn" id="v63WaText">WhatsApp Text Only</button><button class="btn" id="v63Download">Download Image</button></div>`;
+    if(q('actionModal')){
+      q('actionTitle').textContent='Bill + Reminder';
+      q('actionBody').innerHTML=html;
+      q('actionSave')?.classList.add('hidden'); q('actionDelete')?.classList.add('hidden'); q('actionModal').classList.remove('hidden');
+      q('v63ShareNow').onclick=async()=>{const file=new File([blob],`${b.billNo}.png`,{type:'image/png'});try{if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]}))await navigator.share({files:[file],text:reminderTextByBill(b),title:'Asha Bill Reminder'});else{downloadBlob(blob,`${b.billNo}.png`);openWhatsApp(c.phone,reminderTextByBill(b));}}catch(e){downloadBlob(blob,`${b.billNo}.png`);openWhatsApp(c.phone,reminderTextByBill(b));}};
+      q('v63WaText').onclick=()=>openWhatsApp(c.phone,reminderTextByBill(b));
+      q('v63Download').onclick=()=>downloadBlob(blob,`${b.billNo}.png`);
+    }else{
+      downloadBlob(blob,`${b.billNo}.png`);
+      openWhatsApp(c.phone,reminderTextByBill(b));
+    }
+  };
+  window.shareCustomerBill=function(cid,billId=''){return v63BillReminder(cid,billId);};
+  window.v53BillReminder=function(cid){return v63BillReminder(cid);};
+
+  // ---------- Payment edit / undo ----------
+  window.findPaymentV63=function(pid){
+    for(const b of state.bills){const p=(b.payments||[]).find(x=>x.id===pid); if(p)return{bill:b,p};}
+    return null;
+  };
+  window.editEntry=function(pid){
+    const fp=findPaymentV63(pid); if(!fp)return alert('Entry not found');
+    window.actionContext={type:'v63editPayment',paymentId:pid};
+    q('actionTitle').textContent=String(fp.p.mode||'').toLowerCase().includes('settle')?'Edit Settlement':'Edit Payment';
+    q('actionBody').innerHTML=`<label>Amount</label><input id="editAmount" type="number" value="${n(fp.p.amount)}"><label>Mode</label><select id="editMode"><option>Cash</option><option>UPI</option><option>Bank</option><option>Online</option><option>Settlement</option></select><label>Received In</label><input id="editReceived" value="${esc(fp.p.receivedIn||'')}"><label>Note</label><input id="editNote" value="${esc(fp.p.note||'')}">`;
+    q('editMode').value=fp.p.mode||'Cash';
+    q('actionSave').classList.remove('hidden'); q('actionDelete').classList.remove('hidden'); q('actionModal').classList.remove('hidden');
+    q('actionSave').onclick=()=>saveEntryV63(); q('actionDelete').onclick=()=>undoEntryV63(pid,true);
+  };
+  window.saveEntryV63=function(){
+    const pid=window.actionContext?.paymentId; const fp=findPaymentV63(pid); if(!fp)return closeAction();
+    const before=n(fp.p.amount);
+    fp.p.amount=n(q('editAmount').value); fp.p.mode=q('editMode').value; fp.p.receivedIn=q('editReceived').value; fp.p.note=q('editNote').value; fp.p.editedAt=nowISO();
+    logV63(fp.bill.customerId,'edit',`Edited ${fp.p.mode} on ${fp.bill.billNo}: ${money(before)} → ${money(fp.p.amount)}`,fp.p.amount);
+    saveState(); if(activeCustomer)renderChat(); closeAction(); alert('Updated');
+  };
+  window.undoEntryV63=function(pid,fromModal=false){
+    const fp=findPaymentV63(pid); if(!fp)return alert('Entry not found');
+    if(!confirm('এই payment/settlement undo/delete করবে?'))return;
+    const amt=n(fp.p.amount), mode=fp.p.mode||'Payment';
+    fp.bill.payments=(fp.bill.payments||[]).filter(x=>x.id!==pid);
+    logV63(fp.bill.customerId,'undo',`Undo ${mode} from ${fp.bill.billNo}: ${money(amt)}`,amt);
+    saveState(); if(activeCustomer)renderChat(); if(fromModal)closeAction();
+  };
+  window.deleteAction=function(){ if(window.actionContext?.type==='v63editPayment')return undoEntryV63(window.actionContext.paymentId,true); };
+  window.saveAction=function(){ if(window.actionContext?.type==='v63editPayment')return saveEntryV63(); };
+  window.closeAction=function(){window.actionContext=null; q('actionModal')?.classList.add('hidden'); q('actionSave')?.classList.remove('hidden'); q('actionDelete')?.classList.remove('hidden');};
+
+  // ---------- Manual owner-only chat ----------
+  window.addManualChatV63=function(cid=activeCustomer,text=''){
+    const c=cust(cid); if(!c)return alert('Customer not found');
+    const msg=String(text||q('manualChatInput')?.value||'').trim(); if(!msg)return;
+    ensureManual(c).push({id:uid(),text:msg,date:nowISO(),sender:'owner'});
+    logV63(c.id,'manual-chat','Manual chat/note added',0);
+    if(q('manualChatInput'))q('manualChatInput').value='';
+    saveState(); if(activeCustomer===cid)renderChat();
+  };
+  window.editManualChatV63=function(cid,msgId){
+    const c=cust(cid), m=c&&ensureManual(c).find(x=>x.id===msgId); if(!m)return alert('Message not found');
+    window.actionContext={type:'v63manual',cid,msgId};
+    q('actionTitle').textContent='Edit Chat / Note';
+    q('actionBody').innerHTML=`<label>Message</label><textarea id="manualEditText">${esc(m.text||'')}</textarea>`;
+    q('actionSave').classList.remove('hidden'); q('actionDelete').classList.remove('hidden'); q('actionModal').classList.remove('hidden');
+    q('actionSave').onclick=()=>{m.text=q('manualEditText').value.trim();m.editedAt=nowISO();logV63(cid,'manual-edit','Manual chat/note edited',0);saveState();renderChat();closeAction();};
+    q('actionDelete').onclick=()=>deleteManualChatV63(cid,msgId,true);
+  };
+  window.deleteManualChatV63=function(cid,msgId,fromModal=false){
+    const c=cust(cid); if(!c)return; if(!confirm('Delete this chat/note?'))return;
+    c.manualChats=ensureManual(c).filter(x=>x.id!==msgId);
+    logV63(cid,'manual-delete','Manual chat/note deleted',0);
+    saveState(); if(activeCustomer===cid)renderChat(); if(fromModal)closeAction();
+  };
+  window.openManualChatV63=function(cid=activeCustomer){
+    const c=cust(cid); if(!c)return;
+    const chats=ensureManual(c).slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+    q('actionTitle').textContent='Manual Chat / Notes';
+    q('actionBody').innerHTML=`<p class="muted"><b>${esc(c.name)}</b></p><textarea id="manualModalInput" placeholder="Message/note লিখুন"></textarea><button class="btn primary full" id="manualModalSend">Add</button><div class="v63-manager-list" style="margin-top:10px">${chats.length?chats.map(m=>`<div class="v63-manager-item"><b>${esc(m.text)}</b><br><small>${esc(fmtDate(m.date))}${m.editedAt?' • Edited':''}</small><div class="v63-manager-actions"><button onclick="editManualChatV63('${c.id}','${m.id}')">Edit</button><button class="danger-mini" onclick="deleteManualChatV63('${c.id}','${m.id}')">Delete</button></div></div>`).join(''):'<div class="card muted">No manual chat/note</div>'}</div>`;
+    q('actionSave')?.classList.add('hidden'); q('actionDelete')?.classList.add('hidden'); q('actionModal').classList.remove('hidden');
+    q('manualModalSend').onclick=()=>{addManualChatV63(c.id,q('manualModalInput').value);openManualChatV63(c.id);};
+  };
+
+  // ---------- User menu & renderChat final ----------
+  window.openUserMenuV52=function(cid){
+    const c=cust(cid); if(!c)return alert('User not found');
+    const b=latestBillV63(cid);
+    if(!q('v52Menu')){
+      document.body.insertAdjacentHTML('beforeend','<div id="v52Menu"><div class="v52-panel"><div class="v52-title"><div><b id="v52Name"></b><small id="v52Sub"></small></div><button class="v52-close" id="v52Close">×</button></div><div id="v52Body" class="v52-actions"></div><div id="v52Status" class="v52-status"></div></div></div>');
+      q('v52Close').onclick=()=>closeMenu();
+      q('v52Menu').addEventListener('click',e=>{if(e.target.id==='v52Menu')closeMenu();});
+    }
+    q('v52Name').textContent=c.name||'User';
+    q('v52Sub').textContent=(c.phone||'No phone')+' • '+(c.village||'No village')+' • Due '+money(customerDue(cid));
+    q('v52Body').className='v52-actions';
+    q('v52Body').innerHTML=`<button class="primary" id="mNewBill">▤ New Bill</button><button id="mEdit">✎ Edit User</button><button id="mLedger">☷ Ledger</button><button id="mReceive">₹ Receive</button><button id="mSettle">✓ Settle</button><button class="primary" id="mBillReminder">⏰ Bill + Reminder</button><button id="mChat">💬 Chat</button><button id="mNormal">Ⓦ Normal Reminder</button><button id="mCall">✆ Call</button><button class="danger" id="mDelete">⌫ Delete User</button>`;
+    q('v52Status').textContent=b?'Latest bill: '+b.billNo:'No bill yet';
+    q('v52Menu').classList.add('open');
+    q('mNewBill').onclick=()=>{closeMenu();try{closeChat()}catch(e){};showPage('billPage');setTimeout(()=>{q('billCustomer').value=cid;toggleManual();if(window.updatePreviousDueV55)updatePreviousDueV55(true);previewBill();},160);};
+    q('mEdit').onclick=()=>v53EditUser? v53EditUser(cid):openCustomer(cid);
+    q('mLedger').onclick=()=>{closeMenu();renderChatLedger(cid);};
+    q('mReceive').onclick=()=>{closeMenu();directPay(cid,false);};
+    q('mSettle').onclick=()=>{closeMenu();directPay(cid,true);};
+    q('mBillReminder').onclick=()=>v63BillReminder(cid);
+    q('mChat').onclick=()=>openManualChatV63(cid);
+    q('mNormal').onclick=()=>openWhatsApp(c.phone,normalReminderText?normalReminderText(c):'Reminder');
+    q('mCall').onclick=()=>location.href='tel:'+String(c.phone||'').replace(/\D/g,'');
+    q('mDelete').onclick=()=>{if(confirm('Delete this user?')){deleteCustomer(cid);closeMenu();}};
+  };
+  window.openMoreMenu=function(cid){openUserMenuV52(cid);};
+  const oldRenderChatV63=window.renderChat;
+  window.renderChat=function(){
+    if(oldRenderChatV63)oldRenderChatV63();
+    const c=cust(activeCustomer); if(!c)return;
+    if(q('chatMore'))q('chatMore').onclick=()=>openUserMenuV52(c.id);
+    if(q('chatManual'))q('chatManual').onclick=()=>openManualChatV63(c.id);
+    if(q('manualChatSend'))q('manualChatSend').onclick=()=>addManualChatV63(c.id);
+    if(q('manualChatInput'))q('manualChatInput').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();addManualChatV63(c.id);}};
+    // Fix all payment buttons
+    q('chatBody')?.querySelectorAll('button').forEach(btn=>{
+      const text=(btn.textContent||'').trim().toLowerCase();
+      const on=btn.getAttribute('onclick')||'';
+      const pid=(on.match(/editEntry\('([^']+)'\)/)||[])[1];
+      if(pid && text.includes('undo')) btn.onclick=()=>undoEntryV63(pid);
+      else if(pid && text.includes('edit')) btn.onclick=()=>editEntry(pid);
+      if(/bill|reminder/i.test(btn.textContent||'') && on.includes('shareCustomerBill')) {
+        const bid=(on.match(/'([^']+)'\)$/)||[])[1];
+      }
+    });
+    const chats=ensureManual(c).slice().sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+    q('chatBody')?.querySelector('.v63-manual-wrap')?.remove();
+    if(chats.length){
+      q('chatBody').insertAdjacentHTML('beforeend',`<div class="v63-manual-wrap" style="display:flex;flex-direction:column;gap:10px">${chats.map(m=>`<div class="bubble manualB"><b>Owner Message</b><br>${esc(m.text)}<br><small>${esc(fmtDate(m.date))}${m.editedAt?' • Edited':''}</small><div class="msg-tools"><button onclick="editManualChatV63('${c.id}','${m.id}')">Edit</button><button class="danger-mini" onclick="deleteManualChatV63('${c.id}','${m.id}')">Delete</button></div></div>`).join('')}</div>`);
+    }
+  };
+  const oldRenderCustomersV63=window.renderCustomers;
+  window.renderCustomers=function(){
+    if(oldRenderCustomersV63)oldRenderCustomersV63();
+    setTimeout(()=>{document.querySelectorAll('.customer-row').forEach(row=>{const name=row.querySelector('.cust-name')?.textContent||'';const c=state.customers.find(x=>x.name===name);if(c&&(c.note||c.landNote)&&!row.querySelector('.customer-note-line'))row.querySelector('.cust-main')?.insertAdjacentHTML('beforeend',`<div class="customer-note-line">${esc(c.note||c.landNote)}</div>`);});},0);
+  };
+
+  // ---------- Calculator compact with 2nd ----------
+  window.setupCalc=function(){
+    let second=false;
+    function render(){
+      const normal=['AC','DEL','%','÷','7','8','9','×','4','5','6','-','1','2','3','+','2nd','0','.','='];
+      const sci=['sin','cos','tan','log','ln','√','x²','xʸ','π','e','!','(',')','DEG','RAD','2nd','0','.','='];
+      const keys=second?sci:normal;
+      q('calcKeys').innerHTML=keys.map(k=>`<button class="${k==='2nd'?'v63-second':k==='='?'v63-eq':['+','-','×','÷','%'].includes(k)?'op':''}" data-k="${k}">${k}</button>`).join('');
+      document.querySelector('.calc')?.classList.add('v63-calc-compact');
+    }
+    function fact(x){x=Math.floor(x);let r=1;for(let i=2;i<=x;i++)r*=i;return r;}
+    q('calcScreen').textContent=calcVal||'0';
+    render();
+    q('calcKeys').onclick=e=>{
+      const k=e.target.dataset.k;if(!k)return;
+      if(k==='2nd'){second=!second;render();return;}
+      if(k==='AC')calcVal='';
+      else if(k==='DEL')calcVal=calcVal.slice(0,-1);
+      else if(k==='='){
+        try{
+          let exp=calcVal.replace(/×/g,'*').replace(/÷/g,'/').replace(/π/g,'Math.PI').replace(/\be\b/g,'Math.E').replace(/sin\(/g,'Math.sin((Math.PI/180)*').replace(/cos\(/g,'Math.cos((Math.PI/180)*').replace(/tan\(/g,'Math.tan((Math.PI/180)*').replace(/log\(/g,'Math.log10(').replace(/ln\(/g,'Math.log(').replace(/√\(/g,'Math.sqrt(').replace(/\^/g,'**');
+          calcVal=String(Function('return ('+exp+')')());
+        }catch(err){calcVal='Error';}
+      }else if(k==='x²')calcVal+='**2';
+      else if(k==='xʸ')calcVal+='^';
+      else if(k==='!'){try{calcVal=String(fact(Number(Function('return ('+calcVal+')')())))}catch(e){calcVal='Error'}}
+      else if(['sin','cos','tan','log','ln','√'].includes(k))calcVal+=k+'(';
+      else if(k==='DEG'||k==='RAD'){}
+      else{if(calcVal==='Error')calcVal='';calcVal+=k;}
+      q('calcScreen').textContent=calcVal||'0';
+    };
+  };
+  try{setupCalc();}catch(e){console.warn(e);}
+
+  // final service worker update
+  if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations?.().then(rs=>rs.forEach(r=>r.update().catch(()=>{}))).catch(()=>{});}
+  fixStateV63();
+  setTimeout(()=>{try{renderCustomers(); if(activeCustomer)renderChat(); if(currentBill)renderInvoice(currentBill);}catch(e){}},700);
 });
 })();

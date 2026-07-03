@@ -265,3 +265,19 @@ V62 Cache Killer:
 - index.html now loads ./style.css?v=62, ./app.js?v=62, ./manifest.json?v=62.
 - Service worker cache bumped to v62 and uses network-first/no-store for index/app/style/manifest.
 - If phone still shows V59, the GitHub repo files were not replaced or Chrome/PWA site data is serving old app.
+
+
+V63 Full App Rebuild:
+- Final build chip: V63 Full App Rebuild.
+- User menu rebuilt with stable direct handlers.
+- Bill + Reminder fixed with dedicated compact premium hidden bill renderer.
+- Dynamic QR renders locally and converts canvas to image before share/capture.
+- Compact premium bill design added with customer card, charge card, payment summary, QR, footer.
+- Edit User includes Note / জমির নোট.
+- Customer note displays in customer list and premium bill.
+- Payment/Settlement Edit and Undo/Delete fixed with logs.
+- Owner-only manual chat/note added per customer.
+- Manual chat can be sent from user chat input, edited, and deleted.
+- Calculator rebuilt compact with 2nd key for scientific/trigonometry keys.
+- Firestore data sanitized before push to avoid undefined field errors.
+- Cache killer: index loads app.js?v=63, style.css?v=63, manifest.json?v=63.
