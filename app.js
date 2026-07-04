@@ -3769,7 +3769,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 
 ready(function(){
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V65 Bill Reminder Modal Fix';
+  if(chip) chip.textContent='V66 Audited Fix';
 
   function setCloudStatus(text,type='warn'){
     const el=document.getElementById('cloudChip');
@@ -3856,7 +3856,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V65 Bill Reminder Modal Fix';
+  if(chip) chip.textContent='V66 Audited Fix';
 
   function selectedCustomerV55(){
     const sel=q('billCustomer');
@@ -4045,7 +4045,7 @@ ready(function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,1200)); else setTimeout(fn,1200); }
 ready(function(){
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V65 Bill Reminder Modal Fix';
+  if(chip) chip.textContent='V66 Audited Fix';
   const prev=document.getElementById('previousDue');
   if(prev){
     prev.addEventListener('focus',()=>prev.select());
@@ -4067,13 +4067,13 @@ ready(function(){
 
 
 
-/* ==== V65 Bill Reminder Modal Fix / Diagnostics ==== */
+/* ==== V66 Audited Fix / Diagnostics ==== */
 (function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,1400)); else setTimeout(fn,1400); }
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V65 Bill Reminder Modal Fix';
+  if(chip) chip.textContent='V66 Audited Fix';
 
   function setCloudV57(text,type='info'){
     const s=q('cloudStatus');
@@ -4237,7 +4237,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V65 Bill Reminder Modal Fix';
+  if(chip) chip.textContent='V66 Audited Fix';
 
   const RULES_TEXT=`rules_version = '2';
 service cloud.firestore {
@@ -4472,7 +4472,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V65 Bill Reminder Modal Fix';
+  if(chip) chip.textContent='V66 Audited Fix';
 
   function setCloudV59(text){
     const s=q('cloudStatus'); if(s) s.textContent=text;
@@ -4788,7 +4788,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V65 Bill Reminder Modal Fix';
+  if(chip) chip.textContent='V66 Audited Fix';
   const safeNum=v=>Number(v||0)||0;
 
   window.rateLineV60=function(b){
@@ -4948,7 +4948,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V65 Bill Reminder Modal Fix';
+  if(chip) chip.textContent='V66 Audited Fix';
 
   function ensureCustomerChatV61(c){
     if(!c) return [];
@@ -5165,8 +5165,8 @@ ready(function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,800)); else setTimeout(fn,800); }
 ready(function(){
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V65 Bill Reminder Modal Fix';
-  window.ASHA_BUILD='V65 Bill Reminder Modal Fix';
+  if(chip) chip.textContent='V66 Audited Fix';
+  window.ASHA_BUILD='V66 Audited Fix';
   console.log('ASHA_BUILD', window.ASHA_BUILD);
 
   // Force update service worker when the new code is actually loaded.
@@ -5185,7 +5185,7 @@ ready(function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,3600)); else setTimeout(fn,3600); }
 ready(function(){
   const q=id=>document.getElementById(id);
-  const build='V65 Bill Reminder Modal Fix';
+  const build='V66 Audited Fix';
   window.ASHA_BUILD=build;
   const chip=document.querySelector('.hero-chips span:last-child');
   if(chip) chip.textContent=build;
@@ -5567,7 +5567,7 @@ ready(function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,4200)); else setTimeout(fn,4200); }
 ready(function(){
   const q=id=>document.getElementById(id);
-  const build='V65 Bill Reminder Modal Fix';
+  const build='V66 Audited Fix';
   window.ASHA_BUILD=build;
   const chip=document.querySelector('.hero-chips span:last-child');
   if(chip) chip.textContent=build;
@@ -5894,7 +5894,7 @@ ready(function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,4400)); else setTimeout(fn,4400); }
 ready(function(){
   const q=id=>document.getElementById(id);
-  const build='V65 Bill Reminder Modal Fix';
+  const build='V66 Audited Fix';
   window.ASHA_BUILD=build;
   const chip=document.querySelector('.hero-chips span:last-child');
   if(chip) chip.textContent=build;
@@ -5944,5 +5944,123 @@ ready(function(){
   window.renderChat=function(){ if(oldRenderChat) oldRenderChat(); const cid=activeCustomer; if(!cid) return; setTimeout(()=>{ const billBtn=q('v64ToolBill'); if(billBtn) billBtn.onclick=()=>v65BillReminder(cid); if(q('chatShare')) q('chatShare').onclick=()=>v65BillReminder(cid); [...(q('chatBody')?.querySelectorAll('button')||[])].forEach(btn=>{ if(/Bill|Reminder/i.test(btn.textContent||'') && (btn.getAttribute('onclick')||'').includes('shareCustomerBill')){ btn.onclick=()=>v65BillReminder(cid); } }); },80); };
   q('actionModal')?.addEventListener('click',e=>{ if(e.target && e.target.id==='actionModal') closeAction(); });
   setTimeout(()=>{try{if(activeCustomer)renderChat();}catch(e){}},800);
+});
+})();
+
+
+
+/* ===================== V66 AUDITED FIX ===================== */
+(function(){
+function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,4700)); else setTimeout(fn,4700); }
+ready(function(){
+  const q=id=>document.getElementById(id);
+  const build='V66 Audited Fix';
+  window.ASHA_BUILD=build;
+  const chip=document.querySelector('.hero-chips span:last-child');
+  if(chip) chip.textContent=build;
+  console.log('ASHA_BUILD',build);
+
+  function modal(){return q('actionModal');}
+  function markReminder(on){
+    const m=modal();
+    if(!m) return;
+    m.classList.toggle('v66-reminder-active',!!on);
+  }
+
+  const prevCloseAction=window.closeAction;
+  window.closeAction=function(){
+    markReminder(false);
+    if(prevCloseAction) return prevCloseAction();
+    window.actionContext=null;
+    q('actionModal')?.classList.add('hidden');
+  };
+
+  // Rewrap V65 Bill+Reminder to mark its modal only while open.
+  const prevV65 = window.v65BillReminder || window.v64BillReminder || window.shareCustomerBill;
+  window.v66BillReminder = async function(cid,bid=''){
+    markReminder(true);
+    try{
+      return await prevV65(cid,bid);
+    }catch(e){
+      markReminder(false);
+      console.error('V66 bill reminder failed',e);
+      alert('Bill + Reminder open failed: '+(e.message||e));
+    }
+  };
+  window.v65BillReminder=function(cid,bid=''){return v66BillReminder(cid,bid);};
+  window.v64BillReminder=function(cid,bid=''){return v66BillReminder(cid,bid);};
+  window.v53BillReminder=function(cid){return v66BillReminder(cid);};
+  window.shareCustomerBill=function(cid,bid=''){return v66BillReminder(cid,bid);};
+
+  // Ensure edit/payment/chat modals always unmark reminder and show proper action buttons.
+  const prevEditEntry=window.editEntry;
+  window.editEntry=function(pid){
+    markReminder(false);
+    if(prevEditEntry) return prevEditEntry(pid);
+  };
+  const prevOpenManual=window.openManualChatV64 || window.openManualChatV63;
+  if(prevOpenManual){
+    window.openManualChatV64=function(cid=activeCustomer){
+      markReminder(false);
+      return prevOpenManual(cid);
+    };
+    window.openManualChatV63=window.openManualChatV64;
+  }
+
+  // Rebind visible routes to audited Bill+Reminder.
+  const prevRenderChat=window.renderChat;
+  window.renderChat=function(){
+    if(prevRenderChat) prevRenderChat();
+    const cid=activeCustomer;
+    if(!cid) return;
+    setTimeout(()=>{
+      const billBtn=q('v64ToolBill');
+      if(billBtn) billBtn.onclick=()=>v66BillReminder(cid);
+      if(q('chatShare')) q('chatShare').onclick=()=>v66BillReminder(cid);
+      [...(q('chatBody')?.querySelectorAll('button')||[])].forEach(btn=>{
+        if(/Bill|Reminder/i.test(btn.textContent||'') && (btn.getAttribute('onclick')||'').includes('shareCustomerBill')){
+          btn.onclick=()=>v66BillReminder(cid);
+        }
+      });
+    },100);
+  };
+
+  const prevMenu=window.openUserMenuV52 || window.openUserMenu;
+  if(prevMenu){
+    window.openUserMenuV52=function(cid){
+      prevMenu(cid);
+      setTimeout(()=>{
+        ['mBillReminder','v52BillReminder','mReminderBill'].forEach(id=>{
+          const btn=q(id);
+          if(btn) btn.onclick=()=>v66BillReminder(cid);
+        });
+        [...document.querySelectorAll('button')].forEach(btn=>{
+          if(/Bill\s*\+\s*Reminder|Reminder\s*\+\s*Bill/i.test(btn.textContent||'')) btn.onclick=()=>v66BillReminder(cid);
+        });
+      },180);
+    };
+    window.openUserMenu=window.openUserMenuV52;
+  }
+
+  // Quick runtime diagnostics available in console or from alert if needed.
+  window.ashaAuditV66=function(){
+    return {
+      build:window.ASHA_BUILD,
+      indexVersion:'v66',
+      hasV64BillHTML:typeof window.v64BillHTML==='function',
+      hasV65BillReminder:typeof window.v65BillReminder==='function',
+      hasEditEntry:typeof window.editEntry==='function',
+      hasManualChat:typeof window.addManualChatV64==='function' || typeof window.addManualChatV63==='function',
+      actionModalExists:!!q('actionModal'),
+      currentModalReminderClass:q('actionModal')?.classList.contains('v66-reminder-active') || false
+    };
+  };
+
+  setTimeout(()=>{
+    try{
+      markReminder(false);
+      if(activeCustomer && typeof renderChat==='function') renderChat();
+    }catch(e){}
+  },600);
 });
 })();

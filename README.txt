@@ -303,3 +303,14 @@ V65 Bill Reminder Modal Fix:
 - Close button fixed and background tap closes modal.
 - All Bill + Reminder routes call the V65 fixed modal.
 - Cache bumped to v65.
+
+
+V66 Audited Fix:
+- Full static audit completed on V65.
+- JS syntax check passed.
+- Fixed V65 issue: actionSave/actionDelete were hidden globally by modal CSS.
+- Now Save/Delete are hidden only while Bill+Reminder preview modal is open.
+- Edit Payment, Undo, Manual Chat Edit/Delete modals keep Save/Delete visible.
+- Bill+Reminder routes are rebound to audited V66 wrapper.
+- Added runtime diagnostic function: ashaAuditV66().
+- Cache bumped to v66.
