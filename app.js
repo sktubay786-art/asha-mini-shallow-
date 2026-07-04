@@ -3769,7 +3769,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 
 ready(function(){
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V64 User Center + Bill Modes';
+  if(chip) chip.textContent='V65 Bill Reminder Modal Fix';
 
   function setCloudStatus(text,type='warn'){
     const el=document.getElementById('cloudChip');
@@ -3856,7 +3856,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V64 User Center + Bill Modes';
+  if(chip) chip.textContent='V65 Bill Reminder Modal Fix';
 
   function selectedCustomerV55(){
     const sel=q('billCustomer');
@@ -4045,7 +4045,7 @@ ready(function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,1200)); else setTimeout(fn,1200); }
 ready(function(){
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V64 User Center + Bill Modes';
+  if(chip) chip.textContent='V65 Bill Reminder Modal Fix';
   const prev=document.getElementById('previousDue');
   if(prev){
     prev.addEventListener('focus',()=>prev.select());
@@ -4067,13 +4067,13 @@ ready(function(){
 
 
 
-/* ==== V64 User Center + Bill Modes / Diagnostics ==== */
+/* ==== V65 Bill Reminder Modal Fix / Diagnostics ==== */
 (function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,1400)); else setTimeout(fn,1400); }
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V64 User Center + Bill Modes';
+  if(chip) chip.textContent='V65 Bill Reminder Modal Fix';
 
   function setCloudV57(text,type='info'){
     const s=q('cloudStatus');
@@ -4237,7 +4237,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V64 User Center + Bill Modes';
+  if(chip) chip.textContent='V65 Bill Reminder Modal Fix';
 
   const RULES_TEXT=`rules_version = '2';
 service cloud.firestore {
@@ -4472,7 +4472,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V64 User Center + Bill Modes';
+  if(chip) chip.textContent='V65 Bill Reminder Modal Fix';
 
   function setCloudV59(text){
     const s=q('cloudStatus'); if(s) s.textContent=text;
@@ -4788,7 +4788,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V64 User Center + Bill Modes';
+  if(chip) chip.textContent='V65 Bill Reminder Modal Fix';
   const safeNum=v=>Number(v||0)||0;
 
   window.rateLineV60=function(b){
@@ -4948,7 +4948,7 @@ function ready(fn){ if(document.readyState==='loading') document.addEventListene
 ready(function(){
   const q=id=>document.getElementById(id);
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V64 User Center + Bill Modes';
+  if(chip) chip.textContent='V65 Bill Reminder Modal Fix';
 
   function ensureCustomerChatV61(c){
     if(!c) return [];
@@ -5165,8 +5165,8 @@ ready(function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,800)); else setTimeout(fn,800); }
 ready(function(){
   const chip=document.querySelector('.hero-chips span:last-child');
-  if(chip) chip.textContent='V64 User Center + Bill Modes';
-  window.ASHA_BUILD='V64 User Center + Bill Modes';
+  if(chip) chip.textContent='V65 Bill Reminder Modal Fix';
+  window.ASHA_BUILD='V65 Bill Reminder Modal Fix';
   console.log('ASHA_BUILD', window.ASHA_BUILD);
 
   // Force update service worker when the new code is actually loaded.
@@ -5185,7 +5185,7 @@ ready(function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,3600)); else setTimeout(fn,3600); }
 ready(function(){
   const q=id=>document.getElementById(id);
-  const build='V64 User Center + Bill Modes';
+  const build='V65 Bill Reminder Modal Fix';
   window.ASHA_BUILD=build;
   const chip=document.querySelector('.hero-chips span:last-child');
   if(chip) chip.textContent=build;
@@ -5567,7 +5567,7 @@ ready(function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,4200)); else setTimeout(fn,4200); }
 ready(function(){
   const q=id=>document.getElementById(id);
-  const build='V64 User Center + Bill Modes';
+  const build='V65 Bill Reminder Modal Fix';
   window.ASHA_BUILD=build;
   const chip=document.querySelector('.hero-chips span:last-child');
   if(chip) chip.textContent=build;
@@ -5884,5 +5884,65 @@ ready(function(){
 
   if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations?.().then(rs=>rs.forEach(r=>r.update().catch(()=>{}))).catch(()=>{});}
   setTimeout(()=>{try{if(currentBill)renderInvoice(currentBill);if(activeCustomer)renderChat();renderCustomers();}catch(e){console.warn(e)}},700);
+});
+})();
+
+
+
+/* ===================== V65 BILL REMINDER MODAL LAYOUT FIX ===================== */
+(function(){
+function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,4400)); else setTimeout(fn,4400); }
+ready(function(){
+  const q=id=>document.getElementById(id);
+  const build='V65 Bill Reminder Modal Fix';
+  window.ASHA_BUILD=build;
+  const chip=document.querySelector('.hero-chips span:last-child');
+  if(chip) chip.textContent=build;
+  console.log('ASHA_BUILD',build);
+  function getCustV65(cid){ return state.customers.find(c=>c.id===cid); }
+  function latestBillV65(cid){ return state.bills.filter(b=>b.customerId===cid).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')) || String(b.billNo||'').localeCompare(String(a.billNo||'')))[0]; }
+  function showModalV65(){ const modal=q('actionModal'); if(modal){ modal.classList.remove('hidden'); modal.style.display='flex'; } }
+  function closeModalV65(){ const modal=q('actionModal'); if(modal){ modal.classList.add('hidden'); modal.style.display=''; } }
+  window.closeAction=function(){ window.actionContext=null; closeModalV65(); if(q('actionSave')) q('actionSave').classList.remove('hidden'); if(q('actionDelete')) q('actionDelete').classList.remove('hidden'); };
+  window.v65BillReminder=async function(cid,bid=''){
+    const c=getCustV65(cid); if(!c) return alert('User not found');
+    const b=bid?state.bills.find(x=>x.id===bid):latestBillV65(cid); if(!b) return alert('এই user-এর bill নেই। আগে New Bill তৈরি করুন।');
+    currentBill=b;
+    let blob;
+    try{ if(typeof v64BillBlob==='function') blob=await v64BillBlob(b); else if(typeof v63BillBlob==='function') blob=await v63BillBlob(b); else blob=await invoiceBlob(); }
+    catch(e){ console.warn(e); return alert('Bill image তৈরি হচ্ছে না। একবার Preview খুলে আবার চেষ্টা করুন।'); }
+    const url=URL.createObjectURL(blob);
+    const due=typeof billDue==='function'?billDue(b):0;
+    const text=reminderTextByBill(b);
+    q('actionTitle').textContent='Bill + Reminder';
+    q('actionBody').innerHTML=`
+      <div class="v65-reminder-modal">
+        <div class="v65-reminder-info"><b>${esc(c.name||'')}</b><br>${esc(b.billNo||'')} • Due <b>${money(due)}</b><br><small>Bill image scroll করে দেখা যাবে। Button সবসময় দেখা যাবে।</small></div>
+        <div class="v65-bill-scroll"><img src="${url}" alt="Bill preview"></div>
+        <div class="v65-share-actions">
+          <button class="btn primary full" id="v65ShareNow">Share Image + Text</button>
+          <button class="btn" id="v65WaOnly">WhatsApp Text</button>
+          <button class="btn" id="v65Download">Download</button>
+          <button class="btn" id="v65Close">Close</button>
+        </div>
+      </div>`;
+    q('actionSave')?.classList.add('hidden'); q('actionDelete')?.classList.add('hidden');
+    if(q('actionClose')) q('actionClose').onclick=()=>closeAction();
+    showModalV65();
+    q('v65ShareNow').onclick=async()=>{ const file=new File([blob],`${b.billNo}.png`,{type:'image/png'}); try{ if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file],text,title:'Asha Bill Reminder'}); } else { downloadBlob(blob,`${b.billNo}.png`); openWhatsApp(c.phone,text); } }catch(e){ console.warn(e); downloadBlob(blob,`${b.billNo}.png`); openWhatsApp(c.phone,text); } };
+    q('v65WaOnly').onclick=()=>openWhatsApp(c.phone,text);
+    q('v65Download').onclick=()=>downloadBlob(blob,`${b.billNo}.png`);
+    q('v65Close').onclick=()=>closeAction();
+  };
+  window.v64BillReminder=function(cid,bid=''){ return v65BillReminder(cid,bid); };
+  window.v63BillReminder=function(cid,bid=''){ return v65BillReminder(cid,bid); };
+  window.v53BillReminder=function(cid){ return v65BillReminder(cid); };
+  window.shareCustomerBill=function(cid,bid=''){ return v65BillReminder(cid,bid); };
+  const oldOpenMenu=window.openUserMenuV52||window.openUserMenu;
+  if(oldOpenMenu){ window.openUserMenuV52=function(cid){ oldOpenMenu(cid); setTimeout(()=>{ ['mBillReminder','v52BillReminder','mReminderBill'].forEach(id=>{ const btn=q(id); if(btn) btn.onclick=()=>v65BillReminder(cid); }); [...document.querySelectorAll('button')].forEach(btn=>{ if(/Bill\s*\+\s*Reminder|Reminder\s*\+\s*Bill/i.test(btn.textContent||'')){ btn.onclick=()=>v65BillReminder(cid); } }); },160); }; window.openUserMenu=window.openUserMenuV52; }
+  const oldRenderChat=window.renderChat;
+  window.renderChat=function(){ if(oldRenderChat) oldRenderChat(); const cid=activeCustomer; if(!cid) return; setTimeout(()=>{ const billBtn=q('v64ToolBill'); if(billBtn) billBtn.onclick=()=>v65BillReminder(cid); if(q('chatShare')) q('chatShare').onclick=()=>v65BillReminder(cid); [...(q('chatBody')?.querySelectorAll('button')||[])].forEach(btn=>{ if(/Bill|Reminder/i.test(btn.textContent||'') && (btn.getAttribute('onclick')||'').includes('shareCustomerBill')){ btn.onclick=()=>v65BillReminder(cid); } }); },80); };
+  q('actionModal')?.addEventListener('click',e=>{ if(e.target && e.target.id==='actionModal') closeAction(); });
+  setTimeout(()=>{try{if(activeCustomer)renderChat();}catch(e){}},800);
 });
 })();

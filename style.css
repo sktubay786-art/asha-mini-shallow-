@@ -2104,3 +2104,19 @@ textarea#custNote{min-height:72px}
   border-radius:20px;
   background:linear-gradient(135deg,#064e3b,#10b981);
 }
+
+/* ================= V65 BILL REMINDER MODAL FIX ================= */
+#actionModal{align-items:center!important;justify-content:center!important;padding:10px!important;}
+#actionModal .modal-card{max-height:92vh!important;width:min(460px,96vw)!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;padding:0!important;border-radius:24px!important;}
+#actionModal #actionTitle{position:sticky;top:0;z-index:5;background:#fff;padding:14px 48px 10px 16px;margin:0!important;border-bottom:1px solid #e4e7ec;font-size:18px;}
+#actionModal #actionClose,#actionModal .modal-close,#actionModal .close{position:absolute!important;top:8px!important;right:8px!important;z-index:20!important;width:38px!important;height:38px!important;border-radius:50%!important;background:#fff!important;}
+#actionModal #actionBody{overflow:auto!important;padding:12px!important;flex:1 1 auto!important;min-height:0!important;}
+.v65-reminder-modal{display:flex;flex-direction:column;gap:10px;height:100%;}
+.v65-reminder-info{background:#f8fafc;border:1px solid #e4e7ec;border-radius:16px;padding:9px 10px;font-size:13px;}
+.v65-bill-scroll{max-height:52vh;overflow:auto;background:#f8fafc;border:1px solid #e4e7ec;border-radius:18px;padding:10px;display:flex;justify-content:center;}
+.v65-bill-scroll img{width:100%;max-width:360px;height:auto;display:block;border-radius:14px;background:#fff;box-shadow:0 8px 24px rgba(16,24,40,.12);}
+.v65-share-actions{position:sticky;bottom:0;z-index:6;display:grid;grid-template-columns:1fr 1fr;gap:8px;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);padding:10px 0 0;border-top:1px solid #eef2f6;}
+.v65-share-actions button{min-height:44px;border-radius:15px;font-weight:950;}
+.v65-share-actions .full{grid-column:1/-1;}
+#actionModal #actionSave,#actionModal #actionDelete{display:none!important;}
+@media(max-width:480px){#actionModal{padding:6px!important;}#actionModal .modal-card{width:98vw!important;max-height:94vh!important;border-radius:22px!important;}.v65-bill-scroll{max-height:48vh;}.v65-share-actions{grid-template-columns:1fr;}.v65-share-actions .full{grid-column:auto;}}

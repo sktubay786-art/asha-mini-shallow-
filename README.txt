@@ -294,3 +294,12 @@ V64 User Center + Bill Modes:
 - Changing Bill Design/Mode now changes the preview and shared bill image.
 - Dedicated QR rendering for each bill mode.
 - Cache bumped to v64.
+
+
+V65 Bill Reminder Modal Fix:
+- Fixed Bill + Reminder preview taking full screen and pushing buttons too low.
+- Bill preview now stays inside a scrollable area.
+- Share Image + Text, WhatsApp Text, Download, and Close buttons remain visible/sticky.
+- Close button fixed and background tap closes modal.
+- All Bill + Reminder routes call the V65 fixed modal.
+- Cache bumped to v65.
