@@ -635,3 +635,78 @@ const css=`#v77ActionRoot{display:none;position:fixed;inset:0;z-index:100500;bac
 const style=document.createElement('style');style.textContent=css;document.head.append(style);
 window.ashaV77CustomerActions={open:actions,run,close,version:'V77'};
 })();
+
+
+/* ===== V78: Animated home + honest cloud status + iOS refresh/login polish ===== */
+(() => {
+  const ready = fn => document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', fn, {once:true}) : fn();
+  ready(() => {
+    document.documentElement.classList.add('asha-v78');
+    const build = document.getElementById('buildChip');
+    if (build) build.textContent = 'V78 · iOS Edition';
+    const title = document.getElementById('companyTitle');
+    if (title) title.textContent = 'ASHA Billing';
+    const sub = document.getElementById('companySub');
+    if (sub) sub.textContent = 'Smart billing · Customer management';
+
+    // The dashboard shows a cloud badge only when the app's real sync status supports it.
+    const chip = document.getElementById('cloudChip');
+    const status = document.getElementById('cloudStatus');
+    const syncCloud = () => {
+      if (!chip) return;
+      const appVisible = document.getElementById('app') && !document.getElementById('app').classList.contains('hidden');
+      const loginVisible = document.getElementById('login') && !document.getElementById('login').classList.contains('hidden');
+      if (loginVisible || !appVisible) { chip.textContent = 'Cloud: Locked'; chip.dataset.state = 'locked'; return; }
+      const t = (status?.textContent || '').trim().toLowerCase();
+      if (/cloud loaded/.test(t)) { chip.textContent = 'Cloud: Loaded ✓'; chip.dataset.state = 'ok'; }
+      else if (/cloud saved|saved ✅|cloud: saved/.test(t)) { chip.textContent = 'Cloud: Synced ✓'; chip.dataset.state = 'ok'; }
+      else if (/pull failed|push failed|failed|login needed|wrong owner/.test(t)) { chip.textContent = 'Cloud: Offline'; chip.dataset.state = 'bad'; }
+      else if (/no cloud data/.test(t)) { chip.textContent = 'Cloud: No data'; chip.dataset.state = 'warn'; }
+      else { chip.textContent = 'Cloud: Checking…'; chip.dataset.state = 'checking'; }
+    };
+    syncCloud();
+    if (status) new MutationObserver(syncCloud).observe(status, {childList:true,subtree:true,characterData:true});
+    if (chip) new MutationObserver(syncCloud).observe(chip, {attributes:true,attributeFilter:['class']});
+    setInterval(syncCloud, 1200);
+
+    // Add entrance animations once per element; respect reduced-motion preferences in CSS.
+    const home = document.getElementById('homePage');
+    if (home) {
+      const targets = home.querySelectorAll('.dashboard-head, .metric, .quick-actions button');
+      targets.forEach((el, i) => { el.classList.add('v78-enter'); el.style.setProperty('--v78-delay', `${Math.min(i * 45, 420)}ms`); });
+      const activeObserver = new MutationObserver(() => {
+        if (home.classList.contains('active')) {
+          targets.forEach(el => { el.classList.remove('v78-entered'); void el.offsetWidth; el.classList.add('v78-entered'); });
+          syncCloud();
+        }
+      });
+      activeObserver.observe(home, {attributes:true,attributeFilter:['class']});
+    }
+
+    // iOS login surface is re-applied on every refresh / auth-state toggle.
+    const login = document.getElementById('login');
+    const loginCard = login?.querySelector('.login-card');
+    if (loginCard) {
+      loginCard.setAttribute('role','region'); loginCard.setAttribute('aria-label','ASHA Billing secure login');
+      const brand = loginCard.querySelector('.brand-row p');
+      if (brand) brand.textContent = 'Secure sign in';
+      const loginButton = document.getElementById('loginBtn');
+      if (loginButton) { loginButton.textContent = 'Sign In'; loginButton.setAttribute('aria-label','Sign in to ASHA Billing'); }
+      const email = document.getElementById('email');
+      const password = document.getElementById('password');
+      if (email) { email.setAttribute('autocomplete','username'); email.setAttribute('autocapitalize','none'); email.setAttribute('spellcheck','false'); }
+      if (password) password.setAttribute('autocomplete','current-password');
+    }
+    if (window.login && !window.ashaV78LoginWrapped) {
+      const oldLogin = window.login;
+      window.login = async function(...args) {
+        const b = document.getElementById('loginBtn');
+        if (b) { b.disabled = true; b.dataset.originalText = b.textContent; b.textContent = 'Signing in…'; }
+        try { return await oldLogin.apply(this,args); }
+        finally { if (b) { b.disabled = false; b.textContent = 'Sign In'; } syncCloud(); }
+      };
+      window.ashaV78LoginWrapped = true;
+      if (document.getElementById('loginBtn')) document.getElementById('loginBtn').onclick = window.login;
+    }
+  });
+})();

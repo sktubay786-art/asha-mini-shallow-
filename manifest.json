@@ -1,7 +1,7 @@
 {
-  "name": "ASHA Billing V77 iOS",
-  "short_name": "ASHA V77",
-  "start_url": "./index.html?v=77",
+  "name": "ASHA Billing V78 iOS",
+  "short_name": "ASHA V78",
+  "start_url": "./index.html?v=78",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f5f7f6",
@@ -20,5 +20,5 @@
       "purpose": "any maskable"
     }
   ],
-  "version": "77"
+  "version": "78"
 }
