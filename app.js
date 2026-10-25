@@ -2301,14 +2301,13 @@ ready(function(){
     if(!tab) return;
 
     const pages=[
-      ['homePage',realIcon('home'),'Home'],
-      ['customersPage',realIcon('users'),'Users'],
-      ['billPage',realIcon('bill'),'Bill'],
-      ['payPage',realIcon('pay'),'Pay'],
-      ['historyPage',realIcon('history'),'History'],
-      ['reportsPage',realIcon('report'),'Report'],
-      ['calcPage',realIcon('calc'),'Calc'],
-      ['settingsPage',realIcon('settings'),'Set']
+      ['homePage',window.ashaIOSIcon('home'),'Home'],
+      ['customersPage',window.ashaIOSIcon('users'),'Users'],
+      ['billPage',window.ashaIOSIcon('bill'),'Bill'],
+      ['payPage',window.ashaIOSIcon('pay'),'Pay'],
+      ['historyPage',window.ashaIOSIcon('history'),'History'],
+      ['calcPage',window.ashaIOSIcon('calc'),'Calculator'],
+      ['settingsPage',window.ashaIOSIcon('settings'),'Settings']
     ];
 
     // Remove duplicates and rebuild once. This fixes two/three icons issue.
@@ -2500,7 +2499,7 @@ ready(function(){
   window.rebuildTabbarV44=function(){
     const tab=document.querySelector('.tabbar'); if(!tab) return;
     createCalcPageV44();
-    const items=[['homePage',ICONS.home,'Home'],['customersPage',ICONS.users,'Users'],['billPage',ICONS.bill,'Bill'],['payPage',ICONS.pay,'Pay'],['historyPage',ICONS.history,'History'],['reportsPage',ICONS.report,'Report'],['calcPage',ICONS.calc,'Calc'],['settingsPage',ICONS.set,'Set']].filter(x=>pageExists(x[0]));
+    const items=[['homePage',window.ashaIOSIcon('home'),'Home'],['customersPage',window.ashaIOSIcon('users'),'Users'],['billPage',window.ashaIOSIcon('bill'),'Bill'],['payPage',window.ashaIOSIcon('pay'),'Pay'],['historyPage',window.ashaIOSIcon('history'),'History'],['calcPage',window.ashaIOSIcon('calc'),'Calculator'],['settingsPage',window.ashaIOSIcon('settings'),'Settings']].filter(x=>pageExists(x[0]));
     const current=document.querySelector('.page.active')?.id || 'homePage';
     tab.innerHTML=items.map(([id,ico,label])=>`<button data-page="${id}" class="${id===current?'active':''}"><i>${ico}</i><span>${label}</span></button>`).join('');
     tab.querySelectorAll('button[data-page]').forEach(btn=>{btn.onclick=()=>{showPage(btn.dataset.page);setTimeout(()=>btn.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'}),40);};});
@@ -2901,7 +2900,7 @@ ready(function(){
   window.rebuildTabbarV50=function(){
     const tab=document.querySelector('.tabbar'); if(!tab) return;
     createCalcPage();
-    const items=[['homePage',ICO.home,'Home'],['customersPage',ICO.users,'Users'],['billPage',ICO.bill,'Bill'],['payPage',ICO.pay,'Pay'],['historyPage',ICO.history,'History'],['reportsPage',ICO.report,'Report'],['calcPage',ICO.calc,'Calc'],['settingsPage',ICO.set,'Set']].filter(x=>pageExists(x[0]));
+    const items=[['homePage',window.ashaIOSIcon('home'),'Home'],['customersPage',window.ashaIOSIcon('users'),'Users'],['billPage',window.ashaIOSIcon('bill'),'Bill'],['payPage',window.ashaIOSIcon('pay'),'Pay'],['historyPage',window.ashaIOSIcon('history'),'History'],['calcPage',window.ashaIOSIcon('calc'),'Calculator'],['settingsPage',window.ashaIOSIcon('settings'),'Settings']].filter(x=>pageExists(x[0]));
     const cur=document.querySelector('.page.active')?.id || 'homePage';
     tab.innerHTML=items.map(([id,ico,label])=>'<button data-page="'+id+'" class="'+(id===cur?'active':'')+'"><i>'+ico+'</i><span>'+label+'</span></button>').join('');
     tab.querySelectorAll('button').forEach(btn=>{
@@ -6259,7 +6258,7 @@ ready(function(){
     if(q('customersPage')) q('customersPage').classList.add('v70-users-page');
     if(window.renderCustomers) renderCustomers();
     const chip=document.querySelector('.hero-chips span:last-child'); if(chip)chip.textContent='V70 · Settings Rate + User Actions';
-    window.ASHA_BUILD='V70 Settings Rate + User Actions';
+    window.ASHA_BUILD='V72 iOS Responsive Navigation';
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(applyV70,700)); else setTimeout(applyV70,700);
 })();
@@ -6385,7 +6384,7 @@ ready(function(){
   }
   window.ashaAuditV71 = function(){
     const rates = ratesFromBigha(state.settings?.rateBigha ?? 2200);
-    return {build:'V71 Correct Land Conversion', decimalPerBigha:40, kathaPerBigha:20, rates,
+    return {build:'V72 iOS Responsive Navigation', decimalPerBigha:40, kathaPerBigha:20, rates,
       examples:{oneBigha:charge(1,'bigha',rates.rateBigha),tenKatha:charge(10,'katha',rates.rateKatha),tenDecimal:charge(10,'decimal',rates.rateDecimal)}};
   };
   setTimeout(()=>{
@@ -6400,3 +6399,18 @@ ready(function(){
     }catch(e){console.error('ASHA V71 rate setup failed', e);}
   }, 900);
 })();
+
+
+/* ===== V72: unified iOS-style navigation icon set ===== */
+window.ashaIOSIcon = function(name){
+  const paths={
+    home:'<path d="m3.5 10.5 8.5-7 8.5 7M5.5 9.5v10h13v-10M9 19.5v-6h6v6"/>',
+    users:'<circle cx="9" cy="8" r="3.2"/><path d="M3.2 19v-1.3a5.8 5.8 0 0 1 11.6 0V19zM16.2 5.3a3 3 0 0 1 0 5.7M17 14.2a4.1 4.1 0 0 1 3.8 4.3V19h-3"/>',
+    bill:'<path d="M6.5 3.5h8l4 4V21h-12zM14.5 3.5v4h4M9 12h7M9 15.5h7M9 19h4"/>',
+    pay:'<path d="M12 3v18M16.5 7.2c-.8-1.3-2.2-2-4.4-2-2.5 0-4.2 1.2-4.2 3s1.4 2.7 4.2 3.2 4.3 1.2 4.3 3.2-1.8 3.4-4.5 3.4c-2.1 0-3.9-.8-4.8-2.4"/>',
+    history:'<path d="M3.5 11a8.5 8.5 0 1 1 2.3 6M3.5 5.5V11h5.5M12 7v5l3.2 2"/>',
+    calc:'<rect x="5" y="3" width="14" height="18" rx="2.7"/><path d="M8 7h8M8 11h1M12 11h1M16 11h.1M8 15h1M12 15h1M16 15h.1M8 18h1M12 18h1M16 18h.1"/>',
+    settings:'<circle cx="12" cy="12" r="3.2"/><path d="M19 13.5l1.1.8-1.5 2.5-1.3-.5a7.7 7.7 0 0 1-1.7 1l-.2 1.4h-3l-.3-1.4a7.7 7.7 0 0 1-1.7-1l-1.3.5-1.5-2.5 1.1-.8a7.8 7.8 0 0 1 0-2l-1.1-.9 1.5-2.5 1.3.5a7.7 7.7 0 0 1 1.7-1l.3-1.4h3l.2 1.4a7.7 7.7 0 0 1 1.7 1l1.3-.5 1.5 2.5-1.1.9a7.8 7.8 0 0 1 0 2z"/>'
+  };
+  return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">'+(paths[name]||paths.home)+'</svg>';
+};
