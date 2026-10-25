@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>Asha Billing</title>
+  <title>ASHA Billing</title>
   <meta name="theme-color" content="#0b7a4d">
-  <meta name="app-build" content="V66 Audited Fix">
-  <link rel="manifest" href="./manifest.json?v=66">
-  <link rel="stylesheet" href="./style.css?v=66">
+  <meta name="app-build" content="V67 iOS Studio">
+  <link rel="manifest" href="./manifest.json?v=67">
+  <link rel="stylesheet" href="./style.css?v=67">
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -20,7 +20,7 @@
       <div class="brand-row">
         <img src="./icon-192.png" class="brand-icon" alt="">
         <div>
-          <h1>Asha Billing</h1>
+          <h1>ASHA Billing</h1>
           <p>Secure owner login</p>
         </div>
       </div>
@@ -46,7 +46,7 @@
       </div>
       <div class="hero-chips">
         <span id="cloudChip">Cloud: checking</span>
-        <span>V66 Audited Fix</span>
+        <span>V67 iOS Studio</span>
       </div>
     </header>
 
@@ -68,6 +68,14 @@
           <button data-page="reportsPage">📊<b>Reports</b><small>Bank / village / month</small></button>
           <button data-page="calcPage">🧮<b>Scientific Calc</b><small>iOS-like calculator</small></button>
         </div>
+        <section class="studio-section" aria-label="Quick billing flashcards">
+          <div class="studio-heading"><div><span class="eyebrow">ASHA STUDIO</span><h2>Billing shortcuts</h2><p>Tap a card to flip it for a quick tip.</p></div><span class="studio-spark">✦</span></div>
+          <div class="flashcard-grid">
+            <button class="flashcard" type="button" data-front="NORMAL BILL" data-back="Create and save the bill first. Verify land unit, rate, previous due and paid amount before saving."><span class="flash-icon">▤</span><b>Normal Bill</b><small>Calculate · Save · Preview</small><span class="flip-hint">Tap to flip ↻</span></button>
+            <button class="flashcard" type="button" data-front="PRINT / PDF" data-back="Choose Thermal 80mm for receipt printers, A5/A6 for compact paper, or export PDF for a standard A4 page. Check preview before printing."><span class="flash-icon">▧</span><b>Print & PDF</b><small>Paper sizes · Clear layout</small><span class="flip-hint">Tap to flip ↻</span></button>
+            <button class="flashcard" type="button" data-front="REMINDER + BILL" data-back="Use Reminder + Bill to share the bill image and payment reminder. Confirm the customer's phone and the due amount before sharing."><span class="flash-icon">↗</span><b>Reminder + Bill</b><small>Share image · Send reminder</small><span class="flip-hint">Tap to flip ↻</span></button>
+          </div>
+        </section>
       </section>
 
       <section id="customersPage" class="page">
@@ -316,7 +324,8 @@
   </div>
   <input id="importFile" type="file" accept=".json" hidden>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="./app.js?v=66"></script>
+  <script src="./app.js?v=67"></script>
+  <script src="./upgrade.js?v=67"></script>
 <div id="v63ShareRoot" class="v63-share-root"></div>
 </body>
 </html>

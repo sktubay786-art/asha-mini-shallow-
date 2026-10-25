@@ -1,11 +1,11 @@
 {
-  "name": "Asha Billing",
-  "short_name": "Asha Billing",
-  "start_url": "./index.html?v=66",
+  "name": "ASHA Billing",
+  "short_name": "ASHA Billing",
+  "start_url": "./index.html?v=67",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f4f7fb",
-  "theme_color": "#075c39",
+  "background_color": "#f5f7f6",
+  "theme_color": "#08734a",
   "icons": [
     {
       "src": "./icon-192.png",
