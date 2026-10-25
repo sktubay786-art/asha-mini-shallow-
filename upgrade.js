@@ -404,10 +404,7 @@
     if(action==='receive')openPaymentForm(card.dataset.v73Customer,false);else if(action==='ledger')openLedger(card.dataset.v73Customer);else openActions(card.dataset.v73Customer);
   },true);
   document.documentElement.classList.add('asha-v74');
-  const ready=()=>{const chip=document.querySelector('.hero-chips span:last-child');if(chip)chip.textContent='V74 · Customer Functions Audit';const meta=document.querySelector('meta[name="app-build"]');if(meta)meta.content='V74 Customer Functions Audit';window.ASHA_BUILD='V74 Customer Functions Audit';};
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ready,{once:true});else ready();
-  // Older builds contain delayed version-label updates; re-assert V74 after those timers run.
-  [800,4700,6200].forEach(ms=>setTimeout(ready,ms));
+  // Keep the historical customer-action styles/features, but never overwrite the current build label.
 })();
 
 /* ===================== V75 WHOLE-APP RATE CONSISTENCY + CLEAN UI ===================== */
@@ -643,11 +640,24 @@ window.ashaV77CustomerActions={open:actions,run,close,version:'V77'};
   ready(() => {
     document.documentElement.classList.add('asha-v78');
     const build = document.getElementById('buildChip');
-    if (build) build.textContent = 'V78 · iOS Edition';
-    const title = document.getElementById('companyTitle');
-    if (title) title.textContent = 'ASHA Billing';
-    const sub = document.getElementById('companySub');
-    if (sub) sub.textContent = 'Smart billing · Customer management';
+    if (build) build.textContent = 'V79 · Customer Chat';
+    // Remove only the old business quote from the HOME header. Settings and invoice data stay untouched.
+    const applyHomeBrand = () => {
+      const title = document.getElementById('companyTitle');
+      if (title && title.textContent !== 'ASHA Billing') title.textContent = 'ASHA Billing';
+      const sub = document.getElementById('companySub');
+      if (sub && sub.textContent !== 'Smart billing · Customer management') sub.textContent = 'Smart billing · Customer management';
+      const chipLabel = document.getElementById('buildChip');
+      if (chipLabel && chipLabel.textContent !== 'V79 · Customer Chat') chipLabel.textContent = 'V79 · Customer Chat';
+      const meta = document.querySelector('meta[name="app-build"]');
+      if (meta) meta.content = 'V79 Customer Chat Interface';
+      window.ASHA_BUILD = 'V79 Customer Chat Interface';
+    };
+    applyHomeBrand();
+    const titleNode = document.getElementById('companyTitle');
+    const subNode = document.getElementById('companySub');
+    [titleNode, subNode].filter(Boolean).forEach(node => new MutationObserver(applyHomeBrand).observe(node, {childList:true,subtree:true,characterData:true}));
+    [250, 900, 2200, 5000, 8000].forEach(ms => setTimeout(applyHomeBrand, ms));
 
     // The dashboard shows a cloud badge only when the app's real sync status supports it.
     const chip = document.getElementById('cloudChip');
@@ -709,4 +719,55 @@ window.ashaV77CustomerActions={open:actions,run,close,version:'V77'};
       if (document.getElementById('loginBtn')) document.getElementById('loginBtn').onclick = window.login;
     }
   });
+})();
+
+/* ASHA Billing V79 — customer-specific WhatsApp-inspired chat surface. */
+(() => {
+  const modal = () => document.getElementById('chatModal');
+  const decorate = () => {
+    const m = modal();
+    if (!m) return;
+    m.classList.add('asha-wa-conversation');
+    const input = document.getElementById('manualChatInput');
+    if (input) {
+      input.placeholder = 'Message or add a private note…';
+      input.setAttribute('aria-label', 'Message or private note for this customer');
+    }
+    const send = document.getElementById('manualChatSend');
+    if (send) { send.textContent = '➤'; send.setAttribute('aria-label', 'Send message'); titleSafe(send, 'Save message to this customer chat'); }
+    const body = document.getElementById('chatBody');
+    if (body) body.setAttribute('aria-label', 'Customer-specific chat and account activity');
+  };
+  function titleSafe(el, title) { el.title = title; }
+  const oldOpen = window.openChat;
+  if (typeof oldOpen === 'function' && !window.ashaV79OpenWrapped) {
+    window.openChat = function(...args) {
+      const result = oldOpen.apply(this, args);
+      requestAnimationFrame(decorate);
+      setTimeout(decorate, 60);
+      return result;
+    };
+    window.ashaV79OpenWrapped = true;
+  }
+  const oldRender = window.renderChat;
+  if (typeof oldRender === 'function' && !window.ashaV79RenderWrapped) {
+    window.renderChat = function(...args) {
+      const result = oldRender.apply(this, args);
+      requestAnimationFrame(decorate);
+      setTimeout(decorate, 30);
+      return result;
+    };
+    window.ashaV79RenderWrapped = true;
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    decorate();
+    const chip = document.querySelector('.hero-chips span:last-child');
+    if (chip) chip.textContent = 'V79 · Customer Chat Interface';
+    const meta = document.querySelector('meta[name="app-build"]');
+    if (meta) meta.content = 'V79 Customer Chat Interface';
+    const back = document.getElementById('chatBack');
+    if (back) back.setAttribute('aria-label', 'Back to customers');
+  });
+  if (document.readyState !== 'loading') decorate();
+  window.ashaAuditV79 = () => ({build:'V79 Customer Chat Interface',chatClass:!!modal()?.classList.contains('asha-wa-conversation'),customerSpecificComposer:!!document.getElementById('manualChatInput')});
 })();
