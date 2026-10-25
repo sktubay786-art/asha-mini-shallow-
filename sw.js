@@ -1,4 +1,4 @@
-const CACHE='asha-billing-v74-customer-functions-audit';
+const CACHE='asha-billing-v75-customer-functions-audit';
 const ASSETS=['./','./index.html?v=74','./style.css?v=74','./app.js?v=74','./upgrade.js?v=74','./manifest.json?v=74','./icon-192.png','./icon-512.png'];
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).catch(()=>{}))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim()});

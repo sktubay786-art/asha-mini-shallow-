@@ -409,3 +409,44 @@
   // Older builds contain delayed version-label updates; re-assert V74 after those timers run.
   [800,4700,6200].forEach(ms=>setTimeout(ready,ms));
 })();
+
+/* ===================== V75 WHOLE-APP RATE CONSISTENCY + CLEAN UI ===================== */
+(function(){
+  const q=id=>document.getElementById(id);
+  const n=v=>{const x=Number(v);return Number.isFinite(x)?x:0;};
+  const KATHA_PER_BIGHA=20, DECIMAL_PER_BIGHA=40;
+  const unitOf=u=>u==='katha'?'katha':u==='decimal'?'decimal':'bigha';
+  function baseRate(){return Math.max(0,n(state?.settings?.rateBigha ?? 2200));}
+  function rateFor(unit){const r=baseRate();return unit==='katha'?r/KATHA_PER_BIGHA:unit==='decimal'?r/DECIMAL_PER_BIGHA:r;}
+  function toBigha(amount,unit){const a=n(amount);return unit==='katha'?a/KATHA_PER_BIGHA:unit==='decimal'?a/DECIMAL_PER_BIGHA:a;}
+  function normalize(b){if(!b)return b;const unit=unitOf(b.unit||'bigha');const land=n(b.landAmount);const rateUnit=unitOf(b.rateUnit||unit);const rate=n(b.rate);const amount=land*rate;return {...b,unit,rateUnit,landAmount:land,bigha:toBigha(land,unit),rate,current:Math.round((amount+Number.EPSILON)*100)/100,allTotal:Math.round((n(b.previousDue)+amount+Number.EPSILON)*100)/100};}
+  window.ashaRateForV75=rateFor;window.ashaLandToBighaV75=toBigha;window.ashaNormalizeBillV75=normalize;
+  function syncSettingsDisplay(){
+    const r=baseRate();
+    if(q('setRateBigha'))q('setRateBigha').value=String(r);
+    if(q('setRateKatha'))q('setRateKatha').value=(r/KATHA_PER_BIGHA).toFixed(2).replace(/\.00$/,'');
+    if(q('setRateDecimal'))q('setRateDecimal').value=(r/DECIMAL_PER_BIGHA).toFixed(2).replace(/\.00$/,'');
+  }
+  function syncBillRate(force){const unit=unitOf(q('landUnit')?.value||'bigha'),input=q('rate');if(!input)return;if(force||input.dataset.v75Auto==='1'||!input.value){input.value=String(rateFor(unit));input.dataset.v75Auto='1';}const label=input.closest('div')?.querySelector('label');if(label)label.textContent='Rate / '+(unit==='katha'?'কাঠা':unit==='decimal'?'ডেসিমেল':'বিঘা');}
+  // Always derive all unit rates from the saved per-bigha rate, preventing stale converted rates.
+  const oldSettingsSave=window.saveSettings;
+  if(typeof oldSettingsSave==='function'&&!oldSettingsSave.__v75){const wrapped=function(){if(q('setRateBigha'))state.settings.rateBigha=Math.max(0,n(q('setRateBigha').value));state.settings.rateKatha=rateFor('katha');state.settings.rateDecimal=rateFor('decimal');const out=oldSettingsSave.apply(this,arguments);state.settings.rateKatha=rateFor('katha');state.settings.rateDecimal=rateFor('decimal');syncSettingsDisplay();syncBillRate(true);return out;};wrapped.__v75=true;window.saveSettings=wrapped;try{saveSettings=wrapped;}catch(_){}}
+  document.addEventListener('input',e=>{if(e.target?.id==='setRateBigha'){const r=Math.max(0,n(e.target.value));if(q('setRateKatha'))q('setRateKatha').value=(r/20).toFixed(2);if(q('setRateDecimal'))q('setRateDecimal').value=(r/40).toFixed(2);}});
+  document.addEventListener('change',e=>{if(e.target?.id==='landUnit'){syncBillRate(true);if(typeof previewBill==='function')previewBill();}});
+  if(q('rate'))q('rate').addEventListener('input',()=>{q('rate').dataset.v75Auto='0';});
+  const oldBuilder=window.makeBillFromForm;
+  if(typeof oldBuilder==='function'&&!oldBuilder.__v75){const wrapped=function(){const b=oldBuilder.apply(this,arguments);if(!b)return b;const unit=unitOf(q('landUnit')?.value||b.unit||'bigha');const land=n(q('land')?.value??b.landAmount);const rate=(q('rate')?.dataset.v75Auto==='1'||!q('rate')?.value)?rateFor(unit):n(q('rate').value);return normalize({...b,unit,rateUnit:unit,landAmount:land,rate});};wrapped.__v75=true;window.makeBillFromForm=wrapped;try{makeBillFromForm=wrapped;}catch(_){}}
+  const oldInvoice=window.renderInvoice;
+  if(typeof oldInvoice==='function'&&!oldInvoice.__v75){const wrapped=function(b){return oldInvoice.call(this,b?.rateUnit?normalize(b):b,...Array.prototype.slice.call(arguments,1));};wrapped.__v75=true;window.renderInvoice=wrapped;try{renderInvoice=wrapped;}catch(_){}}
+  // Compact non-essential helper copy without hiding fields, totals, or functional controls.
+  const css=document.createElement('style');css.id='v75-clean-ui';css.textContent=`
+    .v75-muted,.helper-text,.help-text,.quick-guide,.billing-shortcuts,.subtitle-helper{display:none!important}
+    .v74-sheet .v74-subtitle,.v74-sheet .v74-description{display:none!important}
+    button,[role=button]{-webkit-tap-highlight-color:transparent}
+    @media(max-width:600px){.v74-sheet{padding-bottom:max(16px,env(safe-area-inset-bottom))}.v74-sheet button{min-height:44px}}
+  `;document.head.appendChild(css);
+  const ready=()=>{const meta=q('meta[name="app-build"]');if(meta)meta.content='V75 Rate Consistency + Clean UI';const chip=document.querySelector('.hero-chips span:last-child');if(chip)chip.textContent='V75 · Updated';window.ASHA_BUILD='V75 Rate Consistency + Clean UI';syncSettingsDisplay();syncBillRate(false);};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ready,{once:true});else ready();
+  [500,1500,3500].forEach(t=>setTimeout(ready,t));
+  window.ashaAuditV75=()=>({build:'V75',conversion:'1 bigha = 20 katha = 40 decimal',rateBigha:baseRate(),rateKatha:rateFor('katha'),rateDecimal:rateFor('decimal'),examples:{bigha1:rateFor('bigha'),katha10:10*rateFor('katha'),decimal10:10*rateFor('decimal')}});
+})();
