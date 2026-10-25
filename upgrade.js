@@ -1,10 +1,10 @@
-/* ASHA Billing V69 — iOS motion, streamlined dashboard and user action sheet. Preserves billing/Firebase logic. */
+/* ASHA Billing V70 — settings-driven rates and user actions, streamlined dashboard and user action sheet. Preserves billing/Firebase logic. */
 (() => {
   const ready = fn => document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', fn, {once:true}) : fn();
   ready(() => {
     document.documentElement.classList.add('asha-v67');
     const chip = document.querySelector('.hero-chips span:nth-child(2)');
-    if (chip) chip.textContent = 'V69 · iOS Motion';
+    if (chip) chip.textContent = 'V70 · Settings Rate + User Actions';
     document.querySelectorAll('.flashcard').forEach(card => {
       card.setAttribute('aria-pressed','false');
       card.addEventListener('click', () => {

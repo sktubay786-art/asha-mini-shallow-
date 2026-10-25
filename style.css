@@ -2300,3 +2300,16 @@ svg{width:1em;height:1em;display:block;fill:none;stroke:currentColor;stroke-widt
 @keyframes iosSheetUp{from{opacity:0;transform:translateY(28px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(max-width:520px){.v52-panel{padding:16px 12px max(14px,env(safe-area-inset-bottom));border-radius:28px 28px 20px 20px}.v52-actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.v52-actions button{min-height:75px;padding:12px 8px 12px 47px;font-size:12px;border-radius:17px}.v52-actions button .ios-action-icon{left:8px;width:30px;height:30px;border-radius:10px}.v52-title b{font-size:18px}.tabbar{width:calc(100% - 12px);gap:2px}.tabbar button{flex:1 0 0!important;min-width:0!important;width:auto!important}.tabbar button i{width:31px;height:30px}}
 @media(prefers-reduced-motion:reduce){.tabbar,.tabbar button,.tabbar button i,.quick-actions button,.action-icon,.v52-panel,.v52-actions button{animation:none!important;transition:none!important}}
+
+/* ===== V70: compact iOS-style actions directly inside Users tab ===== */
+.v70-user-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:12px;width:100%;}
+.v70-user-actions button{appearance:none;border:1px solid rgba(12,112,75,.12);background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(239,249,243,.94));color:#075c39;border-radius:14px;min-height:42px;padding:7px 5px;display:flex;align-items:center;justify-content:center;gap:5px;font:600 12px/1.1 var(--app-font,system-ui);box-shadow:0 4px 12px rgba(22,85,57,.06);transition:transform .18s ease,background .2s ease,box-shadow .2s ease;cursor:pointer;}
+.v70-user-actions button span{font-size:15px;font-weight:800;line-height:1;}
+.v70-user-actions button:active{transform:scale(.96);background:#dff5e9;box-shadow:0 1px 4px rgba(22,85,57,.08);}
+.v70-user-actions button:last-child{background:#087b50;color:#fff;border-color:transparent;}
+.customer-row{align-items:flex-start;flex-wrap:wrap;}
+.customer-row .cust-main{min-width:0;flex:1 1 180px;}
+.customer-row .v70-user-actions{flex:1 0 100%;}
+@media(min-width:760px){.v70-user-actions{max-width:520px;grid-template-columns:repeat(4,minmax(0,1fr));}}
+@media(max-width:390px){.v70-user-actions{gap:5px}.v70-user-actions button{font-size:11px;border-radius:12px;min-height:39px}.v70-user-actions button span{font-size:14px}}
+@media(prefers-reduced-motion:reduce){.v70-user-actions button{transition:none}}

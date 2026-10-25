@@ -6127,3 +6127,139 @@ ready(function(){
       hasReminderRenderer:typeof window.v64BillHTML==='function'};
   };
 })();
+/* ===================== V70 SETTINGS-DRIVEN BILLING + USER TAB ACTIONS ===================== */
+(function(){
+  const q=id=>document.getElementById(id);
+  const KATHA_PER_BIGHA=20, DECIMAL_PER_BIGHA=33;
+  const num=v=>Number.isFinite(Number(v))?Number(v):0;
+  function settingsRate(unit){
+    const s=state.settings||{};
+    if(unit==='katha') return num(s.rateKatha ?? (num(s.rateBigha)/KATHA_PER_BIGHA));
+    if(unit==='decimal') return num(s.rateDecimal ?? (num(s.rateBigha)/DECIMAL_PER_BIGHA));
+    return num(s.rateBigha);
+  }
+  function unitLabel(unit){return unit==='katha'?'কাঠা':unit==='decimal'?'ডেসিমেল':'বিঘা';}
+  function normalizeNewBill(b){
+    if(!b) return b;
+    const unit=b.unit||'bigha';
+    const land=num(b.landAmount);
+    const rateUnit=b.rateUnit||unit;
+    // Rate is charged per the selected land unit. Never multiply a per-katha rate by bigha.
+    const rate=num(b.rate);
+    const current=land*rate;
+    return {...b,unit,rateUnit,landAmount:land,bigha:unit==='katha'?land/KATHA_PER_BIGHA:unit==='decimal'?land/DECIMAL_PER_BIGHA:land,rate,current,allTotal:num(b.previousDue)+current};
+  }
+  window.ashaSettingsRateV70=settingsRate;
+  window.ashaNormalizeBillV70=normalizeNewBill;
+
+  // Make the rate field reflect the saved Settings rate whenever the unit changes.
+  function syncRateInput(force){
+    const unit=q('landUnit')?.value||'bigha', input=q('rate');
+    if(!input) return;
+    const auto=input.dataset.v70Auto==='1';
+    if(force||auto||!input.value){input.value=String(settingsRate(unit));input.dataset.v70Auto='1';}
+    const label=input.closest('div')?.querySelector('label');
+    if(label) label.textContent='Rate / '+unitLabel(unit);
+  }
+  if(q('rate')){
+    q('rate').addEventListener('input',()=>{q('rate').dataset.v70Auto='0';});
+    q('landUnit')?.addEventListener('change',()=>syncRateInput(true));
+  }
+
+  // Final authoritative bill builder: Settings-derived unit rate + amount × same unit rate.
+  const previousBuilder=window.makeBillFromForm;
+  if(previousBuilder){
+    window.makeBillFromForm=function(){
+      const b=previousBuilder();
+      if(!b) return b;
+      const unit=q('landUnit')?.value||b.unit||'bigha';
+      const land=num(q('land')?.value ?? b.landAmount);
+      let rate=num(q('rate')?.value);
+      if(!rate && settingsRate(unit)) rate=settingsRate(unit);
+      const fixed=normalizeNewBill({...b,unit,landAmount:land,rate,rateUnit:unit});
+      // Keep the preview form and saved object in sync.
+      if(q('rate') && q('rate').dataset.v70Auto==='1') q('rate').value=String(settingsRate(unit));
+      return fixed;
+    };
+  }
+  // Save using exactly the normalized bill object shown in preview.
+  const oldSaveBill=window.saveBill;
+  if(oldSaveBill){
+    window.saveBill=function(){
+      const b=window.makeBillFromForm?.();
+      if(!b) return alert('Select/add customer');
+      const customerSelect=q('billCustomer');
+      const isNew=customerSelect?.value==='__new';
+      if(isNew&&!state.customers.find(c=>c.id===b.customerId)) state.customers.push({id:b.customerId,name:b.customerName,phone:b.phone,village:b.village,address:b.address,openingDue:0});
+      // Avoid the old save function rebuilding a differently calculated bill.
+      state.bills.push(b); currentBill=b;
+      if(window.renderInvoice) renderInvoice(b);
+      if(window.saveState) saveState();
+      alert('Bill saved');
+    };
+  }
+
+  // Re-render invoice totals consistently for both normal bill and Reminder + Bill.
+  const oldRenderInvoice=window.renderInvoice;
+  if(oldRenderInvoice){
+    window.renderInvoice=function(b){
+      if(b && b.rateUnit){
+        const view=normalizeNewBill(b);
+        return oldRenderInvoice(view);
+      }
+      return oldRenderInvoice(b);
+    };
+  }
+
+  // Make settings save immediately refresh the rate input and bill preview.
+  const oldSettingsSave=window.saveSettings;
+  if(oldSettingsSave){
+    window.saveSettings=function(){
+      oldSettingsSave();
+      if(q('rate')){q('rate').dataset.v70Auto='1';syncRateInput(true);}
+      if(window.previewBill && q('billPage')?.classList.contains('active')) previewBill();
+    };
+  }
+
+  // User tab: expose essential actions directly on each user card; More opens the full iOS action sheet.
+  const oldRenderUsers=window.renderCustomers;
+  function userQuickAction(cid,action){
+    const c=state.customers.find(x=>x.id===cid); if(!c)return;
+    if(action==='bill'){
+      showPage('billPage'); if(q('billCustomer')) q('billCustomer').value=cid; if(window.toggleManual) toggleManual();
+      if(q('previousDue')) q('previousDue').value=String(customerDue(cid));
+      syncRateInput(true); if(window.previewBill) previewBill();
+    } else if(action==='ledger'){
+      if(window.renderChatLedger) renderChatLedger(cid); else if(window.openChat) openChat(cid);
+    } else if(action==='receive'){
+      if(window.directPay) directPay(cid,false); else if(window.openPayment) openPayment('');
+    } else if(action==='more'){
+      if(window.openUserMenuV52) openUserMenuV52(cid); else if(window.openUserMenu) openUserMenu(cid); else if(window.openChat) openChat(cid);
+    }
+  }
+  window.ashaUserQuickActionV70=userQuickAction;
+  if(oldRenderUsers){
+    window.renderCustomers=function(){
+      oldRenderUsers();
+      document.querySelectorAll('#customerList .customer-row').forEach(row=>{
+        if(row.querySelector('.v70-user-actions')) return;
+        const name=row.querySelector('.cust-name')?.textContent||'';
+        const c=state.customers.find(x=>x.name===name);
+        if(!c) return;
+        const tools=document.createElement('div'); tools.className='v70-user-actions';
+        tools.innerHTML=`<button type="button" data-action="bill" aria-label="New bill"><span>▤</span>Bill</button><button type="button" data-action="ledger" aria-label="Ledger"><span>☷</span>Ledger</button><button type="button" data-action="receive" aria-label="Receive payment"><span>₹</span>Receive</button><button type="button" data-action="more" aria-label="More user actions"><span>•••</span>More</button>`;
+        tools.addEventListener('click',e=>{const btn=e.target.closest('button[data-action]');if(!btn)return;e.preventDefault();e.stopPropagation();userQuickAction(c.id,btn.dataset.action);});
+        (row.querySelector('.cust-main')||row).appendChild(tools);
+      });
+    };
+  }
+
+  function applyV70(){
+    if(q('rate')){q('rate').dataset.v70Auto='1';syncRateInput(true);}
+    if(q('customersPage')) q('customersPage').classList.add('v70-users-page');
+    if(window.renderCustomers) renderCustomers();
+    const chip=document.querySelector('.hero-chips span:last-child'); if(chip)chip.textContent='V70 · Settings Rate + User Actions';
+    window.ASHA_BUILD='V70 Settings Rate + User Actions';
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(applyV70,700)); else setTimeout(applyV70,700);
+})();
