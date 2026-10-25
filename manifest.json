@@ -1,5 +1,5 @@
 {
-  "name": "ASHA Billing",
+  "name": "ASHA Billing — Premium User Center",
   "short_name": "ASHA Billing",
   "start_url": "./index.html?v=72",
   "scope": "./",
