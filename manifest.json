@@ -1,6 +1,6 @@
 {
-  "name": "ASHA Billing — V76 iOS Rate + Customer Actions",
-  "short_name": "ASHA Billing",
+  "name": "ASHA Billing V77 iOS",
+  "short_name": "ASHA V77",
   "start_url": "./index.html?v=76",
   "scope": "./",
   "display": "standalone",
@@ -19,5 +19,6 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "version": "77"
 }
