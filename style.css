@@ -2253,3 +2253,50 @@ svg{width:1em;height:1em;display:block;fill:none;stroke:currentColor;stroke-widt
 @media(min-width:901px){.quick-actions{grid-template-columns:repeat(5,minmax(0,1fr))}.flashcard-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:900px){.quick-actions{grid-template-columns:repeat(2,minmax(0,1fr))}.flashcard-grid{grid-template-columns:1fr}.flashcard{min-height:110px}.quick-actions button{min-height:112px}.tabbar button i{width:35px;height:32px}}
 @media(max-width:520px){.page{padding:11px}.dashboard-head{padding:15px;border-radius:22px}.dashboard-title-row h2{font-size:22px}.dashboard-filters{gap:7px}.dashboard-filters select,.dashboard-filters input{font-size:12px;padding:10px 8px}.metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.metric{padding:11px;border-radius:18px}.metric small{font-size:10px;gap:5px}.metric-icon{width:22px;height:22px}.metric b{font-size:19px}.quick-actions{gap:8px}.quick-actions button{min-height:108px;padding:12px;border-radius:19px}.action-icon{width:35px;height:35px}.quick-actions b{font-size:13px}.quick-actions small{font-size:10px}.studio-section{padding:13px}.flashcard{min-height:105px}.tabbar{left:7px;right:7px;width:auto;bottom:max(6px,env(safe-area-inset-bottom));padding:6px 4px;gap:2px}.tabbar button{min-height:59px;border-radius:15px}.tabbar button i{width:30px;height:29px;border-radius:10px}.tabbar button i svg{width:17px;height:17px}.tabbar span{font-size:9px}}
+
+
+/* ===== V69 iOS Motion + streamlined User Center ===== */
+:root{--ios-green:#087b50;--ios-mint:#dff7e9;--ios-glass:rgba(255,255,255,.84)}
+/* The dashboard stays focused on real business actions; the removed quick-guide area has no reserved space. */
+#homePage{padding-bottom:112px}
+.tabbar{isolation:isolate;overflow-x:auto;scrollbar-width:none;scroll-behavior:smooth;transform:translateX(-50%);animation:iosDockIn .55s cubic-bezier(.2,.8,.2,1) both}
+.tabbar::-webkit-scrollbar{display:none}
+.tabbar button{position:relative;overflow:hidden;transition:background .24s ease,transform .24s cubic-bezier(.2,.8,.2,1),color .2s ease;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.tabbar button:before{content:"";position:absolute;inset:5px;border-radius:17px;background:radial-gradient(circle,rgba(14,160,98,.13),transparent 68%);opacity:0;transform:scale(.55);transition:opacity .28s,transform .32s;pointer-events:none}
+.tabbar button:active{transform:scale(.92)}
+.tabbar button:active:before,.tabbar button.active:before{opacity:1;transform:scale(1)}
+.tabbar button i{position:relative;transition:transform .32s cubic-bezier(.2,.8,.2,1),box-shadow .28s,border-radius .28s;will-change:transform}
+.tabbar button:hover i{transform:translateY(-2px) scale(1.04)}
+.tabbar button.active i{animation:iosIconPop .38s cubic-bezier(.2,.9,.25,1.35)}
+.tabbar button.active i svg{animation:iosGlyphIn .35s ease both}
+.tabbar button span{position:relative;letter-spacing:-.15px;transition:transform .24s ease}
+.tabbar button.active span{transform:translateY(-1px)}
+@keyframes iosDockIn{from{opacity:0;translate:0 18px}to{opacity:1;translate:0 0}}
+@keyframes iosIconPop{0%{transform:scale(.84)}65%{transform:scale(1.1)}100%{transform:scale(1)}}
+@keyframes iosGlyphIn{from{opacity:.45;transform:scale(.82)}to{opacity:1;transform:scale(1)}}
+.quick-actions button{transition:transform .24s cubic-bezier(.2,.8,.2,1),box-shadow .24s,border-color .24s}
+.quick-actions button:active{transform:scale(.975)}
+.action-icon{transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s}
+.quick-actions button:hover .action-icon{transform:translateY(-2px) rotate(-3deg);box-shadow:0 8px 18px rgba(8,123,80,.15)}
+/* iOS-style customer action sheet */
+#v52Menu{align-items:flex-end;background:rgba(12,25,19,.38);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);padding:0 10px max(10px,env(safe-area-inset-bottom))}
+.v52-panel{width:min(560px,100%);max-height:min(84dvh,760px);padding:18px 16px 16px;border:1px solid rgba(255,255,255,.92);border-radius:30px 30px 24px 24px;background:rgba(250,253,251,.96);box-shadow:0 -16px 60px rgba(10,35,22,.2);overscroll-behavior:contain;animation:iosSheetUp .34s cubic-bezier(.2,.8,.2,1)}
+.v52-panel:before{content:"";display:block;width:38px;height:5px;border-radius:99px;background:#d5e1da;margin:-6px auto 15px}
+.v52-title{align-items:center;margin-bottom:16px;padding:0 2px 13px;border-bottom:1px solid #e7eee9}
+.v52-title b{font-size:19px;letter-spacing:-.45px;color:#172820}
+.v52-title small{font-size:12px;line-height:1.5;color:#718078}
+.v52-close{width:38px;height:38px;flex:0 0 auto;background:#f0f5f2;border:1px solid #e0e9e3;color:#2c4538;font-size:23px;line-height:1;transition:transform .2s,background .2s}
+.v52-close:active{transform:scale(.9)}
+.v52-actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.v52-actions button{position:relative;min-height:78px;justify-content:flex-start;align-items:center;text-align:left;padding:13px 12px 12px 54px;border-radius:20px;border:1px solid #e3ece6;background:linear-gradient(145deg,#fff,#f6fbf8);box-shadow:0 4px 14px rgba(17,51,33,.045);font-size:13px;line-height:1.3;transition:transform .2s,border-color .2s,box-shadow .2s;white-space:normal}
+.v52-actions button:active{transform:scale(.975);box-shadow:0 2px 7px rgba(17,51,33,.07)}
+.v52-actions button .ios-action-icon{position:absolute;left:11px;top:50%;translate:0 -50%;width:32px;height:32px;display:grid;place-items:center;border-radius:12px;background:#e5f7ed;color:#087b50}
+.v52-actions button .ios-action-icon svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.v52-actions button.primary{background:linear-gradient(145deg,#087b50,#11a66b);color:white;border-color:transparent;box-shadow:0 7px 16px rgba(8,123,80,.16)}
+.v52-actions button.primary .ios-action-icon{background:rgba(255,255,255,.19);color:white}
+.v52-actions button.danger{background:#fff7f6;color:#b42318;border-color:#f4d9d5}
+.v52-actions button.danger .ios-action-icon{background:#ffebe8;color:#c43228}
+.v52-status{padding:11px 12px;border-radius:15px;background:#f0f7f3;border:1px solid #e3eee7;color:#66766d;font-size:12px}
+@keyframes iosSheetUp{from{opacity:0;transform:translateY(28px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:520px){.v52-panel{padding:16px 12px max(14px,env(safe-area-inset-bottom));border-radius:28px 28px 20px 20px}.v52-actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.v52-actions button{min-height:75px;padding:12px 8px 12px 47px;font-size:12px;border-radius:17px}.v52-actions button .ios-action-icon{left:8px;width:30px;height:30px;border-radius:10px}.v52-title b{font-size:18px}.tabbar{width:calc(100% - 12px);gap:2px}.tabbar button{flex:1 0 0!important;min-width:0!important;width:auto!important}.tabbar button i{width:31px;height:30px}}
+@media(prefers-reduced-motion:reduce){.tabbar,.tabbar button,.tabbar button i,.quick-actions button,.action-icon,.v52-panel,.v52-actions button{animation:none!important;transition:none!important}}

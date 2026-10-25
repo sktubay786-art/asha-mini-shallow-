@@ -5185,7 +5185,7 @@ ready(function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,3600)); else setTimeout(fn,3600); }
 ready(function(){
   const q=id=>document.getElementById(id);
-  const build='V68 Rate + iOS Dashboard';
+  const build='V69 iOS Motion + User Center';
   window.ASHA_BUILD=build;
   const chip=document.querySelector('.hero-chips span:last-child');
   if(chip) chip.textContent=build;
@@ -5567,7 +5567,7 @@ ready(function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,4200)); else setTimeout(fn,4200); }
 ready(function(){
   const q=id=>document.getElementById(id);
-  const build='V68 Rate + iOS Dashboard';
+  const build='V69 iOS Motion + User Center';
   window.ASHA_BUILD=build;
   const chip=document.querySelector('.hero-chips span:last-child');
   if(chip) chip.textContent=build;
@@ -5894,7 +5894,7 @@ ready(function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,4400)); else setTimeout(fn,4400); }
 ready(function(){
   const q=id=>document.getElementById(id);
-  const build='V68 Rate + iOS Dashboard';
+  const build='V69 iOS Motion + User Center';
   window.ASHA_BUILD=build;
   const chip=document.querySelector('.hero-chips span:last-child');
   if(chip) chip.textContent=build;
@@ -5956,7 +5956,7 @@ ready(function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,4700)); else setTimeout(fn,4700); }
 ready(function(){
   const q=id=>document.getElementById(id);
-  const build='V68 Rate + iOS Dashboard';
+  const build='V69 iOS Motion + User Center';
   window.ASHA_BUILD=build;
   const chip=document.querySelector('.hero-chips span:last-child');
   if(chip) chip.textContent=build;
@@ -6122,7 +6122,7 @@ ready(function(){
   }
   installV68Renderers();
   window.ashaAuditV68=function(){
-    return {build:'V68 Rate + iOS Dashboard',decimalPerBigha:DECIMALS_PER_BIGHA,kathaPerBigha:KATHA_PER_BIGHA,
+    return {build:'V69 iOS Motion + User Center',decimalPerBigha:DECIMALS_PER_BIGHA,kathaPerBigha:KATHA_PER_BIGHA,
       examples:{oneBighaFrom33Decimal:unitToBigha(33,'decimal'),oneBighaFrom20Katha:unitToBigha(20,'katha')},
       hasReminderRenderer:typeof window.v64BillHTML==='function'};
   };
