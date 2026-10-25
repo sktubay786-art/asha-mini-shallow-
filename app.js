@@ -15,7 +15,7 @@ function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&l
 function initials(n){return String(n||"?").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase()}
 function phone(p){return String(p||"").replace(/\D/g,"")}
 function normalPhone(raw){raw=String(raw||"").trim();if(!raw)return "";let d=raw.replace(/\D/g,"");if(raw.startsWith("+"))return raw;if(d.length===10)return (state.settings.country||"+91")+" "+d;if(d.length>10&&d.startsWith("91"))return "+91 "+d.slice(-10);return (state.settings.country||"+91")+" "+d}
-function landToBigha(v,u){v=+v||0;return u==="bigha"?v:u==="katha"?v/20:v/40}
+function landToBigha(v,u){v=+v||0;return u==="bigha"?v:u==="katha"?v/20:v/33}
 function billPaid(b){return (b.payments||[]).reduce((s,p)=>s+(+p.amount||0),0)}
 function billDue(b){return Math.max((+b.allTotal||0)-billPaid(b),0)}
 function billStatus(b){return billDue(b)<=0?"Paid":billPaid(b)>0?"Partial":"Due"}
@@ -41,8 +41,8 @@ function renderDash(){
   let bills=state.bills.filter(b=>(!month||String(b.date).startsWith(month))&&(vill==="all"||b.village===vill));
   let total=bills.reduce((s,b)=>s+(+b.allTotal||0),0),paid=bills.reduce((s,b)=>s+billPaid(b),0),due=state.customers.reduce((s,c)=>s+customerDue(c.id),0);
   $("metrics").innerHTML=[
-    ["🧾","Total Bill",money(total)],["✅","Collected",money(paid)],["⚠","Total Due",money(due)],["👥","Customers",state.customers.length]
-  ].map(x=>`<div class="metric"><small>${x[0]} ${x[1]}</small><b>${x[2]}</b></div>`).join("");
+    ['<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.5h7l4 4v13H7zM14 3.5v4h4M9.5 12h6M9.5 15.5h6"/></svg>','Total Bill',money(total)],['<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>','Collected',money(paid)],['<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 22 20H2zM12 9v5M12 17h.01"/></svg>','Total Due',money(due)],['<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 19v-1.3a5.5 5.5 0 0 1 11 0V19zM16 6a3 3 0 0 1 0 5.5M17 14a4.5 4.5 0 0 1 3.5 4.4V19h-4"/></svg>','Customers',state.customers.length]
+  ].map(x=>`<div class="metric"><small><span class="metric-icon">${x[0]}</span><span>${x[1]}</span></small><b>${x[2]}</b></div>`).join("");
 }
 function renderCustomers(){
   let q=$("customerSearch").value.toLowerCase();
@@ -1113,7 +1113,7 @@ v36Ready(function(){
 
   function rateByUnit(unit){
     if(unit==='katha') return +(state.settings.rateKatha || ((state.settings.rateBigha||2200)/20));
-    if(unit==='decimal') return +(((state.settings.rateBigha||2200)/40).toFixed(2));
+    if(unit==='decimal') return +(((state.settings.rateBigha||2200)/33).toFixed(2));
     return +(state.settings.rateBigha || 2200);
   }
   window.rateByUnit = rateByUnit;
@@ -1247,7 +1247,7 @@ ready(function(){
     showCompactMeta: true,
     rateBigha: 2200,
     rateKatha: 110,
-    rateDecimal: 55,
+    rateDecimal: 66.67,
     autoBackup: true,
     appFont: "Inter",
     billFont: "Hind Siliguri"
@@ -1311,7 +1311,7 @@ ready(function(){
     state.settings.defaultBillNote = document.getElementById('setDefaultBillNote')?.value || "";
     state.settings.rateBigha = +(document.getElementById('setRateBigha')?.value || state.settings.rateBigha || 2200);
     state.settings.rateKatha = +(document.getElementById('setRateKatha')?.value || state.settings.rateKatha || 110);
-    state.settings.rateDecimal = +(document.getElementById('setRateDecimal')?.value || state.settings.rateDecimal || 55);
+    state.settings.rateDecimal = +(document.getElementById('setRateDecimal')?.value || state.settings.rateDecimal || 66.67);
     state.settings.showCompactMeta = (document.getElementById('setShowCompactMeta')?.value || "yes") === "yes";
     state.settings.appFont = document.getElementById('setAppFont')?.value || state.settings.appFont || "Inter";
     state.settings.billFont = document.getElementById('setBillFont')?.value || state.settings.billFont || "Hind Siliguri";
@@ -1329,7 +1329,7 @@ ready(function(){
 
   function autoRate(unit){
     if(unit==='katha') return +(state.settings.rateKatha || 110);
-    if(unit==='decimal') return +(state.settings.rateDecimal || 55);
+    if(unit==='decimal') return +(state.settings.rateDecimal || 66.67);
     return +(state.settings.rateBigha || 2200);
   }
 
@@ -1512,7 +1512,7 @@ ready(function(){
   state.settings = Object.assign({
     rateBigha:2200,
     rateKatha:110,
-    rateDecimal:55,
+    rateDecimal:66.67,
     reminderTemplate:"আপনাকে পুরো বিল শীঘ্রই পরিশোধের জন্য বলা হচ্ছে"
   }, state.settings||{});
 
@@ -1520,7 +1520,7 @@ ready(function(){
   function rateSuffix(u){ return u==='katha' ? '/কাঠা' : u==='decimal' ? '/ডেসিমেল' : '/বিঘা'; }
   function rateByUnit(u){
     if(u==='katha') return +(state.settings.rateKatha || ((state.settings.rateBigha||2200)/20));
-    if(u==='decimal') return +(state.settings.rateDecimal || ((state.settings.rateBigha||2200)/40));
+    if(u==='decimal') return +(state.settings.rateDecimal || ((state.settings.rateBigha||2200)/33));
     return +(state.settings.rateBigha || 2200);
   }
   function currentCharge(land, unit, rate){
@@ -1928,7 +1928,7 @@ ready(function(){
     accent:"#075c39",
     rateBigha:2200,
     rateKatha:110,
-    rateDecimal:55,
+    rateDecimal:66.67,
     appFont:"Inter",
     billFont:"Hind Siliguri",
     reminderTemplate:"আপনাকে পুরো বিল শীঘ্রই পরিশোধের জন্য বলা হচ্ছে",
@@ -2084,7 +2084,7 @@ ready(function(){
     setValue('setQrMode',state.settings.qrMode||'dynamic');
     setValue('setRateBigha',state.settings.rateBigha||2200);
     setValue('setRateKatha',state.settings.rateKatha||110);
-    setValue('setRateDecimal',state.settings.rateDecimal||55);
+    setValue('setRateDecimal',state.settings.rateDecimal||66.67);
     setValue('setReminderTemplate',state.settings.reminderTemplate||'');
     setValue('setDefaultBillNote',state.settings.defaultBillNote||'');
     setValue('setAppFont',state.settings.appFont||'Inter');
@@ -2107,7 +2107,7 @@ ready(function(){
       qrMode:document.getElementById('setQrMode')?.value||state.settings.qrMode,
       rateBigha:+(document.getElementById('setRateBigha')?.value||state.settings.rateBigha||2200),
       rateKatha:+(document.getElementById('setRateKatha')?.value||state.settings.rateKatha||110),
-      rateDecimal:+(document.getElementById('setRateDecimal')?.value||state.settings.rateDecimal||55),
+      rateDecimal:+(document.getElementById('setRateDecimal')?.value||state.settings.rateDecimal||66.67),
       reminderTemplate:document.getElementById('setReminderTemplate')?.value||state.settings.reminderTemplate,
       defaultBillNote:document.getElementById('setDefaultBillNote')?.value||'',
       appFont:document.getElementById('setAppFont')?.value||state.settings.appFont||'Inter',
@@ -4794,7 +4794,7 @@ ready(function(){
   window.rateLineV60=function(b){
     const r=safeNum(b.rate), u=b.rateUnit||b.unit||'bigha';
     if(u==='katha') return `${money(r)}/কাঠা; বিঘা rate ${money(r*20)}/বিঘা`;
-    if(u==='decimal') return `${money(r)}/ডেসিমেল; বিঘা rate ${money(r*40)}/বিঘা`;
+    if(u==='decimal') return `${money(r)}/ডেসিমেল; বিঘা rate ${money(r*33)}/বিঘা`;
     return `${money(r)}/বিঘা`;
   };
   window.currentChargeV60=function(land,unit,rate){ return safeNum(land)*safeNum(rate); };
@@ -5185,7 +5185,7 @@ ready(function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,3600)); else setTimeout(fn,3600); }
 ready(function(){
   const q=id=>document.getElementById(id);
-  const build='V66 Audited Fix';
+  const build='V68 Rate + iOS Dashboard';
   window.ASHA_BUILD=build;
   const chip=document.querySelector('.hero-chips span:last-child');
   if(chip) chip.textContent=build;
@@ -5275,7 +5275,7 @@ ready(function(){
   window.v63RateLine=function(b){
     const r=n(b.rate), u=b.rateUnit||b.unit||'bigha';
     if(u==='katha') return `${money(r)}/কাঠা; বিঘা rate ${money(r*20)}/বিঘা`;
-    if(u==='decimal') return `${money(r)}/ডেসিমেল; বিঘা rate ${money(r*40)}/বিঘা`;
+    if(u==='decimal') return `${money(r)}/ডেসিমেল; বিঘা rate ${money(r*33)}/বিঘা`;
     return `${money(r)}/বিঘা`;
   };
   const oldMakeBillV63=window.makeBillFromForm;
@@ -5567,7 +5567,7 @@ ready(function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,4200)); else setTimeout(fn,4200); }
 ready(function(){
   const q=id=>document.getElementById(id);
-  const build='V66 Audited Fix';
+  const build='V68 Rate + iOS Dashboard';
   window.ASHA_BUILD=build;
   const chip=document.querySelector('.hero-chips span:last-child');
   if(chip) chip.textContent=build;
@@ -5619,7 +5619,7 @@ ready(function(){
   window.v64RateLine=function(b){
     const r=num(b.rate), u=b.rateUnit||b.unit||'bigha';
     if(u==='katha') return `${money(r)}/কাঠা • বিঘা ${money(r*20)}`;
-    if(u==='decimal') return `${money(r)}/ডেসিমেল • বিঘা ${money(r*40)}`;
+    if(u==='decimal') return `${money(r)}/ডেসিমেল • বিঘা ${money(r*33)}`;
     return `${money(r)}/বিঘা`;
   };
   window.v64Upi=function(amount,billNo){
@@ -5894,7 +5894,7 @@ ready(function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,4400)); else setTimeout(fn,4400); }
 ready(function(){
   const q=id=>document.getElementById(id);
-  const build='V66 Audited Fix';
+  const build='V68 Rate + iOS Dashboard';
   window.ASHA_BUILD=build;
   const chip=document.querySelector('.hero-chips span:last-child');
   if(chip) chip.textContent=build;
@@ -5906,7 +5906,9 @@ ready(function(){
   window.closeAction=function(){ window.actionContext=null; closeModalV65(); if(q('actionSave')) q('actionSave').classList.remove('hidden'); if(q('actionDelete')) q('actionDelete').classList.remove('hidden'); };
   window.v65BillReminder=async function(cid,bid=''){
     const c=getCustV65(cid); if(!c) return alert('User not found');
-    const b=bid?state.bills.find(x=>x.id===bid):latestBillV65(cid); if(!b) return alert('এই user-এর bill নেই। আগে New Bill তৈরি করুন।');
+    const sourceBill=bid?state.bills.find(x=>x.id===bid):latestBillV65(cid); if(!sourceBill) return alert('এই user-এর bill নেই। আগে New Bill তৈরি করুন।');
+    const b={...sourceBill};
+    if(window.ashaBillChargeV68){ b.bigha=window.ashaLandToBighaV68(b.landAmount,b.unit||'bigha'); b.current=window.ashaBillChargeV68(b); b.allTotal=(Number(b.previousDue)||0)+b.current; }
     currentBill=b;
     let blob;
     try{ if(typeof v64BillBlob==='function') blob=await v64BillBlob(b); else if(typeof v63BillBlob==='function') blob=await v63BillBlob(b); else blob=await invoiceBlob(); }
@@ -5954,7 +5956,7 @@ ready(function(){
 function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(fn,4700)); else setTimeout(fn,4700); }
 ready(function(){
   const q=id=>document.getElementById(id);
-  const build='V66 Audited Fix';
+  const build='V68 Rate + iOS Dashboard';
   window.ASHA_BUILD=build;
   const chip=document.querySelector('.hero-chips span:last-child');
   if(chip) chip.textContent=build;
@@ -6063,4 +6065,65 @@ ready(function(){
     }catch(e){}
   },600);
 });
+})();
+
+
+/* ===================== V68 WEST BENGAL LAND/RATE NORMALIZATION ===================== */
+(function(){
+  const DECIMALS_PER_BIGHA = 33;
+  const KATHA_PER_BIGHA = 20;
+  function unitToBigha(amount, unit){
+    const n = Number(amount)||0;
+    return unit==='katha' ? n/KATHA_PER_BIGHA : unit==='decimal' ? n/DECIMALS_PER_BIGHA : n;
+  }
+  function billRateUnit(b){ return b.rateUnit || b.unit || 'bigha'; }
+  function billChargeFromUnits(b){
+    const bigha = unitToBigha(b.landAmount, b.unit || 'bigha');
+    const rateUnit = billRateUnit(b);
+    const unitsAtRate = rateUnit==='katha' ? bigha*KATHA_PER_BIGHA : rateUnit==='decimal' ? bigha*DECIMALS_PER_BIGHA : bigha;
+    return unitsAtRate * (Number(b.rate)||0);
+  }
+  window.ashaLandToBighaV68 = unitToBigha;
+  window.ashaBillChargeV68 = billChargeFromUnits;
+  window.ashaRateLineV68 = function(b){
+    const rate=Number(b.rate)||0, unit=billRateUnit(b);
+    if(unit==='katha') return `${money(rate)}/কাঠা · ${money(rate*KATHA_PER_BIGHA)}/বিঘা`;
+    if(unit==='decimal') return `${money(rate)}/ডেসিমেল · ${money(rate*DECIMALS_PER_BIGHA)}/বিঘা`;
+    return `${money(rate)}/বিঘা`;
+  };
+  function installV68Renderers(){
+    if(typeof window.v64BillHTML!=='function') { setTimeout(installV68Renderers,250); return; }
+    if(window.v64BillHTML.__v68Patched) return;
+    const oldHTML=window.v64BillHTML;
+    const wrapped=function(b,mode=''){
+      if(!b) return oldHTML(b,mode);
+      const view={...b};
+      view.bigha=unitToBigha(view.landAmount,view.unit||'bigha');
+      view.current=billChargeFromUnits(view);
+      view.allTotal=(Number(view.previousDue)||0)+view.current;
+      const original=window.v64RateLine;
+      window.v64RateLine=window.ashaRateLineV68;
+      try{return oldHTML(view,mode);}finally{window.v64RateLine=original;}
+    };
+    wrapped.__v68Patched=true;
+    window.v64BillHTML=wrapped;
+    if(typeof window.v63BillHTML==='function'){
+      const oldHTML63=window.v63BillHTML;
+      window.v63BillHTML=function(b){
+        if(!b) return oldHTML63(b);
+        const view={...b,bigha:unitToBigha(b.landAmount,b.unit||'bigha')};
+        view.current=billChargeFromUnits(view);
+        view.allTotal=(Number(view.previousDue)||0)+view.current;
+        const oldLine=window.v63RateLine;
+        window.v63RateLine=window.ashaRateLineV68;
+        try{return oldHTML63(view);}finally{window.v63RateLine=oldLine;}
+      };
+    }
+  }
+  installV68Renderers();
+  window.ashaAuditV68=function(){
+    return {build:'V68 Rate + iOS Dashboard',decimalPerBigha:DECIMALS_PER_BIGHA,kathaPerBigha:KATHA_PER_BIGHA,
+      examples:{oneBighaFrom33Decimal:unitToBigha(33,'decimal'),oneBighaFrom20Katha:unitToBigha(20,'katha')},
+      hasReminderRenderer:typeof window.v64BillHTML==='function'};
+  };
 })();

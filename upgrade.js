@@ -4,7 +4,7 @@
   ready(() => {
     document.documentElement.classList.add('asha-v67');
     const chip = document.querySelector('.hero-chips span:nth-child(2)');
-    if (chip) chip.textContent = 'V67 · iOS Studio';
+    if (chip) chip.textContent = 'V68 · iOS Studio';
     document.querySelectorAll('.flashcard').forEach(card => {
       card.setAttribute('aria-pressed','false');
       card.addEventListener('click', () => {
