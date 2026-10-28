@@ -1024,3 +1024,108 @@ window.ashaAuditV84Features=()=>({historySearch:!!$('v84HistorySearch'),historyF
  setTimeout(()=>{const chip=document.getElementById('buildChip');if(chip)chip.textContent='V85 · Complete User Experience'},5200);
  window.ashaAuditV85=()=>({build:'V85 Complete Dashboard + Rate-safe Reminder',homeMetrics:!!$('metrics')&&!!$('metrics').children.length,homeQuickActions:!!$('homePage .quick-actions')||!!$('homePage .quick-actions button'),userList:!!$('customerList'),billReminder:typeof window.v66BillReminder==='function',settings:!!$('settingsPage')});
 })();
+
+
+/* ASHA Billing V86 — audited bug fixes: stable Home, correct unit rates, reliable User Bill + Reminder. */
+(function(){
+ 'use strict';
+ const $=id=>document.getElementById(id);
+ const num=v=>{const n=Number(v);return Number.isFinite(n)?n:0};
+ const round=v=>Math.round((num(v)+Number.EPSILON)*100)/100;
+ const safe=v=>typeof window.esc==='function'?window.esc(v):String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const money=v=>typeof window.money==='function'?window.money(v):'₹'+round(v).toLocaleString('en-IN');
+ const unit=v=>['bigha','katha','decimal'].includes(String(v))?String(v):'bigha';
+ const latestBill=cid=>(window.state?.bills||[]).filter(b=>String(b.customerId)===String(cid)).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))||String(b.billNo||'').localeCompare(String(a.billNo||'')))[0];
+ function normalizedBill(source){
+   if(!source)return null;
+   const b={...source};
+   b.unit=unit(b.unit);
+   // The bill's explicit rateUnit is authoritative. Older bills without it use their
+   // selected land unit; never reinterpret a saved per-katha/per-decimal rate as per-bigha.
+   const from=unit(b.rateUnit||b.unit),to=b.unit;
+   let rate=num(b.rate);
+   const perBigha=from==='katha'?rate*20:from==='decimal'?rate*40:rate;
+   rate=to==='katha'?perBigha/20:to==='decimal'?perBigha/40:perBigha;
+   b.rate=round(rate);b.rateUnit=to;
+   b.landAmount=Math.max(0,num(b.landAmount));
+   b.bigha=round(to==='katha'?b.landAmount/20:to==='decimal'?b.landAmount/40:b.landAmount);
+   // Unit-normalized rate × land amount is the source of truth for the charge.
+   b.current=round(b.landAmount*b.rate);
+   b.previousDue=Math.max(0,num(b.previousDue));
+   b.allTotal=round(b.current+b.previousDue);
+   b.payments=Array.isArray(b.payments)?b.payments:[];
+   return b;
+ }
+ function billPaidLocal(b){return (b.payments||[]).reduce((s,p)=>s+Math.max(0,num(p.amount)),0)}
+ function billDueLocal(b){return Math.max(0,round(num(b.allTotal)-billPaidLocal(b)))}
+ function stableHome(){
+   const home=$('homePage');if(!home)return;
+   home.classList.add('v85-home-stable','v86-home-stable');
+   // Guard only presentation: never hide or rebuild dashboard metrics/quick actions.
+   const metrics=$('metrics');if(metrics)metrics.classList.add('v86-metrics-stable');
+ }
+ // A single canonical User Bill + Reminder implementation, avoiding nested legacy wrappers
+ // that could rebuild the bill with a stale rate or leave the action modal in a broken state.
+ async function billWithReminder(cid,bid=''){
+   const state=window.state;
+   if(!state)return alert('App data is not ready yet. Please try again.');
+   const customer=(state.customers||[]).find(c=>String(c.id)===String(cid));
+   if(!customer)return alert('User not found. Please reopen the customer menu.');
+   const source=bid?(state.bills||[]).find(b=>String(b.id)===String(bid)):latestBill(cid);
+   if(!source)return alert('এই user-এর কোনো bill নেই। আগে New Bill তৈরি করুন।');
+   const b=normalizedBill(source);
+   let blob;
+   try{
+     if(typeof window.v64BillBlob==='function')blob=await window.v64BillBlob(b);
+     else if(typeof window.v63BillBlob==='function')blob=await window.v63BillBlob(b);
+     else throw new Error('Bill image renderer is unavailable');
+     if(!blob)throw new Error('Bill image could not be generated');
+   }catch(err){console.error('V86 bill reminder preview failed',err);alert('Bill + Reminder তৈরি করা যায়নি। Internet/QR load পরীক্ষা করে আবার চেষ্টা করুন।');return;}
+   const oldUrl=$('v86ReminderPreview')?.dataset?.objectUrl;
+   if(oldUrl)try{URL.revokeObjectURL(oldUrl)}catch(_){}
+   const url=URL.createObjectURL(blob);
+   if(!$('actionModal')||!$('actionBody')){alert('Reminder window is unavailable. Refresh the app and try again.');return;}
+   $('actionTitle').textContent='Bill + Reminder';
+   $('actionBody').innerHTML=`<div class="v86-reminder"><div class="v86-reminder-summary"><div><small>CUSTOMER</small><b>${safe(customer.name||b.customerName||'Customer')}</b><span>${safe(b.billNo||'Bill')} · ${safe(b.date||'')}</span></div><div class="v86-due-pill"><small>OUTSTANDING</small><b>${money(billDueLocal(b))}</b></div></div><div class="v86-rate-check"><span>Land</span><b>${safe(b.landAmount)} ${safe(b.unit)}</b><span>Rate</span><b>${money(b.rate)} / ${b.unit==='katha'?'কাঠা':b.unit==='decimal'?'ডেসিমেল':'বিঘা'}</b><span>Current bill</span><b>${money(b.current)}</b><span>Total</span><b>${money(b.allTotal)}</b></div><div class="v86-preview-wrap"><img id="v86ReminderPreview" data-object-url="${url}" src="${url}" alt="Bill preview"></div><div class="v86-reminder-actions"><button type="button" class="btn primary full" id="v86ShareImage">Share Image + Text</button><button type="button" class="btn" id="v86WhatsAppText">WhatsApp Text</button><button type="button" class="btn" id="v86DownloadBill">Download Bill</button><button type="button" class="btn" id="v86CloseReminder">Close</button></div></div>`;
+   $('actionSave')?.classList.add('hidden');$('actionDelete')?.classList.add('hidden');
+   $('actionModal').classList.remove('hidden');$('actionModal').style.display='flex';
+   const text=typeof window.reminderTextByBill==='function'?window.reminderTextByBill(b):`${state.settings?.company||'ASHA Billing'}\nBill: ${b.billNo||''}\nTotal: ${money(b.allTotal)}\nPaid: ${money(billPaidLocal(b))}\nDue: ${money(billDueLocal(b))}\nPlease pay at your convenience. Thank you.`;
+   const close=()=>{try{URL.revokeObjectURL(url)}catch(_){};if(typeof window.closeAction==='function')window.closeAction();else $('actionModal').classList.add('hidden');};
+   $('v86CloseReminder').onclick=close;
+   $('v86WhatsAppText').onclick=()=>{if(typeof window.openWhatsApp==='function')window.openWhatsApp(customer.phone||b.phone,text);else{const digits=String(customer.phone||b.phone||'').replace(/\D/g,'');if(!digits)return alert('Add a customer phone number first.');const phone=digits.length===10?'91'+digits:digits;window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(text),'_blank','noopener');}};
+   $('v86DownloadBill').onclick=()=>{if(typeof window.downloadBlob==='function')window.downloadBlob(blob,`${b.billNo||'ASHA-Bill'}.png`);else{const a=document.createElement('a');a.href=url;a.download=`${b.billNo||'ASHA-Bill'}.png`;a.click();}};
+   $('v86ShareImage').onclick=async()=>{const file=new File([blob],`${b.billNo||'ASHA-Bill'}.png`,{type:blob.type||'image/png'});try{if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],text,title:'ASHA Billing — Bill Reminder'});}else{if(typeof window.downloadBlob==='function')window.downloadBlob(blob,file.name);$('v86WhatsAppText').click();}}catch(err){if(err?.name!=='AbortError'){console.warn('Share fallback',err);if(typeof window.downloadBlob==='function')window.downloadBlob(blob,file.name);}}};
+ }
+ // Replace every public historical alias, so all User menus share the same tested flow.
+ window.v86BillWithReminder=billWithReminder;
+ window.v66BillReminder=billWithReminder;window.v65BillReminder=billWithReminder;window.v64BillReminder=billWithReminder;window.v63BillReminder=billWithReminder;window.shareCustomerBill=billWithReminder;
+ window.openBillPreviewV45=billWithReminder;window.openBillPreviewV50=billWithReminder;
+ // User menu entry points can have stale inline handlers; delegate in capture phase.
+ document.addEventListener('click',function(e){
+   const btn=e.target.closest('#mBillReminder,#v52BillReminder,#v64ToolBill,#chatShare,[data-v73-detail-action="reminder"],[data-v74-action="reminder"]');
+   if(!btn)return;
+   let cid=window.activeCustomer||window.actionContext?.customerId||window.actionContext?.cid;
+   if(!cid){const sub=$('v52Sub')?.textContent||'';const c=(window.state?.customers||[]).find(x=>sub.startsWith(String(x.name||'User')+' ·'));cid=c?.id;}
+   if(!cid)return;
+   e.preventDefault();e.stopImmediatePropagation();billWithReminder(cid);
+ },true);
+ // Ensure bill creation rate label and conversion stay in sync with the Settings per-bigha rate.
+ function syncRate(){
+   const input=$('rate'),sel=$('landUnit');if(!input||!sel)return;
+   const u=unit(sel.value),settings=window.state?.settings||{};
+   const perBigha=num(settings.rateBigha??settings.rate??2200);
+   const expected=u==='katha'?perBigha/20:u==='decimal'?perBigha/40:perBigha;
+   const label=input.closest('div')?.querySelector('label');if(label)label.textContent='Rate / '+(u==='katha'?'কাঠা':u==='decimal'?'ডেসিমেল':'বিঘা');
+   if(input.dataset.v86Auto==='1'||!input.value){input.value=String(round(expected));input.dataset.v86Auto='1';}
+ }
+ $('landUnit')?.addEventListener('change',()=>{if($('rate'))$('rate').dataset.v86Auto='1';syncRate();try{window.previewBill?.()}catch(_){}});
+ $('rate')?.addEventListener('input',()=>{if($('rate'))$('rate').dataset.v86Auto='0'});
+ document.addEventListener('DOMContentLoaded',syncRate,{once:true});setTimeout(syncRate,300);
+ // Do not animate dashboard content again on renders, tab switches, or pageshow.
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',stableHome,{once:true});else stableHome();
+ window.addEventListener('pageshow',stableHome);
+ document.addEventListener('click',e=>{if(e.target.closest('[data-page="homePage"]'))setTimeout(stableHome,0)});
+ const style=document.createElement('style');style.textContent=`#homePage.v86-home-stable .dashboard-head,#homePage.v86-home-stable #metrics,#homePage.v86-home-stable #metrics * ,#homePage.v86-home-stable .quick-actions,#homePage.v86-home-stable .quick-actions *{animation:none!important;transition:background-color .16s ease,border-color .16s ease,box-shadow .16s ease!important;opacity:1!important;transform:none!important;filter:none!important} .v86-reminder{display:grid;gap:12px}.v86-reminder-summary{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px;border-radius:17px;background:#edf8f0}.v86-reminder-summary>div:first-child{display:grid;gap:4px}.v86-reminder-summary small,.v86-due-pill small{font-size:10px;letter-spacing:1px;color:#66816f;font-weight:800}.v86-reminder-summary b{font-size:16px;color:#16462c}.v86-reminder-summary span{font-size:12px;color:#667b6c}.v86-due-pill{text-align:right;display:grid;gap:4px}.v86-due-pill b{font-size:19px!important;color:#087b50!important}.v86-rate-check{display:grid;grid-template-columns:1fr auto;gap:8px 12px;padding:13px;border:1px solid #e1eae3;border-radius:15px;font-size:13px}.v86-rate-check span{color:#718076}.v86-rate-check b{text-align:right;color:#234b34}.v86-preview-wrap{max-height:42vh;overflow:auto;border:1px solid #e2e8e3;border-radius:14px;background:#f7faf7;text-align:center}.v86-preview-wrap img{display:block;max-width:100%;height:auto;margin:auto}.v86-reminder-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;position:sticky;bottom:0;background:inherit;padding-top:4px}.v86-reminder-actions .full{grid-column:1/-1}@media(prefers-reduced-motion:reduce){#homePage *{animation:none!important;scroll-behavior:auto!important}}`;
+ document.head.appendChild(style);
+ window.ashaAuditV86=()=>({build:'V86 Bug Fix',homeMetricsPresent:!!$('metrics'),homeQuickActionsPresent:!!$('homePage .quick-actions'),reminderFlow:window.v66BillReminder===billWithReminder,rateUnitConversion:{bighaToKatha:round(2200/20),bighaToDecimal:round(2200/40)},settingsPresent:!!$('settingsPage')});
+})();

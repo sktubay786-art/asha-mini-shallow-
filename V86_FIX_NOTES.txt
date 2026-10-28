@@ -1,0 +1,10 @@
+ASHA Billing V86 bug-fix package
+
+- Preserves all Home dashboard metric and quick-action elements; presentation animations no longer replay on dashboard refreshes.
+- Replaces nested legacy Bill + Reminder entry points with one customer-scoped workflow and preview, share, WhatsApp text, and download actions.
+- Reminder preview computes a normalized copy of the selected bill and does not mutate stored historical data.
+- Uses explicit rateUnit when present; missing rateUnit falls back to the saved land unit.
+- Shows land, rate, current bill, total, and outstanding due together before sharing.
+- Bumps asset/service-worker cache version to V86.
+
+Validation: ZIP integrity and JavaScript syntax checks are run before packaging. Live Firebase/WhatsApp device testing is not performed in this environment.
