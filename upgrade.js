@@ -1222,100 +1222,27 @@ const css=document.createElement('style');css.id='v93PremiumDashboardHistory';cs
 })();
 
 
-/* ASHA Billing V93.1 — requested mobile cleanup, preserving existing business logic */
+/* ASHA Billing V94 — compact mobile layout; remove the Payment & Settlement intro panel shown in the screenshot. */
 (()=>{'use strict';
- const $=id=>document.getElementById(id);
- function cleanupPay(){
-   const page=$('payPage'); if(!page)return;
-   // Remove the whole promotional/info and computed summary block shown in the uploaded screenshot.
-   ['v89PayHero','v89PaySummary','v90PaySummary','v84PaymentHistory','v90PayHero','v91PayHero'].forEach(id=>$(id)?.remove());
-   page.querySelectorAll('.v89-pay-hero,.v90-pay-hero,.v89-pay-summary,.v90-pay-summary,.v84-pay-progress,.v84-pay-entry,.v84-pay-subtitle,.v89-pay-progress,.v90-progress,.v90-settle-note,.v89-pay-legend,.v90-pay-legend').forEach(el=>el.remove());
-   // Hide the original compact bill-info block, but keep its element in place for existing payment JS.
-   const info=$('payInfo'); if(info){info.setAttribute('aria-hidden','true');info.style.cssText+=';display:none!important';}
-   // Strip leftover helper text only; the bill selector, inputs and all payment actions remain intact.
-   page.querySelectorAll('.muted,.pay-helper,.payment-helper,.v89-pay-title p,.v90-pay-title p').forEach(el=>{if(!el.closest('button'))el.remove()});
-   const card=page.querySelector('.card'); if(card)card.classList.add('v93-pay-compact');
- }
- function keepNormalCalculator(){
-   const page=$('calcPage'); if(!page)return;
-   // Restore the app's original standard calculator (#calcScreen/#calcKeys), without altering its handlers.
-   const normal=page.querySelector(':scope > .card:has(#calcScreen), :scope > .card:has(#calcKeys), .v89-legacy-calc:has(#calcKeys)');
-   if(normal){normal.classList.remove('v89-legacy-calc','v88-old-calc-card');normal.style.setProperty('display','block','important');normal.style.setProperty('visibility','visible','important');}
-   // The land tool remains available from the existing iOS popup launcher, not as a second inline layout.
-   page.querySelectorAll(':scope > .card:has(#calcLand), .v89-legacy-calc:has(#calcLand), .v88-land-old').forEach(el=>{el.style.setProperty('display','none','important')});
-   // Keep the existing scientific calculator as an additional option, and retain the popup launchers.
-   const root=$('v89CalculatorStudio'); if(root){root.querySelectorAll(':scope > .v89-tool-card:not(.v89-calculator)').forEach(el=>el.style.setProperty('display','none','important'));}
- }
- function apply(){cleanupPay();keepNormalCalculator();document.documentElement.classList.add('asha-v93-mobile-clean');}
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(apply,220),{once:true});else setTimeout(apply,220);
- const oldShow=window.showPage;if(typeof oldShow==='function'&&!oldShow.__v93MobileCleanup){const wrap=function(id){oldShow.apply(this,arguments);setTimeout(apply,100)};wrap.__v93MobileCleanup=true;window.showPage=wrap;try{showPage=wrap}catch(_){}}
- window.ashaAuditV93Mobile=()=>({build:'V93 Mobile Pay Cleanup + Standard Calculator',payIntroRemoved:!$('v89PayHero'),paySummaryRemoved:!$('v89PaySummary'),standardCalculatorVisible:!!$('calcKeys')&&getComputedStyle($('calcKeys').closest('.card')||$('calcKeys')).display!=='none',receiveAction:!!$('receiveBtn'),settleAction:!!$('settleBtn'),dueReceiptAction:!!$('dueReceiptBtn'),cashCounterLauncher:!!document.querySelector('[data-v91-open="cash"]'),landCalculatorLauncher:!!document.querySelector('[data-v91-open="land"]')});
- const css=document.createElement('style');css.id='v93MobileCleanupStyles';css.textContent=`
- #payPage .v93-pay-compact{padding:clamp(12px,3.5vw,20px)!important;border-radius:22px!important}
- #payPage .v93-pay-compact h2{margin-top:0!important}
- #payPage #payBill{width:100%;min-width:0;box-sizing:border-box}
- #payPage .two{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
- #payPage .action-bar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
- #payPage .action-bar .btn{min-width:0;min-height:48px;padding:10px 6px;font-size:clamp(10px,2.8vw,13px);line-height:1.25;white-space:normal;overflow-wrap:anywhere;border-radius:15px}
- #payPage .pay-buttons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
- #payPage .pay-buttons .btn{min-width:0;min-height:43px;padding:9px 5px;font-size:12px}
- /* Preserve the existing ordinary calculator keypad on small screens. */
- #calcPage .v89-legacy-calc:has(#calcKeys),#calcPage>.card:has(#calcKeys),#calcPage>.card:has(#calcScreen){display:block!important;visibility:visible!important}
- #calcPage .v88-old-calc-card:has(#calcKeys){display:block!important}
- #calcPage .v89-legacy-calc:has(#calcLand),#calcPage>.card:has(#calcLand),#calcPage .v88-land-old{display:none!important}
- #calcPage #calcScreen{max-width:100%;overflow-x:auto;overflow-wrap:anywhere}
- #calcPage #calcKeys{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
- #calcPage #calcKeys button{min-width:0;min-height:46px;touch-action:manipulation}
- @media(max-width:380px){#payPage .action-bar{gap:6px}#payPage .action-bar .btn{font-size:10px;padding:9px 4px}#payPage .two{gap:8px}#calcPage #calcKeys{gap:6px}#calcPage #calcKeys button{min-height:43px}}
- @media(prefers-reduced-motion:reduce){.v91-modal-sheet{animation:none!important}}
- `;document.head.appendChild(css);
-})();
-
-
-/* ASHA Billing V94 — single FX-100MS-style calculator + dashboard refresh guard */
-(()=>{'use strict';
- const $=id=>document.getElementById(id);
- function enforceCalculator(){
-   const page=$('calcPage'),root=$('v89CalculatorStudio'); if(!page||!root)return;
-   // One primary calculator only: the newer FX-style scientific keypad.
-   page.querySelectorAll(':scope > .card:has(#calcScreen), :scope > .card:has(#calcKeys), .v89-legacy-calc:has(#calcScreen), .v89-legacy-calc:has(#calcKeys), .v88-old-calc-card:has(#calcKeys)').forEach(el=>{
-     if(!root.contains(el))el.style.setProperty('display','none','important');
-   });
-   page.querySelectorAll(':scope > .card:has(#calcLand), .v89-legacy-calc:has(#calcLand), .v88-land-old').forEach(el=>el.style.setProperty('display','none','important'));
-   root.querySelectorAll(':scope > .v89-tool-card').forEach(card=>{
-     if(card.classList.contains('v89-calculator'))card.style.setProperty('display','block','important');
-     else card.style.removeProperty('display'); // cash/land cards are moved into the existing popups by V91
-   });
-   const title=root.querySelector('.v89-calculator .v89-tool-head h2');if(title)title.textContent='FX-100MS Scientific Calculator';
-   const subtitle=root.querySelector('.v89-calculator .v89-tool-head p');if(subtitle)subtitle.textContent='Standard and scientific calculations · DEG/RAD · memory · history';
-   const chip=root.querySelector('.v89-calculator .v89-chip');if(chip)chip.textContent='FX-100MS STYLE';
- }
- function refreshDashboard(){
-   try{
-     if(typeof window.renderDash==='function')window.renderDash();
-     // The latest dashboard renderer is defined by V93 and updates totals from current state.
-     const s=window.state||(typeof state!=='undefined'?state:null);
-     if(s && $('metrics')){
-       const ev=new Event('asha:dashboard-refresh');document.dispatchEvent(ev);
-     }
-   }catch(e){console.warn('Dashboard refresh skipped',e)}
- }
- function apply(){enforceCalculator();}
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(apply,450),{once:true});else setTimeout(apply,450);
- const oldShow=window.showPage;if(typeof oldShow==='function'&&!oldShow.__v94){const wrap=function(id){oldShow.apply(this,arguments);setTimeout(apply,180);if(id==='homePage')setTimeout(refreshDashboard,120)};wrap.__v94=true;window.showPage=wrap;try{showPage=wrap}catch(_){} }
- const oldRender=window.renderDash;if(typeof oldRender==='function'&&!oldRender.__v94){const wrap=function(){oldRender.apply(this,arguments);setTimeout(apply,0)};wrap.__v94=true;window.renderDash=wrap;try{renderDash=wrap}catch(_){} }
- document.addEventListener('click',e=>{if(e.target.closest('#receiveBtn,#settleBtn,#dueReceiptBtn,[data-page="homePage"],[data-page="payPage"]'))setTimeout(()=>{apply();refreshDashboard()},220)});
- const mo=new MutationObserver(()=>{if($('calcPage')&&$('v89CalculatorStudio'))enforceCalculator()});
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>mo.observe($('calcPage')||document.body,{childList:true,subtree:true}),{once:true});else mo.observe($('calcPage')||document.body,{childList:true,subtree:true});
- window.ashaAuditV94=()=>({build:'V94 Single FX-100MS Calculator',fxCalculatorVisible:!!$('v89CalculatorStudio')&&getComputedStyle($('v89CalculatorStudio').querySelector('.v89-calculator')).display!=='none',legacyCalculatorHidden:!$('calcKeys')||getComputedStyle($('calcKeys').closest('.card')||$('calcKeys')).display==='none',cashCounterLauncher:!!document.querySelector('[data-v91-open="cash"]'),landCalculatorLauncher:!!document.querySelector('[data-v91-open="land"]'),dashboardMetrics:!!$('metrics')});
- const css=document.createElement('style');css.id='v94SingleCalculatorMobileStyles';css.textContent=`
- #calcPage>.card:has(#calcScreen),#calcPage>.card:has(#calcKeys),#calcPage .v89-legacy-calc:has(#calcScreen),#calcPage .v89-legacy-calc:has(#calcKeys),#calcPage .v88-old-calc-card:has(#calcKeys){display:none!important}
- #calcPage #v89CalculatorStudio{display:grid!important;gap:13px!important;width:100%;max-width:100%;box-sizing:border-box}
- #calcPage #v89CalculatorStudio>.v89-calculator{display:block!important;width:100%;box-sizing:border-box}
- #calcPage .v89-calculator .v89-keypad{grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(4px,1.6vw,8px)}
- #calcPage .v89-calculator .v89-keypad button{min-width:0;min-height:clamp(43px,11vw,54px);padding:5px 2px;font-size:clamp(11px,3.4vw,15px);border-radius:13px;touch-action:manipulation}
- #calcPage .v89-calculator .v89-tool-head h2{font-size:clamp(20px,5.4vw,25px)}
- #calcPage .v89-calculator .v89-display output{font-size:clamp(28px,8vw,42px)}
- @media(max-width:360px){#calcPage .v89-calculator .v89-keypad{gap:4px}#calcPage .v89-calculator .v89-keypad button{min-height:42px;border-radius:10px;font-size:11px}#calcPage .v89-calculator .v89-calc-tools{grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}#calcPage .v89-calculator .v89-calc-tools button{font-size:8px;padding:5px 1px}}
- `;document.head.appendChild(css);
+const $=id=>document.getElementById(id);
+function apply(){
+ const page=$('payPage'); if(!page)return;
+ // Remove only the promotional/intro panel; preserve bill selection, payment fields, actions and account ledger.
+ const hero=$('v90PayHero'); if(hero)hero.remove();
+ const heading=page.querySelector(':scope > .card > h2'); if(heading && /pay|receive due|settle/i.test(heading.textContent||'')) heading.style.display='none';
+ page.querySelectorAll('.v90-progress,.v89-pay-progress,.v90-settle-note,.v90-pay-title p,.v90-pay-legend,.v89-pay-legend').forEach(el=>el.remove());
+ // Hide only empty-state helper card content until a bill is selected.
+ const info=$('payInfo'); if(info && /^(select bill|select a bill)$/i.test((info.textContent||'').trim())) info.style.display='none'; else if(info) info.style.display='';
+ const summary=$('v90PaySummary'); if(summary){summary.style.marginTop='8px';summary.style.width='100%'}
+}
+const style=document.createElement('style');style.id='v94MobilePay';style.textContent=`
+#payPage{min-width:0}#payPage>.card{padding:clamp(12px,3.8vw,18px)!important;margin:0 0 12px!important;border-radius:23px!important;min-width:0;box-sizing:border-box}#payPage .v90-pay-hero{display:none!important}#payPage .two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}#payPage .two>div{min-width:0}#payPage input,#payPage select{box-sizing:border-box;width:100%;max-width:100%;min-width:0;min-height:46px!important;font-size:16px!important}#payPage .pay-buttons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}#payPage .pay-buttons .btn{min-width:0;padding:10px 6px;font-size:12px;min-height:43px;border-radius:13px}#payPage .action-bar:has(.v92-pay-action){display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:7px!important}#payPage .v92-pay-action{min-width:0!important;min-height:60px!important;padding:9px!important;gap:7px!important;box-sizing:border-box!important}#payPage .v92-pay-action-copy{min-width:0}#payPage .v92-pay-action-copy b{overflow-wrap:anywhere}#payPage .v90-selected-head{display:flex;flex-wrap:wrap;align-items:flex-start;gap:10px}#payPage .v90-selected-head>div:first-child{flex:1 1 145px;min-width:0}#payPage .v90-due-pill{max-width:100%;box-sizing:border-box}#payPage .v90-breakdown{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}#payPage .v90-breakdown>div{min-width:0;padding:10px}#payPage .v90-breakdown b{font-size:clamp(12px,3.8vw,16px);overflow-wrap:anywhere}#payPage .v90-payment-row{min-width:0}#payPage .v90-payment-copy{min-width:0;overflow-wrap:anywhere}#payPage .v90-payment-row>strong{flex-shrink:0}#payPage .v90-pay-summary{min-width:0;box-sizing:border-box;overflow:hidden}#payPage #payInfo:empty{display:none!important}
+#calcPage .calc{width:100%;min-width:0}#calcPage #calcScreen{max-width:100%;overflow-x:auto;overflow-y:hidden;white-space:nowrap;box-sizing:border-box}#calcPage #calcKeys{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}#calcPage #calcKeys button{min-width:0;min-height:48px;padding:8px 4px;font-size:clamp(13px,3.8vw,17px);touch-action:manipulation}#calcPage .card{min-width:0;box-sizing:border-box}#calcPage .v91-tool-launcher{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:390px){#payPage .v92-pay-action{flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;min-height:78px!important}#payPage .v92-pay-action-icon{width:31px!important;height:31px!important;flex-basis:31px!important}#payPage .v92-pay-action-copy small{display:none!important}#payPage .v90-history-head{gap:5px}#payPage .v90-payment-row{gap:7px}#payPage .v90-payment-copy small{font-size:9px}#calcPage #calcKeys{gap:6px}#calcPage #calcKeys button{min-height:44px}}
+@media(max-width:330px){#payPage .pay-buttons{grid-template-columns:1fr}#payPage .action-bar:has(.v92-pay-action){grid-template-columns:1fr!important}#payPage .v92-pay-action{flex-direction:row!important;min-height:55px!important}#calcPage .v91-tool-launcher{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){#payPage *,#calcPage *{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+`;document.head.appendChild(style);
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(apply,150),{once:true});else setTimeout(apply,150);
+const old=window.showPage;if(typeof old==='function'&&!old.__v94){const wrap=function(id){old.apply(this,arguments);if(id==='payPage')setTimeout(apply,80)};wrap.__v94=true;window.showPage=wrap;try{showPage=wrap}catch(_){}}
+window.ashaAuditV94=()=>({build:'V94 Mobile Pay',paymentIntroRemoved:!$('v90PayHero'),normalCalculatorPresent:!!$('calcKeys'),payActionsPresent:!!$('receiveBtn')&&!!$('settleBtn')&&!!$('dueReceiptBtn')});
 })();
