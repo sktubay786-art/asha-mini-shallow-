@@ -7,9 +7,9 @@
   <meta name="theme-color" content="#087b50">
   <meta name="apple-mobile-web-app-title" content="ASHA Billing">
   <meta name="application-name" content="ASHA Billing">
-  <meta name="app-build" content="V94 Mobile Pay + Calculator">
-  <link rel="manifest" href="./manifest.json?v=94">
-  <link rel="stylesheet" href="./style.css?v=94">
+  <meta name="app-build" content="V95 Dashboard Refresh + Local Env">
+  <link rel="manifest" href="./manifest.json?v=95">
+  <link rel="stylesheet" href="./style.css?v=95">
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -48,7 +48,7 @@
       </div>
       <div class="hero-chips">
         <span id="cloudChip">Cloud: checking</span>
-        <span id="buildChip">V94 · Mobile Premium Update</span>
+        <span id="buildChip">V95 · Dashboard Refresh</span>
       </div>
     </header>
 
@@ -155,7 +155,7 @@
 
       <section id="payPage" class="page">
         <div class="card">
-          <h2>Pay / Receive Due / Settle</h2>
+          <h2>Receive Payment</h2>
           <label>Bill</label>
           <select id="payBill"></select>
           <div id="payInfo" class="info-box">Select bill</div>
@@ -317,8 +317,9 @@
   </div>
   <input id="importFile" type="file" accept=".json" hidden>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="./app.js?v=94"></script>
-  <script src="./upgrade.js?v=94"></script>
+  <script src="/config.js"></script>
+  <script src="./app.js?v=95"></script>
+  <script src="./upgrade.js?v=95"></script>
 <div id="v63ShareRoot" class="v63-share-root"></div>
 </body>
 </html>
