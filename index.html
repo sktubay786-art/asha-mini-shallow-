@@ -7,9 +7,9 @@
   <meta name="theme-color" content="#087b50">
   <meta name="apple-mobile-web-app-title" content="ASHA Billing">
   <meta name="application-name" content="ASHA Billing">
-  <meta name="app-build" content="V86 Customer Action Centre">
-  <link rel="manifest" href="./manifest.json?v=86">
-  <link rel="stylesheet" href="./style.css?v=86">
+  <meta name="app-build" content="V87 Premium Bill Studio">
+  <link rel="manifest" href="./manifest.json?v=87">
+  <link rel="stylesheet" href="./style.css?v=87">
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -48,7 +48,7 @@
       </div>
       <div class="hero-chips">
         <span id="cloudChip">Cloud: checking</span>
-        <span id="buildChip">V86 · Customer Centre</span>
+        <span id="buildChip">V87 · Premium Bill Studio</span>
       </div>
     </header>
 
@@ -113,7 +113,7 @@
           <input id="billNote" placeholder="Optional note">
 
           <div class="two">
-            <div><label>Bill Design / Billing Mode</label><select id="template">
+            <div><label>Bill Design</label><select id="template" aria-label="Choose bill design">
 <option value="classic">Classic Official Bill</option>
 <option value="premium">Premium Green Bill</option>
 <option value="boxed">Boxed Modern Bill</option>
@@ -124,16 +124,20 @@
 <option value="thermal">Thermal Compact Bill</option>
 <option value="compact">Compact A6 Bill</option>
 <option value="phone">Phone View Compact</option>
-<option value="mini">Mini Compact Bill</option>
+<option value="mini">Mini Compact</option>
+<option value="royal">Royal Gold Premium</option>
+<option value="midnight">Midnight Premium</option>
+<option value="ocean">Ocean Blue Premium</option>
+<option value="minimal">Minimal Luxe</option>
+<option value="modern">Modern Receipt</option>
 </select></div>
-            <div><label>Print Size</label><select id="printMode"><option value="thermal80">Thermal 80mm</option><option value="a4two">2 Bills on A4 (A5)</option><option value="a4four">4 Bills on A4 (A6)</option><option value="a4side">A4 Side Half</option><option value="a4land">A4 Landscape Half</option><option value="a4half">A4 Half</option><option value="a4quarter">A4 Quarter</option><option value="phoneview">Phone View Image</option></select></div>
+            <div><label>Print Size</label><select id="printMode" aria-label="Choose print size"><option value="thermal80">Thermal · 80 mm</option><option value="thermal58">Thermal · 58 mm</option><option value="a4full">A4 · Full page</option><option value="a4two">A4 · Half page (A5)</option><option value="a4four">A4 · Quarter page (A6)</option><option value="a4side">A4 · Side half</option><option value="a4land">A4 · Landscape half</option><option value="phoneview">Mobile · Share image</option></select></div>
           </div>
 
           <div class="action-bar">
             <button class="btn primary" id="saveBillBtn">Save Bill</button>
             <button class="btn" id="previewBtn">Preview</button>
           </div>
-          <div id="billDesignHint" class="bill-design-hint">Bill Design এবং Print Size এখান থেকেই preview করে বেছে নিতে পারবেন।</div>
         </div>
 
         <div class="preview-panel">
@@ -141,10 +145,10 @@
             <div id="billPreview"></div>
           </div>
           <div class="action-bar sticky-actions">
-            <button class="btn" id="printBtn">🖨 Print</button>
-            <button class="btn" id="shareBtn">📤 Reminder + Bill</button>
-            <button class="btn" id="pdfBtn">📄 PDF</button>
-            <button class="btn" id="waTextBtn">WhatsApp Text</button>
+            <button class="btn v87-bill-action" id="printBtn" type="button"><span class="v87-action-icon" aria-hidden="true">⎙</span><span>Print</span></button>
+            <button class="btn primary v87-bill-action" id="shareBtn" type="button"><span class="v87-action-icon" aria-hidden="true">↗</span><span>Bill Reminder</span></button>
+            <button class="btn v87-bill-action" id="pdfBtn" type="button"><span class="v87-action-icon" aria-hidden="true">▤</span><span>PDF</span></button>
+            <button class="btn v87-bill-action" id="waTextBtn" type="button"><span class="v87-action-icon" aria-hidden="true">◷</span><span>Reminder</span></button>
           </div>
         </div>
       </section>
@@ -313,8 +317,8 @@
   </div>
   <input id="importFile" type="file" accept=".json" hidden>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="./app.js?v=86"></script>
-  <script src="./upgrade.js?v=86"></script>
+  <script src="./app.js?v=87"></script>
+  <script src="./upgrade.js?v=87"></script>
 <div id="v63ShareRoot" class="v63-share-root"></div>
 </body>
 </html>

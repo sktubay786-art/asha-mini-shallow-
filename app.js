@@ -113,7 +113,7 @@ function renderChat(){
   $("chatCall").onclick=()=>location.href="tel:"+phone(c.phone);$("chatWhats").onclick=()=>open("https://wa.me/"+phone(c.phone),"_blank");$("chatShare").onclick=()=>shareCustomerBill(c.id);
   $("chatBill").onclick=()=>{closeChat();showPage("billPage");$("billCustomer").value=c.id;toggleManual();previewBill()};$("chatPay").onclick=()=>directPay(c.id,false);$("chatSettle").onclick=()=>directPay(c.id,true);$("chatLedger").onclick=()=>renderChatLedger(c.id);$("chatEdit").onclick=()=>openCustomer(c.id);
   let bills=state.bills.filter(b=>b.customerId===c.id).sort((a,b)=>(a.date||"").localeCompare(b.date||""));let out=[];if((+c.openingDue||0)>0)out.push(`<div class="bubble setB">Opening Due: <b>${money(c.openingDue)}</b></div>`);
-  bills.forEach(b=>{out.push(`<div class="day">${esc(b.date)}</div><div class="bubble billB"><b>${esc(b.billNo)}</b><br>Total ${money(b.allTotal)}<br>Paid/Adjusted ${money(billPaid(b))}<br>Due <b>${money(billDue(b))}</b><div class="bubble-actions"><button onclick="viewBill('${b.id}')">View</button><button onclick="openPayment('${b.id}')">Pay</button><button onclick="shareCustomerBill('${c.id}')">Reminder + Bill</button></div></div>`);(b.payments||[]).forEach(p=>out.push(`<div class="bubble ${(p.mode||"").includes("Settlement")?"setB":"payB"}">${esc(p.mode)}<br><b>${money(p.amount)}</b><br>${esc(p.receivedIn)}<br><small>${esc(p.note||"")}</small></div>`))});
+  bills.forEach(b=>{out.push(`<div class="day">${esc(b.date)}</div><div class="bubble billB"><b>${esc(b.billNo)}</b><br>Total ${money(b.allTotal)}<br>Paid/Adjusted ${money(billPaid(b))}<br>Due <b>${money(billDue(b))}</b><div class="bubble-actions"><button onclick="viewBill('${b.id}')">View</button><button onclick="openPayment('${b.id}')">Pay</button><button onclick="shareCustomerBill('${c.id}')">Bill Reminder</button></div></div>`);(b.payments||[]).forEach(p=>out.push(`<div class="bubble ${(p.mode||"").includes("Settlement")?"setB":"payB"}">${esc(p.mode)}<br><b>${money(p.amount)}</b><br>${esc(p.receivedIn)}<br><small>${esc(p.note||"")}</small></div>`))});
   $("chatBody").innerHTML=out.join("")||`<div class="bubble setB">No bill yet</div>`;
 }
 function directPay(id,settle=false){let amt=+(prompt(settle?"Settle amount?":"Receive amount?",customerDue(id)||"")||0);if(!amt)return;let left=amt;state.bills.filter(b=>b.customerId===id&&billDue(b)>0).forEach(b=>{if(left<=0)return;let pay=Math.min(left,billDue(b));(b.payments=b.payments||[]).push({id:uid(),date:today(),amount:pay,mode:settle?"Settlement":"Cash",receivedIn:settle?"Settled":"Cash",note:settle?"Settled from user chat":"Direct due payment"});left-=pay});let c=state.customers.find(x=>x.id===id);if(left>0&&c)c.openingDue=Math.max((+c.openingDue||0)-left,0);saveState();renderChat()}
@@ -248,7 +248,7 @@ ready(function(){
     if($("chatMore"))$("chatMore").onclick=()=>openMoreMenu(c.id);
     let bills=state.bills.filter(b=>b.customerId===c.id).sort((a,b)=>(a.date||"").localeCompare(b.date||""));
     let out=[];if((+c.openingDue||0)>0)out.push(`<div class="bubble setB">Opening Due: <b>${money(c.openingDue)}</b></div>`);
-    bills.forEach(b=>{out.push(`<div class="day">${esc(b.date)}</div><div class="bubble billB"><b>${esc(b.billNo)}</b><br>Total ${money(b.allTotal)}<br>Paid/Adjusted ${money(billPaid(b))}<br>Due <b>${money(billDue(b))}</b><br>${b.note?`<small>Note: ${esc(b.note)}</small>`:""}<div class="bubble-actions"><button onclick="viewBill('${b.id}')">View</button><button onclick="openPayment('${b.id}')">Pay</button><button onclick="shareCustomerBill('${c.id}')">Reminder + Bill</button><button onclick="deleteBill('${b.id}')">Delete</button></div></div>`);(b.payments||[]).forEach(p=>out.push(`<div class="bubble ${(p.mode||"").includes("Settlement")?"setB":"payB"}">${esc(p.mode)}<br><b>${money(p.amount)}</b><br>${esc(p.receivedIn)}<br><small>${esc(p.note||"")}</small><div class="entry-tools"><button onclick="editEntry('${p.id}')">Edit</button><button onclick="editEntry('${p.id}')">Undo/Delete</button></div></div>`))});
+    bills.forEach(b=>{out.push(`<div class="day">${esc(b.date)}</div><div class="bubble billB"><b>${esc(b.billNo)}</b><br>Total ${money(b.allTotal)}<br>Paid/Adjusted ${money(billPaid(b))}<br>Due <b>${money(billDue(b))}</b><br>${b.note?`<small>Note: ${esc(b.note)}</small>`:""}<div class="bubble-actions"><button onclick="viewBill('${b.id}')">View</button><button onclick="openPayment('${b.id}')">Pay</button><button onclick="shareCustomerBill('${c.id}')">Bill Reminder</button><button onclick="deleteBill('${b.id}')">Delete</button></div></div>`);(b.payments||[]).forEach(p=>out.push(`<div class="bubble ${(p.mode||"").includes("Settlement")?"setB":"payB"}">${esc(p.mode)}<br><b>${money(p.amount)}</b><br>${esc(p.receivedIn)}<br><small>${esc(p.note||"")}</small><div class="entry-tools"><button onclick="editEntry('${p.id}')">Edit</button><button onclick="editEntry('${p.id}')">Undo/Delete</button></div></div>`))});
     $("chatBody").innerHTML=out.join("")||`<div class="bubble setB">No bill yet</div>`;
   }
 
@@ -475,7 +475,7 @@ window.shareCustomerBill=async function(id){
   currentBill=bills[0];
   renderInvoice(currentBill);
   setTimeout(async()=>{
-    try{await shareBill()}catch(e){console.warn(e); alert('Reminder + Bill share failed. আবার try করুন।')}
+    try{await shareBill()}catch(e){console.warn(e); alert('Bill Reminder share failed. আবার try করুন।')}
   },220);
 }
 
@@ -544,7 +544,7 @@ window.renderChat=function(){
   let out=[];
   if((+c.openingDue||0)>0) out.push(`<div class="bubble setB">Opening Due: <b>${money(c.openingDue)}</b></div>`);
   bills.forEach(b=>{
-    out.push(`<div class="day">${esc(b.date)}</div><div class="bubble billB"><b>${esc(b.billNo)}</b><br>Total ${money(b.allTotal)}<br>Paid/Adjusted ${money(billPaid(b))}<br>Due <b>${money(billDue(b))}</b>${b.note?`<br><small>Note: ${esc(b.note)}</small>`:''}<div class="bubble-actions"><button type="button" onclick="event.stopPropagation();viewBill('${b.id}')">View</button><button type="button" onclick="event.stopPropagation();openPayment('${b.id}')">Pay</button><button type="button" onclick="event.stopPropagation();shareCustomerBill('${c.id}')">Reminder + Bill</button><button type="button" onclick="event.stopPropagation();deleteBill('${b.id}')">Delete</button></div></div>`);
+    out.push(`<div class="day">${esc(b.date)}</div><div class="bubble billB"><b>${esc(b.billNo)}</b><br>Total ${money(b.allTotal)}<br>Paid/Adjusted ${money(billPaid(b))}<br>Due <b>${money(billDue(b))}</b>${b.note?`<br><small>Note: ${esc(b.note)}</small>`:''}<div class="bubble-actions"><button type="button" onclick="event.stopPropagation();viewBill('${b.id}')">View</button><button type="button" onclick="event.stopPropagation();openPayment('${b.id}')">Pay</button><button type="button" onclick="event.stopPropagation();shareCustomerBill('${c.id}')">Bill Reminder</button><button type="button" onclick="event.stopPropagation();deleteBill('${b.id}')">Delete</button></div></div>`);
     (b.payments||[]).forEach(p=>out.push(`<div class="bubble ${(p.mode||'').includes('Settlement')?'setB':'payB'}">${esc(p.mode)}<br><b>${money(p.amount)}</b><br>${esc(p.receivedIn)}<br><small>${esc(p.note||'')}</small><div class="entry-tools"><button type="button" onclick="event.stopPropagation();editEntry('${p.id}')">Edit</button><button type="button" onclick="event.stopPropagation();editEntry('${p.id}')">Undo/Delete</button></div></div>`))
   });
   chatBody.innerHTML=out.join('')||`<div class="bubble setB">No bill yet</div>`;
@@ -673,7 +673,7 @@ Bill image auto-download হবে, না হলে নিচের download �
           <div class="bubble-actions">
             <button type="button" onclick="viewBill('${b.id}')">View</button>
             <button type="button" class="primary" onclick="openPayment('${b.id}')">Pay</button>
-            <button type="button" onclick="shareCustomerBill('${c.id}','${b.id}')">Reminder + Bill</button>
+            <button type="button" onclick="shareCustomerBill('${c.id}','${b.id}')">Bill Reminder</button>
             <button type="button" onclick="deleteBill('${b.id}')">Delete</button>
           </div>
         </div>`);
@@ -843,7 +843,7 @@ ready(function(){
     let out=[`<div class="chat-summary"><div class="sum-card"><small>Live Due</small><b>${money(customerDue(c.id))}</b></div><div class="sum-card"><small>Total Bill</small><b>${money(totalTotal)}</b></div><div class="sum-card"><small>Collected</small><b>${money(paidTotal)}</b></div></div><div class="chat-stack">`];
     if((+c.openingDue||0)>0){out.push(`<div class="bubble setB"><b>Opening Due</b><div class="chat-topnote">আগের বাকি</div><b>${money(c.openingDue)}</b></div>`);}    
     bills.forEach(b=>{
-      out.push(`<div class="day">${esc(b.date)}</div><div class="bubble billB"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><div><b>${esc(b.billNo)}</b><div class="chat-topnote">${esc(b.season)} • ${esc(b.landAmount)} ${esc(b.unit)}</div></div><div style="text-align:right"><div><b>${money(billDue(b))}</b></div><div class="chat-topnote">Due</div></div></div><div style="margin-top:8px;line-height:1.6">Total ${money(b.allTotal)}<br>Paid/Adjusted ${money(billPaid(b))}${b.note?`<br><small>Note: ${esc(b.note)}</small>`:''}</div><div class="bubble-actions"><button type="button" onclick="viewBill('${b.id}')">View</button><button type="button" class="primary" onclick="openPayment('${b.id}')">Pay</button><button type="button" onclick="shareCustomerBill('${c.id}','${b.id}')">Reminder + Bill</button><button type="button" onclick="deleteBill('${b.id}')">Delete</button></div></div>`);
+      out.push(`<div class="day">${esc(b.date)}</div><div class="bubble billB"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><div><b>${esc(b.billNo)}</b><div class="chat-topnote">${esc(b.season)} • ${esc(b.landAmount)} ${esc(b.unit)}</div></div><div style="text-align:right"><div><b>${money(billDue(b))}</b></div><div class="chat-topnote">Due</div></div></div><div style="margin-top:8px;line-height:1.6">Total ${money(b.allTotal)}<br>Paid/Adjusted ${money(billPaid(b))}${b.note?`<br><small>Note: ${esc(b.note)}</small>`:''}</div><div class="bubble-actions"><button type="button" onclick="viewBill('${b.id}')">View</button><button type="button" class="primary" onclick="openPayment('${b.id}')">Pay</button><button type="button" onclick="shareCustomerBill('${c.id}','${b.id}')">Bill Reminder</button><button type="button" onclick="deleteBill('${b.id}')">Delete</button></div></div>`);
       (b.payments||[]).forEach(p=>out.push(`<div class="bubble ${(String(p.mode).toLowerCase().includes('settle'))?'setB':'payB'}"><b>${esc(p.mode)}</b><div class="chat-topnote">${esc(p.date)} • ${esc(p.receivedIn||'')}</div><div><b>${money(p.amount)}</b></div><small>${esc(p.note||'')}</small><div class="entry-tools"><button type="button" onclick="editEntry('${p.id}')">Edit</button><button type="button" onclick="editEntry('${p.id}')">Undo/Delete</button></div></div>`));
     });
     out.push('</div>');
@@ -989,7 +989,7 @@ v36Ready(function(){
     let out=[`<div class="chat-summary"><div class="sum-card"><small>Live Due</small><b>${money(customerDue(c.id))}</b></div><div class="sum-card"><small>Total Bill</small><b>${money(totalBill)}</b></div><div class="sum-card"><small>Collected</small><b>${money(totalPaid)}</b></div></div><div class="chat-stack">`];
     if((+c.openingDue||0)>0) out.push(`<div class="bubble setB"><b>Opening Due</b><div class="chat-topnote">আগের বাকি</div><b>${money(c.openingDue)}</b></div>`);
     bills.forEach(b=>{
-      out.push(`<div class="day">${esc(b.date)}</div><div class="bubble billB"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><div><b>${esc(b.billNo)}</b><div class="chat-topnote">${esc(b.season||'-')} • ${esc(String(b.landAmount||''))} ${esc(b.unit||'')}</div></div><div style="text-align:right"><div><b>${money(billDue(b))}</b></div><div class="chat-topnote">Due</div></div></div><div style="margin-top:8px;line-height:1.58">Total ${money(b.allTotal)}<br>Paid/Adjusted ${money(billPaid(b))}${b.note?`<br><small>Note: ${esc(b.note)}</small>`:''}</div><div class="bubble-actions"><button type="button" onclick="chatViewBill('${b.id}')">View</button><button type="button" class="primary" onclick="chatOpenPay('${b.id}')">Pay</button><button type="button" onclick="shareCustomerBill('${c.id}','${b.id}')">Reminder + Bill</button><button type="button" onclick="chatDeleteBill('${b.id}')">Delete</button></div></div>`);
+      out.push(`<div class="day">${esc(b.date)}</div><div class="bubble billB"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><div><b>${esc(b.billNo)}</b><div class="chat-topnote">${esc(b.season||'-')} • ${esc(String(b.landAmount||''))} ${esc(b.unit||'')}</div></div><div style="text-align:right"><div><b>${money(billDue(b))}</b></div><div class="chat-topnote">Due</div></div></div><div style="margin-top:8px;line-height:1.58">Total ${money(b.allTotal)}<br>Paid/Adjusted ${money(billPaid(b))}${b.note?`<br><small>Note: ${esc(b.note)}</small>`:''}</div><div class="bubble-actions"><button type="button" onclick="chatViewBill('${b.id}')">View</button><button type="button" class="primary" onclick="chatOpenPay('${b.id}')">Pay</button><button type="button" onclick="shareCustomerBill('${c.id}','${b.id}')">Bill Reminder</button><button type="button" onclick="chatDeleteBill('${b.id}')">Delete</button></div></div>`);
       (b.payments||[]).forEach(p=>out.push(`<div class="bubble ${(String(p.mode).toLowerCase().includes('settle'))?'setB':'payB'}"><b>${esc(p.mode)}</b><div class="chat-topnote">${esc(p.date)} • ${esc(p.receivedIn||'')}</div><div><b>${money(p.amount)}</b></div><small>${esc(p.note||'')}</small><div class="entry-tools"><button type="button" onclick="editEntry('${p.id}')">Edit</button><button type="button" onclick="editEntry('${p.id}')">Undo/Delete</button></div></div>`));
     });
     out.push('</div>');
@@ -1224,7 +1224,7 @@ Thank you: ${state.settings.owner} (owner)`;
 
   function enhanceChatIcons(){
     const a=document.getElementById('chatShare'), b=document.getElementById('chatCall'), c=document.getElementById('chatWhats'), d=document.getElementById('chatMore');
-    if(a){a.textContent='⇪';a.title='Reminder + Bill';}
+    if(a){a.textContent='⇪';a.title='Bill Reminder';}
     if(b){b.textContent='✆';b.title='Call';}
     if(c){c.textContent='Ⓦ';c.title='WhatsApp note';}
     if(d){d.textContent='⋯';d.title='More';}
@@ -2011,7 +2011,7 @@ ready(function(){
         <div class="v41-card">
           <div class="v41-row">
             <div class="v41-icon">${v41Icon('reminder')}</div>
-            <div class="v41-main"><b>WhatsApp / SMS Reminder Message</b><small>Used in Reminder + Bill</small><textarea id="setReminderTemplate"></textarea></div>
+            <div class="v41-main"><b>WhatsApp / SMS Reminder Message</b><small>Used in Bill Reminder</small><textarea id="setReminderTemplate"></textarea></div>
           </div>
           <div class="v41-row">
             <div class="v41-icon">${v41Icon('bill')}</div>
@@ -2251,7 +2251,7 @@ ready(function(){
     let lastDate='';
     bills.forEach(b=>{
       if(b.date!==lastDate){out+=`<div class="v42-date"><span>${esc(b.date)}</span></div>`;lastDate=b.date;}
-      out+=`<div class="v42-bubble v42-bill"><div class="v42-bubble-title"><span>▤ ${esc(b.billNo)}</span><span class="due">${money(billDue(b))}</span></div><div class="line"><span>মোট টাকা</span><b>${money(b.allTotal)}</b></div><div class="line"><span>মোট জমা</span><b>${money(billPaid(b))}</b></div><div class="line"><span>বাকি</span><b class="due">${money(billDue(b))}</b></div><p class="muted">${esc(b.season||'')} • ${esc(b.landAmount)} ${unitLabel(b.unit)}</p><div class="v42-bubble-actions"><button data-act="view" data-id="${b.id}">View</button><button data-act="pay" data-id="${b.id}">Pay</button><button data-act="reminder" data-id="${b.id}">Reminder + Bill</button><button data-act="delete" data-id="${b.id}">Delete</button></div></div>`;
+      out+=`<div class="v42-bubble v42-bill"><div class="v42-bubble-title"><span>▤ ${esc(b.billNo)}</span><span class="due">${money(billDue(b))}</span></div><div class="line"><span>মোট টাকা</span><b>${money(b.allTotal)}</b></div><div class="line"><span>মোট জমা</span><b>${money(billPaid(b))}</b></div><div class="line"><span>বাকি</span><b class="due">${money(billDue(b))}</b></div><p class="muted">${esc(b.season||'')} • ${esc(b.landAmount)} ${unitLabel(b.unit)}</p><div class="v42-bubble-actions"><button data-act="view" data-id="${b.id}">View</button><button data-act="pay" data-id="${b.id}">Pay</button><button data-act="reminder" data-id="${b.id}">Bill Reminder</button><button data-act="delete" data-id="${b.id}">Delete</button></div></div>`;
       (b.payments||[]).forEach(p=>{out+=`<div class="v42-bubble ${String(p.mode).toLowerCase().includes('settle')?'v42-settle':'v42-pay'}"><div class="v42-bubble-title"><span>${String(p.mode).toLowerCase().includes('settle')?'✓ Settlement':'✓ Payment Received'}</span><span>${money(p.amount)}</span></div><p class="muted">${esc(p.receivedIn||'')} • ${esc(p.note||'')}</p><div class="v42-bubble-actions"><button data-act="editpay" data-id="${p.id}">Edit</button><button data-act="editpay" data-id="${p.id}">Undo/Delete</button></div></div>`});
     });
     out+=`<div class="v42-sticky-reminder"><button id="v42SendReminder">Send Reminder</button></div>`;
@@ -2443,7 +2443,7 @@ ready(function(){
           <div class="bubble-actions">
             <button type="button" onclick="chatViewBill('${b.id}')">View</button>
             <button type="button" class="primary" onclick="chatOpenPay('${b.id}')">Pay</button>
-            <button type="button" onclick="shareCustomerBill('${c.id}','${b.id}')">Reminder + Bill</button>
+            <button type="button" onclick="shareCustomerBill('${c.id}','${b.id}')">Bill Reminder</button>
             <button type="button" onclick="chatDeleteBill('${b.id}')">Delete</button>
           </div>
         </div>`);
@@ -2590,7 +2590,7 @@ ready(function(){
     let out=[`<div class="chat-summary"><div class="sum-card"><small>Live Due</small><b>${money(customerDue(c.id))}</b></div><div class="sum-card"><small>Total Bill</small><b>${money(total)}</b></div><div class="sum-card"><small>Collected</small><b>${money(paid)}</b></div></div>`];
     if((+c.openingDue||0)>0) out.push(`<div class="bubble setB"><b>Opening Due</b><br><b>${money(c.openingDue)}</b></div>`);
     bills.forEach(b=>{
-      out.push(`<div class="day">${esc(b.date)}</div><div class="bubble billB"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><div><b>${esc(b.billNo)}</b><div class="chat-topnote">${esc(b.season||'-')} • ${esc(String(b.landAmount||''))} ${esc(b.unit||'')}</div></div><div style="text-align:right"><b>${money(billDue(b))}</b><div class="chat-topnote">Due</div></div></div><div style="margin-top:8px;line-height:1.58">Total ${money(b.allTotal)}<br>Paid/Joma ${money(billPaid(b))}${b.note?`<br><small>Note: ${esc(b.note)}</small>`:''}</div><div class="bubble-actions"><button type="button" title="View" onclick="chatViewBill('${b.id}')">${ICONS.view} View</button><button type="button" class="primary" title="Pay" onclick="chatOpenPay('${b.id}')">${ICONS.pay2} Pay</button><button type="button" title="Reminder + Bill" onclick="shareCustomerBill('${c.id}','${b.id}')">${ICONS.remind} Bill</button><button type="button" title="Delete" onclick="chatDeleteBill('${b.id}')">${ICONS.del}</button></div></div>`);
+      out.push(`<div class="day">${esc(b.date)}</div><div class="bubble billB"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><div><b>${esc(b.billNo)}</b><div class="chat-topnote">${esc(b.season||'-')} • ${esc(String(b.landAmount||''))} ${esc(b.unit||'')}</div></div><div style="text-align:right"><b>${money(billDue(b))}</b><div class="chat-topnote">Due</div></div></div><div style="margin-top:8px;line-height:1.58">Total ${money(b.allTotal)}<br>Paid/Joma ${money(billPaid(b))}${b.note?`<br><small>Note: ${esc(b.note)}</small>`:''}</div><div class="bubble-actions"><button type="button" title="View" onclick="chatViewBill('${b.id}')">${ICONS.view} View</button><button type="button" class="primary" title="Pay" onclick="chatOpenPay('${b.id}')">${ICONS.pay2} Pay</button><button type="button" title="Bill Reminder" onclick="shareCustomerBill('${c.id}','${b.id}')">${ICONS.remind} Bill</button><button type="button" title="Delete" onclick="chatDeleteBill('${b.id}')">${ICONS.del}</button></div></div>`);
       (b.payments||[]).forEach(p=>{
         out.push(`<div class="bubble ${String(p.mode||'').toLowerCase().includes('settle')?'setB':'payB'}"><b>${esc(p.mode||'Payment')}</b><div class="chat-topnote">${esc(p.date||'')} • ${esc(p.receivedIn||'')}</div><b>${money(p.amount)}</b><br><small>${esc(p.note||'')}</small><div class="entry-tools"><button type="button" onclick="editEntry('${p.id}')">${ICONS.edit} Edit</button><button type="button" onclick="editEntry('${p.id}')">${ICONS.del} Undo</button></div></div>`);
       });
@@ -2762,7 +2762,7 @@ Contact: ${state.settings.contact}`;
         <button onclick="renderChatLedger('${cid}');closeV45Sheet()">☷ Ledger</button>
         <button onclick="directPay('${cid}',false);closeV45Sheet()">₹ Receive Payment</button>
         <button onclick="directPay('${cid}',true);closeV45Sheet()">✓ Settlement</button>
-        <button class="primary" onclick="openBillPreviewV45('${cid}','${b?b.id:''}')">⏰ Bill + Reminder</button>
+        <button class="primary" onclick="openBillPreviewV45('${cid}','${b?b.id:''}')">⏰ Bill Reminder</button>
         <button onclick="openWhatsApp('${(c.phone||'').replace(/'/g,'')}','${normalReminderText(c).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n')}')">Ⓦ Normal Reminder</button>
         <button onclick="location.href='tel:+${phoneDigits(c.phone)}'">✆ Call</button>
         <button class="danger" onclick="deleteCustomer('${cid}')">⌫ Delete User</button>
@@ -3007,7 +3007,7 @@ ready(function(){
       '<div class="v45-preview-note">Preview দেখে তারপর share করুন।</div>'+
       '<img class="v45-preview-img" src="'+url+'">'+
       '<div class="v50-menu-grid">'+
-      '<button class="primary" onclick="shareCustomerBill(\''+cid+'\',\''+b.id+'\')">'+ICO.remind+' Share Bill + Reminder</button>'+
+      '<button class="primary" onclick="shareCustomerBill(\''+cid+'\',\''+b.id+'\')">'+ICO.remind+' Share Bill Reminder</button>'+
       '<button onclick="normalReminderV50(\''+cid+'\')">'+ICO.wa+' Normal Reminder</button>'+
       '<button onclick="downloadCurrentBillV45(\''+b.id+'\')">⇩ Download</button>'+
       '<button onclick="closeV45Sheet()">Close</button>'+
@@ -3024,7 +3024,7 @@ ready(function(){
       '<button onclick="renderChatLedger(\''+cid+'\');closeV45Sheet()">'+ICO.ledger+' Ledger</button>'+
       '<button onclick="directPay(\''+cid+'\',false);closeV45Sheet()">'+ICO.pay+' Receive</button>'+
       '<button onclick="directPay(\''+cid+'\',true);closeV45Sheet()">'+ICO.settle+' Settle</button>'+
-      '<button class="primary" onclick="openBillPreviewV50(\''+cid+'\',\''+(b?b.id:'')+'\')">'+ICO.remind+' Bill + Reminder</button>'+
+      '<button class="primary" onclick="openBillPreviewV50(\''+cid+'\',\''+(b?b.id:'')+'\')">'+ICO.remind+' Bill Reminder</button>'+
       '<button onclick="normalReminderV50(\''+cid+'\')">'+ICO.wa+' Normal Reminder</button>'+
       '<button onclick="location.href=\'tel:+'+phoneDigits(c.phone)+'\'">'+ICO.call+' Call</button>'+
       '<button class="danger" onclick="deleteCustomer(\''+cid+'\')">'+ICO.del+' Delete</button>'+
@@ -3241,7 +3241,7 @@ Contact: ${state.settings.contact}`;
       '<button onclick="renderChatLedger(\''+cid+'\');closeV45Sheet()">☷ Ledger</button>'+
       '<button onclick="directPay(\''+cid+'\',false);closeV45Sheet()">₹ Receive</button>'+
       '<button onclick="directPay(\''+cid+'\',true);closeV45Sheet()">✓ Settle</button>'+
-      '<button class="primary" onclick="openBillPreviewV50(\''+cid+'\',\''+(b?b.id:'')+'\')">⏰ Bill + Reminder</button>'+
+      '<button class="primary" onclick="openBillPreviewV50(\''+cid+'\',\''+(b?b.id:'')+'\')">⏰ Bill Reminder</button>'+
       '<button onclick="openWhatsApp(\''+(c.phone||'').replace(/'/g,'')+'\',\''+normalReminder(c).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n')+'\')">Ⓦ Normal Reminder</button>'+
       '<button onclick="location.href=\'tel:+'+phoneDigits(c.phone)+'\'">✆ Call</button>'+
       '<button class="danger" onclick="if(confirm(\'Delete user?\')){deleteCustomer(\''+cid+'\');closeV45Sheet();closeUserDetailV51();}">⌫ Delete</button>'+
@@ -3378,7 +3378,7 @@ Contact: ${state.settings.contact}`;
       <button id="v52Ledger">☷ Ledger</button>
       <button id="v52Receive">₹ Receive</button>
       <button id="v52Settle">✓ Settle</button>
-      <button class="primary" id="v52BillReminder">⏰ Bill + Reminder</button>
+      <button class="primary" id="v52BillReminder">⏰ Bill Reminder</button>
       <button id="v52Normal">Ⓦ Normal Reminder</button>
       <button id="v52Call">✆ Call</button>
       <button class="danger" id="v52Delete">⌫ Delete User</button>
@@ -3548,7 +3548,7 @@ Contact: ${state.settings.contact}`;
       const url=URL.createObjectURL(blob);
       const text=reminderTextByBill(b);
       if(!q('v52Menu')) return;
-      q('v52Name').textContent='Bill + Reminder';
+      q('v52Name').textContent='Bill Reminder';
       q('v52Sub').textContent=b.billNo+' • Due '+money(billDue(b));
       q('v52Body').className='v52-actions';
       q('v52Body').innerHTML=`
@@ -3684,7 +3684,7 @@ Contact: ${state.settings.contact}`;
       <button id="mLedger">☷ Ledger</button>
       <button id="mReceive">₹ Receive</button>
       <button id="mSettle">✓ Settle</button>
-      <button class="primary" id="mBillReminder">⏰ Bill + Reminder</button>
+      <button class="primary" id="mBillReminder">⏰ Bill Reminder</button>
       <button id="mNormal">Ⓦ Normal Reminder</button>
       <button id="mCall">✆ Call</button>
       <button class="danger" id="mDelete">⌫ Delete User</button>
@@ -4907,7 +4907,7 @@ ready(function(){
     if(!c||!b) return alert('No bill found for reminder');
     currentBill=b; renderInvoice(b); await renderQRCodesV60(q('billPreview')||document);
     const blob=await invoiceBlob(), url=URL.createObjectURL(blob);
-    q('actionTitle').textContent='Bill + Reminder Preview';
+    q('actionTitle').textContent='Bill Reminder Preview';
     q('actionBody').innerHTML=`<p class="muted"><b>${esc(c.name)}</b> • ${esc(b.billNo)} • Due <b>${money(billDue(b))}</b></p><div class="v60-share-preview"><img src="${url}"></div><div class="action-bar"><button class="btn primary" id="v60ShareNow">Share Image + Text</button><button class="btn" id="v60WaOnly">WhatsApp Text Only</button><button class="btn" id="v60DownloadImg">Download Image</button></div>`;
     q('actionSave').classList.add('hidden'); q('actionDelete').classList.add('hidden'); q('actionModal').classList.remove('hidden');
     q('actionClose').onclick=()=>closeAction();
@@ -5380,7 +5380,7 @@ ready(function(){
       <img class="v63-preview-img" src="${url}">
       <div class="action-bar"><button class="btn primary" id="v63ShareNow">Share Image + Text</button><button class="btn" id="v63WaText">WhatsApp Text Only</button><button class="btn" id="v63Download">Download Image</button></div>`;
     if(q('actionModal')){
-      q('actionTitle').textContent='Bill + Reminder';
+      q('actionTitle').textContent='Bill Reminder';
       q('actionBody').innerHTML=html;
       q('actionSave')?.classList.add('hidden'); q('actionDelete')?.classList.add('hidden'); q('actionModal').classList.remove('hidden');
       q('v63ShareNow').onclick=async()=>{const file=new File([blob],`${b.billNo}.png`,{type:'image/png'});try{if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]}))await navigator.share({files:[file],text:reminderTextByBill(b),title:'Asha Bill Reminder'});else{downloadBlob(blob,`${b.billNo}.png`);openWhatsApp(c.phone,reminderTextByBill(b));}}catch(e){downloadBlob(blob,`${b.billNo}.png`);openWhatsApp(c.phone,reminderTextByBill(b));}};
@@ -5472,7 +5472,7 @@ ready(function(){
     q('v52Name').textContent=c.name||'User';
     q('v52Sub').textContent=(c.phone||'No phone')+' • '+(c.village||'No village')+' • Due '+money(customerDue(cid));
     q('v52Body').className='v52-actions';
-    q('v52Body').innerHTML=`<button class="primary" id="mNewBill">▤ New Bill</button><button id="mEdit">✎ Edit User</button><button id="mLedger">☷ Ledger</button><button id="mReceive">₹ Receive</button><button id="mSettle">✓ Settle</button><button class="primary" id="mBillReminder">⏰ Bill + Reminder</button><button id="mChat">💬 Chat</button><button id="mNormal">Ⓦ Normal Reminder</button><button id="mCall">✆ Call</button><button class="danger" id="mDelete">⌫ Delete User</button>`;
+    q('v52Body').innerHTML=`<button class="primary" id="mNewBill">▤ New Bill</button><button id="mEdit">✎ Edit User</button><button id="mLedger">☷ Ledger</button><button id="mReceive">₹ Receive</button><button id="mSettle">✓ Settle</button><button class="primary" id="mBillReminder">⏰ Bill Reminder</button><button id="mChat">💬 Chat</button><button id="mNormal">Ⓦ Normal Reminder</button><button id="mCall">✆ Call</button><button class="danger" id="mDelete">⌫ Delete User</button>`;
     q('v52Status').textContent=b?'Latest bill: '+b.billNo:'No bill yet';
     q('v52Menu').classList.add('open');
     q('mNewBill').onclick=()=>{closeMenu();try{closeChat()}catch(e){};showPage('billPage');setTimeout(()=>{q('billCustomer').value=cid;toggleManual();if(window.updatePreviousDueV55)updatePreviousDueV55(true);previewBill();},160);};
@@ -5590,12 +5590,12 @@ ready(function(){
   }
   function modeClass(t){
     t=String(t||'premium').toLowerCase();
-    if(['classic','boxed','bengali','qrfirst','standard','normal','thermal','compact','phone','mini'].includes(t)) return 'v64-'+t;
+    if(['classic','boxed','bengali','qrfirst','standard','normal','thermal','compact','phone','mini','royal','midnight','ocean','minimal','modern'].includes(t)) return 'v64-'+t;
     return 'v64-premium';
   }
   function cleanMode(t){
     t=String(t||'premium').toLowerCase();
-    if(['classic','boxed','bengali','qrfirst','standard','normal','thermal','compact','phone','mini'].includes(t)) return t;
+    if(['classic','boxed','bengali','qrfirst','standard','normal','thermal','compact','phone','mini','royal','midnight','ocean','minimal','modern'].includes(t)) return t;
     return 'premium';
   }
 
@@ -5727,7 +5727,7 @@ ready(function(){
     currentBill=b;
     const blob=await v64BillBlob(b);
     const url=URL.createObjectURL(blob);
-    q('actionTitle').textContent='Bill + Reminder';
+    q('actionTitle').textContent='Bill Reminder';
     q('actionBody').innerHTML=`<p class="muted"><b>${esc(c.name)}</b> • ${esc(b.billNo)} • Due <b>${money(billDue(b))}</b></p>
       <img class="v63-preview-img" src="${url}">
       <div class="action-bar"><button class="btn primary" id="v64ShareNow">Share Image + Text</button><button class="btn" id="v64WaOnly">WhatsApp Text Only</button><button class="btn" id="v64Download">Download Image</button></div>`;
@@ -5915,7 +5915,7 @@ ready(function(){
     const url=URL.createObjectURL(blob);
     const due=typeof billDue==='function'?billDue(b):0;
     const text=reminderTextByBill(b);
-    q('actionTitle').textContent='Bill + Reminder';
+    q('actionTitle').textContent='Bill Reminder';
     q('actionBody').innerHTML=`
       <div class="v65-reminder-modal">
         <div class="v65-reminder-info"><b>${esc(c.name||'')}</b><br>${esc(b.billNo||'')} • Due <b>${money(due)}</b><br><small>Bill image scroll করে দেখা যাবে। Button সবসময় দেখা যাবে।</small></div>
@@ -5985,7 +5985,7 @@ ready(function(){
     }catch(e){
       markReminder(false);
       console.error('V66 bill reminder failed',e);
-      alert('Bill + Reminder open failed: '+(e.message||e));
+      alert('Bill Reminder open failed: '+(e.message||e));
     }
   };
   window.v65BillReminder=function(cid,bid=''){return v66BillReminder(cid,bid);};
@@ -6198,7 +6198,7 @@ ready(function(){
     };
   }
 
-  // Re-render invoice totals consistently for both normal bill and Reminder + Bill.
+  // Re-render invoice totals consistently for both normal bill and Bill Reminder.
   const oldRenderInvoice=window.renderInvoice;
   if(oldRenderInvoice){
     window.renderInvoice=function(b){
