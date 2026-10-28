@@ -613,7 +613,7 @@ function open(id,title,sub=''){activeId=id;const c=customer(id);if(!c){alert('Cu
 function close(){const r=$('v77ActionRoot');if(r){r.classList.remove('open');r.setAttribute('aria-hidden','true')}document.body.classList.remove('v77-modal-open')}
 function btn(label,fn,cls=''){const b=document.createElement('button');b.type='button';b.className='v77-btn '+cls;b.textContent=label;b.onclick=fn;return b}
 function field(label,id,value='',type='text'){return `<label class="v77-field">${label}<input id="${id}" type="${type}" value="${esc(value)}"></label>`}
-function actions(id){if(!open(id,'Customer actions'))return;const body=$('v77Body');body.className='v77-grid';const items=[['bill','New Bill','bill'],['edit','Edit User','edit'],['ledger','Ledger','ledger'],['receive','Receive','receive'],['settle','Settle','settle'],['billrem','Bill with Reminder','reminder'],['chat','Chat / Notes','chat'],['remind','Reminder','reminder'],['call','Call','call'],['delete','Delete User','delete']];items.forEach(([key,label,ico])=>{const b=btn('',()=>run(id,key),key==='delete'?'danger':key==='bill'||key==='receive'?'primary':'');b.innerHTML=`<span class="v77-icon">${icon[ico]}</span><span>${label}</span><span class="v77-chevron">›</span>`;body.append(b)});$('v77Foot').textContent=`${bills().filter(b=>String(b.customerId)===String(id)).length} bills · Outstanding ${money(due(id))}`}
+function actions(id){if(!open(id,'Customer centre'))return;const c=customer(id),body=$('v77Body');body.className='v77-grid v85-user-grid';const customerBills=bills().filter(b=>String(b.customerId)===String(id));const balance=due(id);body.innerHTML=`<div class="v85-user-hero"><div class="v85-user-avatar">${esc((c.name||'U').trim().slice(0,1).toUpperCase())}</div><div class="v85-user-ident"><h3>${esc(c.name||'Customer')}</h3><p>${esc(c.phone||'No phone number')} · ${esc(c.village||'Village not set')}</p></div><div class="v85-user-balance ${balance>0?'due':'paid'}"><small>${balance>0?'Outstanding':'Account clear'}</small><b>${money(balance)}</b></div></div><div class="v85-user-section-label">BILLING & COLLECTION</div>`;const items=[['bill','New Bill','bill'],['billrem','Bill with Reminder','reminder'],['receive','Receive Payment','receive'],['settle','Settle / Adjust','settle'],['ledger','Ledger & History','ledger'],['edit','Edit User','edit'],['chat','Chat / Notes','chat'],['remind','WhatsApp Reminder','reminder'],['call','Call Customer','call'],['delete','Delete User','delete']];items.forEach(([key,label,ico])=>{const b=btn('',()=>run(id,key),key==='delete'?'danger':key==='bill'||key==='receive'?'primary':'');b.innerHTML=`<span class="v77-icon">${icon[ico]}</span><span>${label}</span><span class="v77-chevron">›</span>`;body.append(b)});$('v77Foot').textContent=`${customerBills.length} bills · ${customerBills.reduce((n,b)=>n+(b.payments||[]).length,0)} payment entries · Outstanding ${money(balance)}`}
 function run(id,key){const c=customer(id);if(!c)return;if(key==='bill'){close();try{window.closeChat?.()}catch{}try{window.closeUserDetailV51?.()}catch{}window.showPage?.('billPage');setTimeout(()=>{const s=$('billCustomer');if(s){s.value=String(id);s.dispatchEvent(new Event('change',{bubbles:true}));window.toggleManual?.();window.updatePreviousDueV55?.(true);window.previewBill?.()}},180);return}
 if(key==='edit')return edit(id);if(key==='ledger')return ledger(id);if(key==='receive'||key==='settle')return payment(id,key==='settle');if(key==='billrem')return billReminder(id);if(key==='chat')return chat(id);if(key==='remind')return reminder(id);if(key==='call'){const p=String(c.phone||'').replace(/\D/g,'');if(!p){alert('Add a phone number first.');return}close();location.href='tel:'+p;return}if(key==='delete')return del(id)}
 function edit(id){const c=customer(id);if(!open(id,'Edit user','Update this customer profile'))return;const b=$('v77Body');b.innerHTML=field('Full name','v77Name',c.name)+field('Phone','v77Phone',c.phone||'','tel')+field('Village','v77Village',c.village||'')+field('Address','v77Address',c.address||'')+field('Opening due (₹)','v77Opening',c.openingDue||0,'number')+`<label class="v77-field">Private note<textarea id="v77Note">${esc(c.note||c.landNote||'')}</textarea></label>`;$('v77Foot').append(btn('Cancel',actions.bind(null,id)),btn('Save changes',()=>{const name=$('v77Name').value.trim(),opening=Number($('v77Opening').value);if(!name)return alert('Enter customer name.');if(!Number.isFinite(opening)||opening<0)return alert('Opening due must be zero or more.');Object.assign(c,{name,phone:$('v77Phone').value.trim(),village:$('v77Village').value.trim(),address:$('v77Address').value.trim(),openingDue:opening,note:$('v77Note').value.trim()});save();close();try{window.renderChat?.()}catch{}},'primary'))}
@@ -880,10 +880,11 @@ window.ashaV77CustomerActions={open:actions,run,close,version:'V77'};
     if(card){card.classList.add('v81-login-card');card.setAttribute('aria-label','ASHA Billing secure login');}
     const home=$('homePage');if(home){home.classList.add('v81-home');}
     // Restore dashboard after initial load and when the browser restores the page from cache.
-    const refreshHome=()=>{setBuild();if($('app')&&!$('app').classList.contains('hidden')&&home?.classList.contains('active')){try{window.renderAll?.(false);window.renderDash?.()}catch(_){}}};
+    const refreshHome=()=>{setBuild();};
+    // Do not rerender the entire dashboard on pageshow/visibilitychange: this caused a double-load flash.
     window.addEventListener('pageshow',refreshHome);
     document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshHome()});
-    if(home?.classList.contains('active'))setTimeout(refreshHome,180);
+    if(home?.classList.contains('active'))refreshHome();
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
@@ -895,7 +896,7 @@ window.ashaV77CustomerActions={open:actions,run,close,version:'V77'};
 function activate(){const app=$('app'),home=$('homePage');if(!app||app.classList.contains('hidden')||!home)return;
 document.querySelectorAll('main .page, #app > .page').forEach(p=>p.classList.toggle('active',p===home));
 document.querySelectorAll('.tabbar button[data-page]').forEach(b=>{const on=b.dataset.page==='homePage';b.classList.toggle('active',on);b.setAttribute('aria-current',on?'page':'false')});
-home.classList.add('v84-home-ready');if(!active){active=true;try{window.renderAll?.(false)}catch(e){}try{window.renderDash?.()}catch(e){}}
+home.classList.add('v85-home-ready');if(!active){active=true;const metrics=$('metrics');if(metrics&&!metrics.children.length){try{window.renderDash?.()}catch(e){}}}
 }
 function queue(){clearTimeout(timer);timer=setTimeout(activate,100)}
 const app=$('app');if(app&&window.MutationObserver)new MutationObserver(()=>{if(!app.classList.contains('hidden')){active=false;queue()}else active=false}).observe(app,{attributes:true,attributeFilter:['class']});
@@ -937,90 +938,42 @@ window.ashaAuditV84Features=()=>({historySearch:!!$('v84HistorySearch'),historyF
 })();
 
 
-/* ASHA Billing V85 — preserve the complete dashboard, prevent repeat entrance effects,
-   and normalize bill-rate units before the existing reminder/share workflow. */
+/* ASHA Billing V85 — preserved dashboard, customer centre redesign and saved-invoice reminder integrity */
 (function(){
- 'use strict';
- const $=id=>document.getElementById(id);
- const n=v=>Number.isFinite(Number(v))?Number(v):0;
- const latestBillFor=cid=>(window.state?.bills||[]).filter(b=>String(b.customerId)===String(cid)).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))||String(b.billNo||'').localeCompare(String(a.billNo||'')))[0];
- function conversionRate(rate, from, to){
-   const perBigha = from==='katha' ? n(rate)*20 : from==='decimal' ? n(rate)*40 : n(rate);
-   return to==='katha' ? perBigha/20 : to==='decimal' ? perBigha/40 : perBigha;
- }
- function normalizeBillForDisplay(source){
-   if(!source)return source;
-   const b={...source};
-   const unit=['bigha','katha','decimal'].includes(String(b.unit))?String(b.unit):'bigha';
-   const rateUnit=['bigha','katha','decimal'].includes(String(b.rateUnit))?String(b.rateUnit):unit;
-   // Rates are expressed per land unit. Convert legacy rateUnit records instead of
-   // multiplying decimal/katha land by a per-bigha rate or printing a misleading rate.
-   const rate=conversionRate(n(b.rate),rateUnit,unit);
-   b.unit=unit;b.rateUnit=unit;b.rate=Number(rate.toFixed(4));
-   b.bigha=unit==='katha'?n(b.landAmount)/20:unit==='decimal'?n(b.landAmount)/40:n(b.landAmount);
-   b.current=Number((n(b.landAmount)*b.rate).toFixed(2));
-   b.previousDue=n(b.previousDue);
-   b.allTotal=Number((b.current+b.previousDue).toFixed(2));
-   return b;
- }
- // Keep the entire Home dashboard and its quick-action links present; only disable
- // repeated entrance motion. No feature cards or metrics are removed.
- function preserveHome(){
-   const home=$('homePage');if(!home)return;
-   home.classList.add('v85-home-stable');
-   const metrics=$('metrics');
-   if(metrics && !metrics.dataset.v85Guard){
-     metrics.dataset.v85Guard='1';
-     const observer=new MutationObserver(()=>{
-       // Repeated render calls may refresh values, but should not replay entry motion.
-       home.classList.add('v85-home-stable');
-     });
-     observer.observe(metrics,{attributes:true,childList:true,subtree:true});
-   }
- }
- // Ensure reminder and share actions use the same normalized bill preview/rate line.
- const priorHTML=window.v64BillHTML;
- if(typeof priorHTML==='function'&&!priorHTML.__v85RateSafe){
-   const safeHTML=function(source,mode){return priorHTML.call(this,normalizeBillForDisplay(source),mode)};
-   safeHTML.__v85RateSafe=true;window.v64BillHTML=safeHTML;
- }
- const priorReminder=window.v66BillReminder;
- if(typeof priorReminder==='function'&&!priorReminder.__v85RateSafe){
-   const safeReminder=async function(cid,bid=''){
-     const source=bid?(window.state?.bills||[]).find(x=>String(x.id)===String(bid)):latestBillFor(cid);
-     if(!source){return priorReminder.call(this,cid,bid)}
-     // Temporarily normalize the source record for legacy reminder builders that clone
-     // the selected bill internally, then restore the user's stored record unchanged.
-     const snapshot={rate:source.rate,rateUnit:source.rateUnit,unit:source.unit,current:source.current,allTotal:source.allTotal,bigha:source.bigha};
-     const normalized=normalizeBillForDisplay(source);
-     Object.assign(source,{rate:normalized.rate,rateUnit:normalized.rateUnit,unit:normalized.unit,current:normalized.current,allTotal:normalized.allTotal,bigha:normalized.bigha});
-     try{return await priorReminder.call(this,cid,bid)}
-     finally{Object.assign(source,snapshot)}
-   };
-   safeReminder.__v85RateSafe=true;window.v66BillReminder=safeReminder;
-   window.v65BillReminder=function(cid,bid=''){return window.v66BillReminder(cid,bid)};
-   window.v64BillReminder=function(cid,bid=''){return window.v66BillReminder(cid,bid)};
-   window.shareCustomerBill=function(cid,bid=''){return window.v66BillReminder(cid,bid)};
- }
- // Older User Center buttons called several historical preview function names. Route
- // all of those entry points to the same repaired reminder flow.
- ['openBillPreviewV45','openBillPreviewV50','openBillPreviewV60','openBillReminderPreviewV60'].forEach(name=>{
-   if(typeof window[name]==='function'&&!window[name].__v85RateSafe){const fn=function(cid,bid=''){return window.v66BillReminder(cid,bid)};fn.__v85RateSafe=true;window[name]=fn;}
- });
- // Rebind visible User Center and menu actions after older wrappers have finished setting up.
- function bindUserActions(){
-   const menu=$('v52Menu');if(menu&&!menu.dataset.v85ReminderBound){
-     menu.dataset.v85ReminderBound='1';
-     menu.addEventListener('click',e=>{const b=e.target.closest('#mBillReminder,#v52BillReminder');if(!b)return;const cid=window.activeCustomer||window.actionContext?.customerId||window.actionContext?.cid;if(cid){e.preventDefault();e.stopImmediatePropagation();window.v66BillReminder(cid)}} ,true);
-   }
-   document.querySelectorAll('[data-v73-detail-action="reminder"]').forEach(btn=>{
-     if(btn.dataset.v85Bound)return;btn.dataset.v85Bound='1';
-     btn.addEventListener('click',e=>{const cid=window.activeCustomer;if(cid){e.preventDefault();e.stopImmediatePropagation();window.v66BillReminder(cid)}},true);
-   });
- }
- function init(){preserveHome();bindUserActions();const chip=document.getElementById('buildChip');if(chip)chip.textContent='V85 · Complete User Experience';}
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
- document.addEventListener('click',e=>{if(e.target.closest('.tabbar button,[data-page]'))setTimeout(preserveHome,0)});
- setTimeout(()=>{const chip=document.getElementById('buildChip');if(chip)chip.textContent='V85 · Complete User Experience'},5200);
- window.ashaAuditV85=()=>({build:'V85 Complete Dashboard + Rate-safe Reminder',homeMetrics:!!$('metrics')&&!!$('metrics').children.length,homeQuickActions:!!$('homePage .quick-actions')||!!$('homePage .quick-actions button'),userList:!!$('customerList'),billReminder:typeof window.v66BillReminder==='function',settings:!!$('settingsPage')});
+  const $=id=>document.getElementById(id);
+  const safe=v=>typeof window.esc==='function'?esc(v):String(v??'');
+  // Keep every existing dashboard metric and quick action; only disable duplicate entry animation.
+  const style=document.createElement('style');style.textContent=`
+  #homePage.v85-home-ready .dashboard-head,#homePage.v85-home-ready .metrics .metric,#homePage.v85-home-ready .quick-actions button{animation:none!important;transition:box-shadow .16s ease,border-color .16s ease!important;opacity:1!important;transform:none!important;filter:none!important}
+  .v85-user-hero{grid-column:1/-1;display:grid;grid-template-columns:48px minmax(0,1fr);gap:12px;align-items:center;padding:15px;margin-bottom:3px;border:1px solid #e2eee5;border-radius:20px;background:linear-gradient(135deg,#f3faf5,#fff);box-shadow:0 6px 18px #173b2508}
+  .v85-user-avatar{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(145deg,#0a8555,#36b77b);color:white;font-weight:800;font-size:21px;box-shadow:inset 0 1px 0 #ffffff55}
+  .v85-user-ident{min-width:0}.v85-user-ident h3{margin:0 0 4px;font-size:16px;letter-spacing:-.3px;color:#173b28}.v85-user-ident p{margin:0;font-size:11px;line-height:1.45;color:#6c7d71;overflow-wrap:anywhere}
+  .v85-user-balance{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:11px 13px;border-radius:13px;background:#fff;border:1px solid #e5eee7}.v85-user-balance small{font-size:11px;color:#75857a}.v85-user-balance b{font-size:20px;letter-spacing:-.4px;color:#b45309}.v85-user-balance.paid b{color:#07804f}
+  .v85-user-section-label{grid-column:1/-1;margin:8px 2px 0;color:#7a8a7e;font-size:10px;font-weight:850;letter-spacing:1.25px}
+  .v85-user-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.v85-user-grid .v77-btn{min-width:0;padding:10px;gap:8px;border-radius:16px;min-height:62px;font-size:12px;line-height:1.25}.v85-user-grid .v77-btn>span:nth-child(2){overflow-wrap:anywhere}.v85-user-grid .v77-icon{width:30px;height:30px;border-radius:10px}
+  .v77-sheet{padding:clamp(15px,4vw,22px)!important;border-radius:28px 28px 24px 24px!important}.v77-sheet header{position:sticky;top:-1px;z-index:2;background:rgba(250,252,250,.96);padding:2px 0 10px;margin-bottom:10px;backdrop-filter:blur(16px)}
+  @media(max-width:380px){.v85-user-grid{grid-template-columns:1fr}.v85-user-hero{grid-template-columns:42px minmax(0,1fr)}.v85-user-avatar{width:42px;height:42px}}
+  `;document.head.appendChild(style);
+  // Make reminder generation always use the saved bill's totals. Only derive fields for incomplete legacy records.
+  const previous=window.v66BillReminder||window.v65BillReminder||window.v64BillReminder;
+  if(typeof previous==='function'&&!window.__v85ReminderWrapped){
+    window.__v85ReminderWrapped=true;
+    window.v85BillReminder=async function(cid,bid=''){
+      const c=(window.state?.customers||[]).find(x=>String(x.id)===String(cid));
+      const bill=bid?(window.state?.bills||[]).find(x=>String(x.id)===String(bid)):(window.state?.bills||[]).filter(x=>String(x.customerId)===String(cid)).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')))[0];
+      if(!c){alert('Customer not found.');return}
+      if(!bill){alert('এই user-এর কোনো bill নেই। আগে New Bill তৈরি করুন।');return}
+      // Do not mutate state or replace historical rates/totals during sharing.
+      const snapshot={...bill,payments:Array.isArray(bill.payments)?bill.payments.map(p=>({...p})):[]};
+      if(!Number.isFinite(Number(snapshot.current)))snapshot.current=(Number(snapshot.landAmount)||0)*(Number(snapshot.rate)||0);
+      if(!Number.isFinite(Number(snapshot.allTotal)))snapshot.allTotal=(Number(snapshot.previousDue)||0)+(Number(snapshot.current)||0);
+      const oldBills=window.state.bills;
+      try{
+        // Reminder renderer resolves the chosen bill by id; use its original stored object values.
+        return await previous(cid,bid||snapshot.id);
+      }catch(err){console.error('V85 reminder fallback',err);alert('Bill + Reminder খোলা যায়নি। Bill preview খুলে আবার চেষ্টা করুন।')}
+    };
+    window.v66BillReminder=window.v85BillReminder;window.v65BillReminder=window.v85BillReminder;window.v64BillReminder=window.v85BillReminder;window.shareCustomerBill=window.v85BillReminder;
+  }
+  window.ashaAuditV85=()=>({build:'V85 User Centre + Saved Bill Reminder',homeMetrics:!!$('metrics'),quickActions:!!document.querySelector('#homePage .quick-actions'),userCentre:!!$('v77ActionRoot'),reminderWrapped:!!window.__v85ReminderWrapped});
 })();

@@ -5907,7 +5907,7 @@ ready(function(){
     const c=getCustV65(cid); if(!c) return alert('User not found');
     const sourceBill=bid?state.bills.find(x=>x.id===bid):latestBillV65(cid); if(!sourceBill) return alert('এই user-এর bill নেই। আগে New Bill তৈরি করুন।');
     const b={...sourceBill};
-    if(window.ashaBillChargeV68){ b.bigha=window.ashaLandToBighaV68(b.landAmount,b.unit||'bigha'); b.current=window.ashaBillChargeV68(b); b.allTotal=(Number(b.previousDue)||0)+b.current; }
+    if(window.ashaBillChargeV68){ b.bigha=window.ashaLandToBighaV68(b.landAmount,b.unit||'bigha'); /* A reminder must reproduce the saved invoice, never silently recalculate historical totals with today's rate/settings. */ if(!Number.isFinite(Number(b.current))) b.current=window.ashaBillChargeV68(b); if(!Number.isFinite(Number(b.allTotal))) b.allTotal=(Number(b.previousDue)||0)+Number(b.current||0); }
     currentBill=b;
     let blob;
     try{ if(typeof v64BillBlob==='function') blob=await v64BillBlob(b); else if(typeof v63BillBlob==='function') blob=await v63BillBlob(b); else blob=await invoiceBlob(); }
@@ -6098,8 +6098,8 @@ ready(function(){
       if(!b) return oldHTML(b,mode);
       const view={...b};
       view.bigha=unitToBigha(view.landAmount,view.unit||'bigha');
-      view.current=billChargeFromUnits(view);
-      view.allTotal=(Number(view.previousDue)||0)+view.current;
+      if(!Number.isFinite(Number(view.current))) view.current=billChargeFromUnits(view);
+      if(!Number.isFinite(Number(view.allTotal))) view.allTotal=(Number(view.previousDue)||0)+Number(view.current||0);
       const original=window.v64RateLine;
       window.v64RateLine=window.ashaRateLineV68;
       try{return oldHTML(view,mode);}finally{window.v64RateLine=original;}
@@ -6111,8 +6111,8 @@ ready(function(){
       window.v63BillHTML=function(b){
         if(!b) return oldHTML63(b);
         const view={...b,bigha:unitToBigha(b.landAmount,b.unit||'bigha')};
-        view.current=billChargeFromUnits(view);
-        view.allTotal=(Number(view.previousDue)||0)+view.current;
+        if(!Number.isFinite(Number(view.current))) view.current=billChargeFromUnits(view);
+        if(!Number.isFinite(Number(view.allTotal))) view.allTotal=(Number(view.previousDue)||0)+Number(view.current||0);
         const oldLine=window.v63RateLine;
         window.v63RateLine=window.ashaRateLineV68;
         try{return oldHTML63(view);}finally{window.v63RateLine=oldLine;}
