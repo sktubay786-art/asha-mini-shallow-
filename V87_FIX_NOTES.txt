@@ -1,0 +1,9 @@
+ASHA Billing V87 — Login Recovery
+
+- Preserves the V85 full app files and existing feature code.
+- Adds a mobile login interaction recovery layer and explicit tappable login fields/button.
+- Makes login card visible and above decorative/background layers; prevents background decoration intercepting touch.
+- Bumps PWA/service-worker cache to V87 and keeps app name ASHA Billing.
+- Static syntax/ZIP checks only; live Firebase sign-in and real-device behavior still require verification.
+
+Deploy all files together to the hosting root, then refresh site data / reopen the installed app. If the installed PWA still shows only the icon, uninstall it and reinstall from the updated deployed URL.

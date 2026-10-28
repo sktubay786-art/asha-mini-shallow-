@@ -2674,3 +2674,14 @@ body.v74-sheet-open{overflow:hidden!important}
 .v73-detail-actions button:active,.v52-actions button:active{transform:scale(.985)}
 .v64-bill .v64-line{align-items:flex-start}.v64-bill .v64-line b{text-align:right;overflow-wrap:anywhere}
 @media(max-width:380px){#homePage .metric{padding:12px!important}#homePage .metric-icon{width:30px;height:30px;flex-basis:30px}#homePage .metric small{gap:6px;font-size:10px!important}#homePage .quick-actions{gap:8px!important}}
+
+/* V87 Login recovery: stable mobile layout, explicit touch targets, no decorative overlay interception. */
+#login:not(.hidden){position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;height:100dvh!important;min-height:100vh!important;z-index:2147483000!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow-y:auto!important;overscroll-behavior:contain;pointer-events:auto!important;isolation:isolate!important}
+#login:not(.hidden)::before,#login:not(.hidden)::after{pointer-events:none!important;z-index:-1!important}
+#login .login-card{position:relative!important;z-index:1!important;pointer-events:auto!important;opacity:1!important;visibility:visible!important;transform:none!important;filter:none!important;animation:none!important;max-height:calc(100dvh - 24px);overflow-y:auto;touch-action:pan-y}
+#login .login-card input,#login .login-card button,#login .login-card label{pointer-events:auto!important;touch-action:manipulation!important}
+#login #loginBtn{position:relative!important;z-index:2!important;min-height:50px!important;opacity:1!important;visibility:visible!important;cursor:pointer!important}
+#login.hidden{display:none!important;pointer-events:none!important}
+#app.hidden{display:none!important}
+.v63-share-root{pointer-events:none!important}
+@media(max-width:520px){#login:not(.hidden){padding: max(12px,env(safe-area-inset-top)) 14px max(12px,env(safe-area-inset-bottom))!important}#login .login-card{width:100%!important;padding:20px!important;border-radius:24px!important}}
