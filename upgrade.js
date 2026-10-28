@@ -640,7 +640,7 @@ window.ashaV77CustomerActions={open:actions,run,close,version:'V77'};
   ready(() => {
     document.documentElement.classList.add('asha-v78');
     const build = document.getElementById('buildChip');
-    if (build) build.textContent = 'V79 · Customer Chat';
+    if (build) build.textContent = 'V80 · Dashboard + Manual Rate';
     // Remove only the old business quote from the HOME header. Settings and invoice data stay untouched.
     const applyHomeBrand = () => {
       const title = document.getElementById('companyTitle');
@@ -648,10 +648,10 @@ window.ashaV77CustomerActions={open:actions,run,close,version:'V77'};
       const sub = document.getElementById('companySub');
       if (sub && sub.textContent !== 'Smart billing · Customer management') sub.textContent = 'Smart billing · Customer management';
       const chipLabel = document.getElementById('buildChip');
-      if (chipLabel && chipLabel.textContent !== 'V79 · Customer Chat') chipLabel.textContent = 'V79 · Customer Chat';
+      if (chipLabel && chipLabel.textContent !== 'V80 · Dashboard + Manual Rate') chipLabel.textContent = 'V80 · Dashboard + Manual Rate';
       const meta = document.querySelector('meta[name="app-build"]');
-      if (meta) meta.content = 'V79 Customer Chat Interface';
-      window.ASHA_BUILD = 'V79 Customer Chat Interface';
+      if (meta) meta.content = 'V80 Dashboard + Manual Rate';
+      window.ASHA_BUILD = 'V80 Dashboard + Manual Rate';
     };
     applyHomeBrand();
     const titleNode = document.getElementById('companyTitle');
@@ -762,12 +762,78 @@ window.ashaV77CustomerActions={open:actions,run,close,version:'V77'};
   document.addEventListener('DOMContentLoaded', () => {
     decorate();
     const chip = document.querySelector('.hero-chips span:last-child');
-    if (chip) chip.textContent = 'V79 · Customer Chat Interface';
+    if (chip) chip.textContent = 'V80 · Dashboard + Manual Rate Interface';
     const meta = document.querySelector('meta[name="app-build"]');
-    if (meta) meta.content = 'V79 Customer Chat Interface';
+    if (meta) meta.content = 'V80 Dashboard + Manual Rate';
     const back = document.getElementById('chatBack');
     if (back) back.setAttribute('aria-label', 'Back to customers');
   });
   if (document.readyState !== 'loading') decorate();
-  window.ashaAuditV79 = () => ({build:'V79 Customer Chat Interface',chatClass:!!modal()?.classList.contains('asha-wa-conversation'),customerSpecificComposer:!!document.getElementById('manualChatInput')});
+  window.ashaAuditV79 = () => ({build:'V80 Dashboard + Manual Rate',chatClass:!!modal()?.classList.contains('asha-wa-conversation'),customerSpecificComposer:!!document.getElementById('manualChatInput')});
+})();
+
+/* ASHA Billing V80 — dashboard persistence + optional manual bill rate */
+(function(){
+  'use strict';
+  const $=id=>document.getElementById(id);
+  const n=v=>{const x=Number(v);return Number.isFinite(x)?x:0};
+  const round=v=>Math.round((n(v)+Number.EPSILON)*100)/100;
+  const unit=()=> $('landUnit')?.value||'bigha';
+  const rateFromSettings=u=>{const b=Math.max(0,n(state?.settings?.rateBigha??2200));return round(b/(u==='katha'?20:u==='decimal'?40:1));};
+  const labelFor=u=>'Rate / '+(u==='katha'?'কাঠা':u==='decimal'?'ডেসিমেল':'বিঘা');
+  const FILTER_KEY='asha_dashboard_filters_v80';
+  function restoreFilters(){
+    try{const f=JSON.parse(localStorage.getItem(FILTER_KEY)||'{}');if($('homeMonth')&&f.month)$('homeMonth').value=f.month;}
+    catch(_){}
+  }
+  function persistFilters(){
+    try{localStorage.setItem(FILTER_KEY,JSON.stringify({month:$('homeMonth')?.value||'',village:$('homeVillage')?.value||'all'}));}catch(_){}
+  }
+  // fillSelects runs on every render. Preserve the dashboard selection instead of resetting it to All villages.
+  const oldFill=window.fillSelects;
+  if(typeof oldFill==='function'&&!oldFill.__v80){
+    const wrapped=function(){
+      const priorVillage=$('homeVillage')?.value||'';
+      const priorReportVillage=$('reportVillage')?.value||'';
+      const out=oldFill.apply(this,arguments);
+      const saved=(()=>{try{return JSON.parse(localStorage.getItem(FILTER_KEY)||'{}')}catch(_){return {}}})();
+      const hv=$('homeVillage');if(hv){const want=priorVillage||saved.village||'all';if([...hv.options].some(o=>o.value===want))hv.value=want;}
+      const rv=$('reportVillage');if(rv&&priorReportVillage&&[...rv.options].some(o=>o.value===priorReportVillage))rv.value=priorReportVillage;
+      return out;
+    };wrapped.__v80=true;window.fillSelects=wrapped;try{fillSelects=wrapped}catch(_){}
+  }
+  restoreFilters();
+  ['homeVillage','homeMonth'].forEach(id=>$(id)?.addEventListener('change',()=>{persistFilters();if(typeof window.renderAll==='function')window.renderAll(false);}));
+
+  function setRateLabel(){const el=$('rate');if(!el)return;const label=el.closest('div')?.querySelector('label');if(label)label.textContent=labelFor(unit());el.readOnly=false;el.removeAttribute('aria-readonly');el.title='Default comes from Settings; you can change this rate for this bill only.';}
+  function setDefaultRate(force){const el=$('rate');if(!el)return;if(force||el.dataset.v80Manual!=='1'||!el.value){el.value=String(rateFromSettings(unit()));el.dataset.v80Manual='0';}setRateLabel();}
+  const rate=$('rate');
+  if(rate){rate.readOnly=false;rate.removeAttribute('aria-readonly');rate.addEventListener('input',()=>{rate.dataset.v80Manual='1';setRateLabel();if(typeof window.previewBill==='function')window.previewBill();});}
+  $('landUnit')?.addEventListener('change',()=>{setDefaultRate(true);if(typeof window.previewBill==='function')window.previewBill();});
+  // A one-tap reset makes it easy to return to the rate configured in Settings.
+  if(rate&&!$('resetBillRate')){
+    const holder=rate.parentElement;
+    if(holder){const btn=document.createElement('button');btn.id='resetBillRate';btn.type='button';btn.className='btn';btn.textContent='Use Settings Rate';btn.style.cssText='margin-top:6px;padding:7px 10px;font-size:12px;min-height:34px';btn.addEventListener('click',()=>{setDefaultRate(true);if(typeof window.previewBill==='function')window.previewBill();});holder.appendChild(btn);}
+  }
+  // Rebuild bill using the actual editable rate. This rate is stored on the bill and does not alter Settings.
+  function buildManualRateBill(){
+    const sel=$('billCustomer');if(!sel)return null;let c=null;
+    if(sel.value==='__new'){
+      c={id:typeof window.uid==='function'?window.uid():String(Date.now()),name:$('manualName')?.value.trim()||'New Customer',phone:typeof window.normalPhone==='function'?window.normalPhone($('manualPhone')?.value):($('manualPhone')?.value||''),village:$('manualVillage')?.value.trim()||'',address:$('manualAddress')?.value.trim()||'',openingDue:0};
+    }else c=(state.customers||[]).find(x=>String(x.id)===String(sel.value));
+    if(!c)return null;
+    const u=unit(),qty=Math.max(0,n($('land')?.value)),rateValue=Math.max(0,n($('rate')?.value)),current=round(qty*rateValue);
+    const exists=(state.customers||[]).some(x=>String(x.id)===String(c.id));
+    const previousDue=exists&&typeof window.customerDue==='function'?n(window.customerDue(c.id)):0;
+    const paid=Math.max(0,n($('paidNow')?.value));
+    const bigha=round(qty/(u==='katha'?20:u==='decimal'?40:1));
+    return {id:typeof window.uid==='function'?window.uid():String(Date.now()),billNo:typeof window.nextBillNo==='function'?window.nextBillNo():'ASHA-'+Date.now(),date:typeof window.today==='function'?window.today():new Date().toISOString().slice(0,10),customerId:c.id,customerName:c.name,phone:c.phone||'',address:c.address||'',village:c.village||'',season:$('season')?.value||'',landAmount:qty,unit:u,rateUnit:u,bigha,rate:rateValue,current,previousDue,allTotal:round(previousDue+current),note:$('billNote')?.value||'',payments:paid>0?[{id:typeof window.uid==='function'?window.uid():String(Date.now()+1),date:typeof window.today==='function'?window.today():new Date().toISOString().slice(0,10),amount:paid,mode:$('billPayMode')?.value||'Cash',receivedIn:$('receivedIn')?.value||'Cash',note:'Initial payment'}]:[]};
+  }
+  window.makeBillFromForm=buildManualRateBill;try{makeBillFromForm=buildManualRateBill}catch(_){}
+  // Keep the dashboard rendered on a normal refresh and after data is loaded.
+  window.addEventListener('pageshow',()=>{restoreFilters();setRateLabel();if(typeof window.renderAll==='function')window.renderAll(false);});
+  setRateLabel();
+  document.addEventListener('DOMContentLoaded',()=>{setRateLabel();setDefaultRate(false);});
+  [120,500,1200].forEach(ms=>setTimeout(setRateLabel,ms));
+  window.ashaAuditV80=()=>({build:'V80 Dashboard Persistence + Manual Bill Rate',manualRateEnabled:!!$('rate')&&!$('rate').readOnly,settingsRate:rateFromSettings(unit()),billRate:n($('rate')?.value),dashboardFiltersPersisted:!!localStorage.getItem(FILTER_KEY)});
 })();
