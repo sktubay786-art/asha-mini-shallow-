@@ -1270,3 +1270,52 @@ const css=document.createElement('style');css.id='v93PremiumDashboardHistory';cs
  @media(prefers-reduced-motion:reduce){.v91-modal-sheet{animation:none!important}}
  `;document.head.appendChild(css);
 })();
+
+
+/* ASHA Billing V94 — single FX-100MS-style calculator + dashboard refresh guard */
+(()=>{'use strict';
+ const $=id=>document.getElementById(id);
+ function enforceCalculator(){
+   const page=$('calcPage'),root=$('v89CalculatorStudio'); if(!page||!root)return;
+   // One primary calculator only: the newer FX-style scientific keypad.
+   page.querySelectorAll(':scope > .card:has(#calcScreen), :scope > .card:has(#calcKeys), .v89-legacy-calc:has(#calcScreen), .v89-legacy-calc:has(#calcKeys), .v88-old-calc-card:has(#calcKeys)').forEach(el=>{
+     if(!root.contains(el))el.style.setProperty('display','none','important');
+   });
+   page.querySelectorAll(':scope > .card:has(#calcLand), .v89-legacy-calc:has(#calcLand), .v88-land-old').forEach(el=>el.style.setProperty('display','none','important'));
+   root.querySelectorAll(':scope > .v89-tool-card').forEach(card=>{
+     if(card.classList.contains('v89-calculator'))card.style.setProperty('display','block','important');
+     else card.style.removeProperty('display'); // cash/land cards are moved into the existing popups by V91
+   });
+   const title=root.querySelector('.v89-calculator .v89-tool-head h2');if(title)title.textContent='FX-100MS Scientific Calculator';
+   const subtitle=root.querySelector('.v89-calculator .v89-tool-head p');if(subtitle)subtitle.textContent='Standard and scientific calculations · DEG/RAD · memory · history';
+   const chip=root.querySelector('.v89-calculator .v89-chip');if(chip)chip.textContent='FX-100MS STYLE';
+ }
+ function refreshDashboard(){
+   try{
+     if(typeof window.renderDash==='function')window.renderDash();
+     // The latest dashboard renderer is defined by V93 and updates totals from current state.
+     const s=window.state||(typeof state!=='undefined'?state:null);
+     if(s && $('metrics')){
+       const ev=new Event('asha:dashboard-refresh');document.dispatchEvent(ev);
+     }
+   }catch(e){console.warn('Dashboard refresh skipped',e)}
+ }
+ function apply(){enforceCalculator();}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(apply,450),{once:true});else setTimeout(apply,450);
+ const oldShow=window.showPage;if(typeof oldShow==='function'&&!oldShow.__v94){const wrap=function(id){oldShow.apply(this,arguments);setTimeout(apply,180);if(id==='homePage')setTimeout(refreshDashboard,120)};wrap.__v94=true;window.showPage=wrap;try{showPage=wrap}catch(_){} }
+ const oldRender=window.renderDash;if(typeof oldRender==='function'&&!oldRender.__v94){const wrap=function(){oldRender.apply(this,arguments);setTimeout(apply,0)};wrap.__v94=true;window.renderDash=wrap;try{renderDash=wrap}catch(_){} }
+ document.addEventListener('click',e=>{if(e.target.closest('#receiveBtn,#settleBtn,#dueReceiptBtn,[data-page="homePage"],[data-page="payPage"]'))setTimeout(()=>{apply();refreshDashboard()},220)});
+ const mo=new MutationObserver(()=>{if($('calcPage')&&$('v89CalculatorStudio'))enforceCalculator()});
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>mo.observe($('calcPage')||document.body,{childList:true,subtree:true}),{once:true});else mo.observe($('calcPage')||document.body,{childList:true,subtree:true});
+ window.ashaAuditV94=()=>({build:'V94 Single FX-100MS Calculator',fxCalculatorVisible:!!$('v89CalculatorStudio')&&getComputedStyle($('v89CalculatorStudio').querySelector('.v89-calculator')).display!=='none',legacyCalculatorHidden:!$('calcKeys')||getComputedStyle($('calcKeys').closest('.card')||$('calcKeys')).display==='none',cashCounterLauncher:!!document.querySelector('[data-v91-open="cash"]'),landCalculatorLauncher:!!document.querySelector('[data-v91-open="land"]'),dashboardMetrics:!!$('metrics')});
+ const css=document.createElement('style');css.id='v94SingleCalculatorMobileStyles';css.textContent=`
+ #calcPage>.card:has(#calcScreen),#calcPage>.card:has(#calcKeys),#calcPage .v89-legacy-calc:has(#calcScreen),#calcPage .v89-legacy-calc:has(#calcKeys),#calcPage .v88-old-calc-card:has(#calcKeys){display:none!important}
+ #calcPage #v89CalculatorStudio{display:grid!important;gap:13px!important;width:100%;max-width:100%;box-sizing:border-box}
+ #calcPage #v89CalculatorStudio>.v89-calculator{display:block!important;width:100%;box-sizing:border-box}
+ #calcPage .v89-calculator .v89-keypad{grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(4px,1.6vw,8px)}
+ #calcPage .v89-calculator .v89-keypad button{min-width:0;min-height:clamp(43px,11vw,54px);padding:5px 2px;font-size:clamp(11px,3.4vw,15px);border-radius:13px;touch-action:manipulation}
+ #calcPage .v89-calculator .v89-tool-head h2{font-size:clamp(20px,5.4vw,25px)}
+ #calcPage .v89-calculator .v89-display output{font-size:clamp(28px,8vw,42px)}
+ @media(max-width:360px){#calcPage .v89-calculator .v89-keypad{gap:4px}#calcPage .v89-calculator .v89-keypad button{min-height:42px;border-radius:10px;font-size:11px}#calcPage .v89-calculator .v89-calc-tools{grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}#calcPage .v89-calculator .v89-calc-tools button{font-size:8px;padding:5px 1px}}
+ `;document.head.appendChild(css);
+})();
