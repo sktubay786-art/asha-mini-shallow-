@@ -1,4 +1,4 @@
-const CACHE='asha-billing-v88-fx100ms-calculator';
+const CACHE='asha-billing-v89-payment-calculator';
 const ASSETS=['./','./index.html?v=88','./style.css?v=88','./app.js?v=88','./upgrade.js?v=88','./manifest.json?v=88','./icon-192.png','./icon-512.png'];
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).catch(()=>{}))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim()});
