@@ -1,7 +1,7 @@
 {
-  "name": "ASHA Billing V82 Home Dashboard",
-  "short_name": "ASHA V82",
-  "start_url": "./index.html?v=82",
+  "name": "ASHA Billing",
+  "short_name": "ASHA Billing",
+  "start_url": "./index.html?v=83",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f5f7f6",
@@ -20,5 +20,5 @@
       "purpose": "any maskable"
     }
   ],
-  "version": "82"
+  "version": "83"
 }

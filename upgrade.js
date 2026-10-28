@@ -919,5 +919,5 @@ window.ashaV77CustomerActions={open:actions,run,close,version:'V77'};
   document.addEventListener('DOMContentLoaded',scheduleHome,{once:true});
   window.addEventListener('pageshow',()=>{if(!$('app')?.classList.contains('hidden'))scheduleHome();});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!$('app')?.classList.contains('hidden'))scheduleHome();});
-  window.ashaAuditV82=()=>({build:'V82 Instant Home Dashboard',appVisible:!!$('app')&&!$('app').classList.contains('hidden'),homeActive:!!$('homePage')?.classList.contains('active'),homeTabActive:!!document.querySelector('.tabbar button[data-page="homePage"].active'),dashboardPresent:!!$('metrics')});
+  window.ashaAuditV82=()=>({build:'V83 iOS Polish',appVisible:!!$('app')&&!$('app').classList.contains('hidden'),homeActive:!!$('homePage')?.classList.contains('active'),homeTabActive:!!document.querySelector('.tabbar button[data-page="homePage"].active'),dashboardPresent:!!$('metrics')});
 })();
