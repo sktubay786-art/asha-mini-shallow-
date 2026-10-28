@@ -837,3 +837,87 @@ window.ashaV77CustomerActions={open:actions,run,close,version:'V77'};
   [120,500,1200].forEach(ms=>setTimeout(setRateLabel,ms));
   window.ashaAuditV80=()=>({build:'V80 Dashboard Persistence + Manual Bill Rate',manualRateEnabled:!!$('rate')&&!$('rate').readOnly,settingsRate:rateFromSettings(unit()),billRate:n($('rate')?.value),dashboardFiltersPersisted:!!localStorage.getItem(FILTER_KEY)});
 })();
+
+/* ASHA Billing V81 — reliable Home/Dashboard navigation + refined login motion */
+(function(){
+  'use strict';
+  const $=id=>document.getElementById(id);
+  function setBuild(){
+    const chip=document.querySelector('.hero-chips span:nth-child(2)');
+    if(chip)chip.textContent='V81 · Home & Login Polish';
+    const meta=document.querySelector('meta[name="app-build"]');if(meta)meta.content='V81 Home Navigation + Login Motion';
+  }
+  function normalizePage(id,shouldRender=true){
+    const target=$(id);if(!target||!target.classList.contains('page'))return false;
+    document.querySelectorAll('main .page, #app > .page').forEach(p=>p.classList.toggle('active',p===target));
+    document.querySelectorAll('.tabbar button[data-page]').forEach(b=>{
+      const on=b.dataset.page===id;b.classList.toggle('active',on);b.setAttribute('aria-current',on?'page':'false');
+    });
+    if(shouldRender){
+      try{if(id==='homePage'&&typeof window.renderAll==='function')window.renderAll(false);else if(typeof window.renderAll==='function')window.renderAll(false);}catch(e){console.warn('Page refresh skipped',e)}
+      if(id==='homePage'){try{window.renderDash?.()}catch(_){};}
+      if(id==='billPage'){try{window.previewBill?.()}catch(_){}}
+    }
+    return true;
+  }
+  function go(id){
+    if(id==='calcPage'&&!$('calcPage')){try{window.createCalcPageV44?.();window.createCalcPageV43?.()}catch(_){}}
+    let ok=false;
+    try{if(typeof window.showPage==='function')window.showPage(id);ok=!!$(id)?.classList.contains('page')}catch(e){console.warn(e)}
+    if(!ok)ok=normalizePage(id,false);
+    if(ok){normalizePage(id,true);if(id==='homePage'){window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}}
+  }
+  // Capture navigation taps so older, stacked click handlers cannot leave the page and tabbar out of sync.
+  document.addEventListener('click',function(e){
+    const btn=e.target.closest('button[data-page]');if(!btn)return;
+    const id=btn.dataset.page;if(!id)return;
+    e.preventDefault();e.stopImmediatePropagation();go(id);
+  },true);
+  window.ashaGoPageV81=go;
+  function start(){
+    setBuild();
+    const login=$('login'),card=login?.querySelector('.login-card');
+    if(card){card.classList.add('v81-login-card');card.setAttribute('aria-label','ASHA Billing secure login');}
+    const home=$('homePage');if(home){home.classList.add('v81-home');}
+    // Restore dashboard after initial load and when the browser restores the page from cache.
+    const refreshHome=()=>{setBuild();if($('app')&&!$('app').classList.contains('hidden')&&home?.classList.contains('active')){try{window.renderAll?.(false);window.renderDash?.()}catch(_){}}};
+    window.addEventListener('pageshow',refreshHome);
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshHome()});
+    if(home?.classList.contains('active'))setTimeout(refreshHome,180);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
+})();
+
+
+/* ASHA Billing V82 — show a fully-rendered Home dashboard immediately after login */
+(function(){
+  'use strict';
+  const $=id=>document.getElementById(id);
+  let lastHomeRefresh=0;
+  function activateHome(reason){
+    const app=$('app'),home=$('homePage');
+    if(!app||app.classList.contains('hidden')||!home)return;
+    document.querySelectorAll('main .page, #app > .page').forEach(p=>p.classList.toggle('active',p===home));
+    document.querySelectorAll('.tabbar button[data-page]').forEach(b=>{
+      const active=b.dataset.page==='homePage';
+      b.classList.toggle('active',active);b.setAttribute('aria-current',active?'page':'false');
+    });
+    home.classList.add('v82-home-ready');
+    // Rebuild dashboard after the cloud pull / auth state update has had a chance to settle.
+    try{if(typeof window.renderAll==='function')window.renderAll(false);}catch(e){console.warn('V82 dashboard render:',e)}
+    try{if(typeof window.renderDash==='function')window.renderDash();}catch(e){console.warn('V82 dashboard metrics:',e)}
+    const now=Date.now();
+    if(now-lastHomeRefresh>180){lastHomeRefresh=now;home.classList.remove('v82-home-refresh');void home.offsetWidth;home.classList.add('v82-home-refresh');}
+  }
+  function scheduleHome(){[0,90,280,650,1300].forEach(ms=>setTimeout(()=>activateHome('login'),ms));}
+  // Successful login hides #login and reveals #app; observe that transition instead of relying on a second Home tap.
+  const app=$('app');
+  if(app&&window.MutationObserver){new MutationObserver(()=>{if(!app.classList.contains('hidden'))scheduleHome();}).observe(app,{attributes:true,attributeFilter:['class']});}
+  const login=$('login');
+  if(login&&window.MutationObserver){new MutationObserver(()=>{if(login.classList.contains('hidden'))scheduleHome();}).observe(login,{attributes:true,attributeFilter:['class']});}
+  // Also handle a remembered Firebase session and browser back/forward cache restoration.
+  document.addEventListener('DOMContentLoaded',scheduleHome,{once:true});
+  window.addEventListener('pageshow',()=>{if(!$('app')?.classList.contains('hidden'))scheduleHome();});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!$('app')?.classList.contains('hidden'))scheduleHome();});
+  window.ashaAuditV82=()=>({build:'V82 Instant Home Dashboard',appVisible:!!$('app')&&!$('app').classList.contains('hidden'),homeActive:!!$('homePage')?.classList.contains('active'),homeTabActive:!!document.querySelector('.tabbar button[data-page="homePage"].active'),dashboardPresent:!!$('metrics')});
+})();

@@ -2570,3 +2570,44 @@ body.v74-sheet-open{overflow:hidden!important}
 @keyframes ashaChatBubbleIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:520px){#chatModal.asha-wa-conversation .chat-head{padding-left:8px!important;padding-right:8px!important;gap:6px!important}#chatModal.asha-wa-conversation .chat-head>button{width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important}#chatModal.asha-wa-conversation .v73-user-overview{padding:10px!important}#chatModal.asha-wa-conversation .chat-body{padding-left:9px!important;padding-right:9px!important}}
 @media(prefers-reduced-motion:reduce){#chatModal.asha-wa-conversation .bubble{animation:none!important}}
+
+/* V81 — refined secure-login entrance and a dependable, polished Home dashboard */
+#login:not(.hidden){position:relative;isolation:isolate;overflow:hidden;background:radial-gradient(ellipse at 12% 10%,rgba(87,214,157,.24),transparent 42%),radial-gradient(ellipse at 90% 85%,rgba(95,173,255,.18),transparent 38%),linear-gradient(145deg,#073c2a 0%,#0b7650 48%,#092d24 100%);animation:v81-login-bg 13s ease-in-out infinite alternate}
+#login:not(.hidden)::before,#login:not(.hidden)::after{content:"";position:absolute;z-index:-1;border-radius:50%;pointer-events:none;filter:blur(1px)}
+#login:not(.hidden)::before{width:min(76vw,430px);height:min(76vw,430px);top:-24%;right:-18%;background:radial-gradient(circle at 35% 35%,rgba(196,255,222,.24),rgba(196,255,222,0) 68%);animation:v81-float 9s ease-in-out infinite alternate}
+#login:not(.hidden)::after{width:min(64vw,340px);height:min(64vw,340px);bottom:-18%;left:-18%;background:radial-gradient(circle at 50% 50%,rgba(166,219,255,.17),rgba(166,219,255,0) 70%);animation:v81-float 11s ease-in-out infinite alternate-reverse}
+#login .login-card.v81-login-card{transform-origin:50% 65%;animation:v81-card-enter .68s cubic-bezier(.18,.82,.22,1) both;box-shadow:0 30px 90px rgba(0,20,12,.3),inset 0 1px 0 rgba(255,255,255,.92);border:1px solid rgba(255,255,255,.72)}
+#login .brand-icon{animation:v81-icon-enter .7s cubic-bezier(.2,.8,.2,1) .08s both}
+#login #loginBtn{position:relative;overflow:hidden;transition:transform .2s ease,box-shadow .2s ease,filter .2s ease}
+#login #loginBtn::after{content:"";position:absolute;inset:-80% auto -80% -35%;width:24%;transform:rotate(20deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.38),transparent);transition:left .5s ease}
+#login #loginBtn:hover::after{left:125%}#login #loginBtn:active{transform:scale(.985);filter:brightness(.97)}
+#homePage.v81-home .card:first-child{border:1px solid rgba(16,126,78,.1);background:linear-gradient(135deg,#fff 0%,#f5fcf7 100%);box-shadow:0 12px 32px rgba(8,74,43,.065)}
+#homePage.v81-home .metrics .metric{position:relative;overflow:hidden;border:1px solid rgba(8,123,80,.1);background:linear-gradient(145deg,#fff 0%,#f8fcf9 100%);box-shadow:0 10px 26px rgba(13,66,42,.06);animation:v81-rise .42s both}
+#homePage.v81-home .metrics .metric:nth-child(2){animation-delay:45ms}#homePage.v81-home .metrics .metric:nth-child(3){animation-delay:90ms}#homePage.v81-home .metrics .metric:nth-child(4){animation-delay:135ms}
+#homePage.v81-home .quick-actions button{border:1px solid rgba(9,123,79,.1);box-shadow:0 10px 25px rgba(11,70,43,.055);transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
+#homePage.v81-home .quick-actions button:hover{transform:translateY(-3px);border-color:rgba(9,123,79,.25);box-shadow:0 16px 32px rgba(11,70,43,.1)}
+#homePage.v81-home .quick-actions button:focus-visible,.tabbar button:focus-visible{outline:3px solid rgba(18,158,99,.28);outline-offset:2px}
+.tabbar button.active{transition:background .22s ease,color .22s ease,transform .22s ease}.tabbar button.active i{transform:translateY(-1px)}
+@keyframes v81-login-bg{from{background-position:0% 0%,100% 100%,0% 50%}to{background-position:8% 5%,90% 92%,100% 50%}}
+@keyframes v81-float{from{transform:translate3d(0,0,0) scale(.96)}to{transform:translate3d(-12px,16px,0) scale(1.05)}}
+@keyframes v81-card-enter{from{opacity:0;transform:translateY(22px) scale(.975);filter:blur(5px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+@keyframes v81-icon-enter{from{opacity:0;transform:translateY(8px) rotate(-8deg) scale(.86)}to{opacity:1;transform:translateY(0) rotate(0) scale(1)}}
+@keyframes v81-rise{from{opacity:.65;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){#login:not(.hidden),#login:not(.hidden)::before,#login:not(.hidden)::after,#login .login-card.v81-login-card,#login .brand-icon,#homePage.v81-home .metrics .metric{animation:none!important}#login #loginBtn,#homePage.v81-home .quick-actions button,.tabbar button,.tabbar button i{transition:none!important}}
+
+
+/* V82 — smoother secure-login entrance and immediate Home dashboard visibility */
+#login:not(.hidden){animation:v82-login-bg 16s ease-in-out infinite alternate}
+#login .login-card.v81-login-card{animation:v82-card-enter .62s cubic-bezier(.2,.78,.22,1) both}
+#login .brand-icon{will-change:transform;animation:v82-icon-enter .7s cubic-bezier(.2,.8,.2,1) .06s both}
+#homePage.v82-home-ready{visibility:visible!important;min-height:35vh}
+#homePage.v82-home-ready .dashboard-head,#homePage.v82-home-ready #metrics,#homePage.v82-home-ready .quick-actions{opacity:1;visibility:visible}
+#homePage.v82-home-refresh .dashboard-head{animation:v82-home-settle .36s ease-out both}
+#homePage.v82-home-ready .metrics .metric{animation:v82-metric-enter .42s cubic-bezier(.2,.7,.25,1) both}
+#homePage.v82-home-ready .metrics .metric:nth-child(2){animation-delay:35ms}#homePage.v82-home-ready .metrics .metric:nth-child(3){animation-delay:70ms}#homePage.v82-home-ready .metrics .metric:nth-child(4){animation-delay:105ms}
+@keyframes v82-login-bg{from{background-position:0% 0%,100% 100%,0% 50%}to{background-position:7% 4%,92% 90%,100% 50%}}
+@keyframes v82-card-enter{from{opacity:0;transform:translateY(15px) scale(.985);filter:blur(2px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+@keyframes v82-icon-enter{from{opacity:0;transform:translateY(5px) scale(.92)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes v82-home-settle{from{opacity:.72;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@keyframes v82-metric-enter{from{opacity:.6;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){#login:not(.hidden),#login .login-card.v81-login-card,#login .brand-icon,#homePage.v82-home-refresh .dashboard-head,#homePage.v82-home-ready .metrics .metric{animation:none!important}}
