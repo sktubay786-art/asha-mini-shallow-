@@ -889,35 +889,49 @@ window.ashaV77CustomerActions={open:actions,run,close,version:'V77'};
 })();
 
 
-/* ASHA Billing V82 — show a fully-rendered Home dashboard immediately after login */
+/* ASHA Billing V84 — one-pass Home activation (fixes repeated dashboard animation) */
 (function(){
-  'use strict';
-  const $=id=>document.getElementById(id);
-  let lastHomeRefresh=0;
-  function activateHome(reason){
-    const app=$('app'),home=$('homePage');
-    if(!app||app.classList.contains('hidden')||!home)return;
-    document.querySelectorAll('main .page, #app > .page').forEach(p=>p.classList.toggle('active',p===home));
-    document.querySelectorAll('.tabbar button[data-page]').forEach(b=>{
-      const active=b.dataset.page==='homePage';
-      b.classList.toggle('active',active);b.setAttribute('aria-current',active?'page':'false');
-    });
-    home.classList.add('v82-home-ready');
-    // Rebuild dashboard after the cloud pull / auth state update has had a chance to settle.
-    try{if(typeof window.renderAll==='function')window.renderAll(false);}catch(e){console.warn('V82 dashboard render:',e)}
-    try{if(typeof window.renderDash==='function')window.renderDash();}catch(e){console.warn('V82 dashboard metrics:',e)}
-    const now=Date.now();
-    if(now-lastHomeRefresh>180){lastHomeRefresh=now;home.classList.remove('v82-home-refresh');void home.offsetWidth;home.classList.add('v82-home-refresh');}
-  }
-  function scheduleHome(){[0,90,280,650,1300].forEach(ms=>setTimeout(()=>activateHome('login'),ms));}
-  // Successful login hides #login and reveals #app; observe that transition instead of relying on a second Home tap.
-  const app=$('app');
-  if(app&&window.MutationObserver){new MutationObserver(()=>{if(!app.classList.contains('hidden'))scheduleHome();}).observe(app,{attributes:true,attributeFilter:['class']});}
-  const login=$('login');
-  if(login&&window.MutationObserver){new MutationObserver(()=>{if(login.classList.contains('hidden'))scheduleHome();}).observe(login,{attributes:true,attributeFilter:['class']});}
-  // Also handle a remembered Firebase session and browser back/forward cache restoration.
-  document.addEventListener('DOMContentLoaded',scheduleHome,{once:true});
-  window.addEventListener('pageshow',()=>{if(!$('app')?.classList.contains('hidden'))scheduleHome();});
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!$('app')?.classList.contains('hidden'))scheduleHome();});
-  window.ashaAuditV82=()=>({build:'V83 iOS Polish',appVisible:!!$('app')&&!$('app').classList.contains('hidden'),homeActive:!!$('homePage')?.classList.contains('active'),homeTabActive:!!document.querySelector('.tabbar button[data-page="homePage"].active'),dashboardPresent:!!$('metrics')});
+'use strict';const $=id=>document.getElementById(id);let active=false,timer=0;
+function activate(){const app=$('app'),home=$('homePage');if(!app||app.classList.contains('hidden')||!home)return;
+document.querySelectorAll('main .page, #app > .page').forEach(p=>p.classList.toggle('active',p===home));
+document.querySelectorAll('.tabbar button[data-page]').forEach(b=>{const on=b.dataset.page==='homePage';b.classList.toggle('active',on);b.setAttribute('aria-current',on?'page':'false')});
+home.classList.add('v84-home-ready');if(!active){active=true;try{window.renderAll?.(false)}catch(e){}try{window.renderDash?.()}catch(e){}}
+}
+function queue(){clearTimeout(timer);timer=setTimeout(activate,100)}
+const app=$('app');if(app&&window.MutationObserver)new MutationObserver(()=>{if(!app.classList.contains('hidden')){active=false;queue()}else active=false}).observe(app,{attributes:true,attributeFilter:['class']});
+const login=$('login');if(login&&window.MutationObserver)new MutationObserver(()=>{if(login.classList.contains('hidden')&&!$('app')?.classList.contains('hidden'))queue()}).observe(login,{attributes:true,attributeFilter:['class']});
+document.addEventListener('DOMContentLoaded',queue,{once:true});window.ashaAuditV84=()=>({build:'V84 Single-pass Home',appVisible:!!$('app')&&!$('app').classList.contains('hidden'),homeActive:!!$('homePage')?.classList.contains('active'),activationCount:active?1:0});
+})();
+
+/* V84 — searchable history, clearer payment workflow and premium settings surfaces */
+(function(){
+'use strict';const $=id=>document.getElementById(id);
+const moneyText=v=>typeof window.money==='function'?money(v):'₹'+(Number(v)||0).toLocaleString('en-IN');
+const safe=v=>typeof window.esc==='function'?esc(v):String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function controls(){const head=$('historyPage')?.querySelector('.card');if(!head||$('v84HistorySearch'))return;
+const box=document.createElement('div');box.className='v84-history-tools';box.innerHTML='<label><span>Search bills / customers</span><input id="v84HistorySearch" type="search" placeholder="Bill no, name, phone, village…"></label><div class="v84-history-filter-row"><label><span>Month</span><input id="v84HistoryMonth" type="month"></label><label><span>Status</span><select id="v84HistoryStatus"><option value="all">All bills</option><option value="due">Due only</option><option value="paid">Fully paid</option></select></label></div><div id="v84HistorySummary" class="v84-history-summary"></div>';
+head.appendChild(box);['v84HistorySearch','v84HistoryMonth','v84HistoryStatus'].forEach(id=>$(id)?.addEventListener('input',drawHistory));}
+const oldHistory=window.renderHistory;
+function drawHistory(){if(!window.state||!Array.isArray(state.bills)){oldHistory?.();return}controls();const q=($('v84HistorySearch')?.value||'').trim().toLowerCase(),month=$('v84HistoryMonth')?.value||'',status=$('v84HistoryStatus')?.value||'all';
+const dueOf=b=>typeof window.billDue==='function'?billDue(b):Math.max(0,(+b.allTotal||0)-(b.payments||[]).reduce((s,p)=>s+(+p.amount||0),0));
+const bills=state.bills.slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))).filter(b=>{const c=(state.customers||[]).find(x=>String(x.id)===String(b.customerId));const hay=[b.billNo,b.customerName,b.phone,b.village,c?.phone,c?.village].join(' ').toLowerCase();const d=dueOf(b);return(!q||hay.includes(q))&&(!month||String(b.date||'').startsWith(month))&&(status==='all'||(status==='due'?d>0:d<=0))});
+$('historyList').innerHTML=bills.map(b=>{const due=dueOf(b),paid=typeof window.billPaid==='function'?billPaid(b):(b.payments||[]).reduce((s,p)=>s+(+p.amount||0),0);const id=String(b.id||'').replace(/'/g,'\\\'');return `<article class="card v84-history-card"><div class="v84-history-top"><div><small>${safe(b.date||'No date')}</small><h3>${safe(b.billNo||'Bill')}</h3><p>${safe(b.customerName||'Customer')} · ${safe(b.village||'')}</p></div><span class="v84-status ${due>0?'is-due':'is-paid'}">${due>0?'DUE':'PAID'}</span></div><div class="v84-history-amounts"><div><small>Total</small><b>${moneyText(b.allTotal)}</b></div><div><small>Paid</small><b>${moneyText(paid)}</b></div><div><small>Due</small><b>${moneyText(due)}</b></div></div><div class="action-bar"><button class="btn" onclick="viewBill('${id}')">View bill</button><button class="btn primary" onclick="openPayment('${id}')">${due>0?'Receive payment':'Payment details'}</button></div></article>`}).join('')||'<div class="card muted">No bills match these filters.</div>';
+const total=bills.reduce((s,b)=>s+(+b.allTotal||0),0),paid=bills.reduce((s,b)=>s+(typeof window.billPaid==='function'?billPaid(b):(b.payments||[]).reduce((a,p)=>a+(+p.amount||0),0)),0),due=bills.reduce((s,b)=>s+dueOf(b),0);if($('v84HistorySummary'))$('v84HistorySummary').innerHTML=`<span>${bills.length} bills</span><span>Total <b>${moneyText(total)}</b></span><span>Collected <b>${moneyText(paid)}</b></span><span>Due <b>${moneyText(due)}</b></span>`;
+}
+if(typeof oldHistory==='function'){window.renderHistory=drawHistory;try{renderHistory=drawHistory}catch(e){}}
+function settingsPolish(){const page=$('settingsPage'),card=page?.querySelector('.card');if(!card||page.dataset.v84Polish)return;page.dataset.v84Polish='1';const h=card.querySelector('h2');if(h)h.insertAdjacentHTML('afterend','<p class="v84-settings-subtitle">Business profile · payment setup · bill appearance · cloud controls</p>');
+const map=[['Company Name','Business profile','Business identity and contact details'],['UPI ID','Payments & QR','UPI ID, QR mode and payment collection'],['Default Print Size','Bill design','Choose the default bill layout']];
+map.forEach(([key,title,sub])=>{const label=[...card.querySelectorAll('label')].find(l=>l.textContent.trim().toLowerCase().includes(key.toLowerCase()));if(!label)return;const block=document.createElement('div');block.className='v84-settings-section';block.innerHTML=`<div class="v84-settings-section-title"><span>${title==='Business profile'?'▦':title==='Payments & QR'?'↗':'▤'}</span><div><b>${title}</b><small>${sub}</small></div></div>`;label.parentNode.insertBefore(block,label)});
+const save=$('saveSettingsBtn');if(save&&!save.dataset.v84Toast){save.dataset.v84Toast='1';save.addEventListener('click',()=>{setTimeout(()=>{save.textContent='✓ Settings saved';save.classList.add('v84-saved');setTimeout(()=>{save.textContent='Save Settings';save.classList.remove('v84-saved')},1600)},100)})}}
+function polishPayments(){
+ const page=$('payPage'),card=page?.querySelector('.card');if(!card||page.dataset.v84PayPolished)return;page.dataset.v84PayPolished='1';
+ const title=card.querySelector('h2');if(title)title.insertAdjacentHTML('afterend','<p class="v84-pay-subtitle">Record real collections separately from settlement or adjustment entries.</p>');
+ const amount=$('payAmount');if(amount){amount.min='0.01';amount.step='0.01';amount.inputMode='decimal';amount.addEventListener('input',()=>{const b=(state.bills||[]).find(x=>String(x.id)===String($('payBill')?.value));const due=b&&typeof window.billDue==='function'?billDue(b):0;const hint=$('v84PayHint');if(hint)hint.textContent=Number(amount.value)>due&&due>0?'Amount is higher than this bill’s current due. Confirm it is intentional.':''})}
+ const info=$('payInfo');if(info&&!$('v84PaymentHistory')){const extra=document.createElement('div');extra.id='v84PaymentHistory';extra.className='v84-payment-history';info.insertAdjacentElement('afterend',extra)}
+ const hint=document.createElement('p');hint.id='v84PayHint';hint.className='v84-pay-hint';$('payInfo')?.insertAdjacentElement('afterend',hint);
+ const old=window.updatePayInfo;if(typeof old==='function'&&!old.__v84){const wrapped=function(){old.apply(this,arguments);const b=(state.bills||[]).find(x=>String(x.id)===String($('payBill')?.value));const target=$('v84PaymentHistory');if(!target)return;if(!b){target.innerHTML='';return}const due=typeof window.billDue==='function'?billDue(b):0;const paid=typeof window.billPaid==='function'?billPaid(b):(b.payments||[]).reduce((s,p)=>s+(+p.amount||0),0);const total=+b.allTotal||0;const pct=total>0?Math.min(100,Math.max(0,paid/total*100)):100;target.innerHTML=`<div class="v84-pay-progress"><div><span>Payment progress</span><b>${Math.round(pct)}%</b></div><div class="v84-pay-track"><i style="width:${pct}%"></i></div><div class="v84-pay-numbers"><span>Paid ${moneyText(paid)}</span><span>Remaining ${moneyText(due)}</span></div></div><h3>Recent entries</h3>${(b.payments||[]).slice().reverse().slice(0,5).map(p=>`<div class="v84-pay-entry"><span><b>${safe(p.mode||'Payment')}</b><small>${safe(p.date||'')} · ${safe(p.receivedIn||'')} ${p.note?'· '+safe(p.note):''}</small></span><strong>${moneyText(p.amount)}</strong></div>`).join('')||'<p class="muted">No payment entries yet.</p>'}`};wrapped.__v84=true;window.updatePayInfo=wrapped;try{updatePayInfo=wrapped}catch(e){}}
+ }
+ function init(){controls();settingsPolish();polishPayments();if(typeof window.renderHistory==='function')window.renderHistory();if(typeof window.updatePayInfo==='function')window.updatePayInfo()}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+window.ashaAuditV84Features=()=>({historySearch:!!$('v84HistorySearch'),historyFilters:!!$('v84HistoryStatus'),settingsPolished:!!$('settingsPage')?.dataset.v84Polish,paymentPage:!!$('payPage'),calculator:!!$('calcPage')});
 })();
