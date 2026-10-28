@@ -935,3 +935,92 @@ function polishPayments(){
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 window.ashaAuditV84Features=()=>({historySearch:!!$('v84HistorySearch'),historyFilters:!!$('v84HistoryStatus'),settingsPolished:!!$('settingsPage')?.dataset.v84Polish,paymentPage:!!$('payPage'),calculator:!!$('calcPage')});
 })();
+
+
+/* ASHA Billing V85 — preserve the complete dashboard, prevent repeat entrance effects,
+   and normalize bill-rate units before the existing reminder/share workflow. */
+(function(){
+ 'use strict';
+ const $=id=>document.getElementById(id);
+ const n=v=>Number.isFinite(Number(v))?Number(v):0;
+ const latestBillFor=cid=>(window.state?.bills||[]).filter(b=>String(b.customerId)===String(cid)).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))||String(b.billNo||'').localeCompare(String(a.billNo||'')))[0];
+ function conversionRate(rate, from, to){
+   const perBigha = from==='katha' ? n(rate)*20 : from==='decimal' ? n(rate)*40 : n(rate);
+   return to==='katha' ? perBigha/20 : to==='decimal' ? perBigha/40 : perBigha;
+ }
+ function normalizeBillForDisplay(source){
+   if(!source)return source;
+   const b={...source};
+   const unit=['bigha','katha','decimal'].includes(String(b.unit))?String(b.unit):'bigha';
+   const rateUnit=['bigha','katha','decimal'].includes(String(b.rateUnit))?String(b.rateUnit):unit;
+   // Rates are expressed per land unit. Convert legacy rateUnit records instead of
+   // multiplying decimal/katha land by a per-bigha rate or printing a misleading rate.
+   const rate=conversionRate(n(b.rate),rateUnit,unit);
+   b.unit=unit;b.rateUnit=unit;b.rate=Number(rate.toFixed(4));
+   b.bigha=unit==='katha'?n(b.landAmount)/20:unit==='decimal'?n(b.landAmount)/40:n(b.landAmount);
+   b.current=Number((n(b.landAmount)*b.rate).toFixed(2));
+   b.previousDue=n(b.previousDue);
+   b.allTotal=Number((b.current+b.previousDue).toFixed(2));
+   return b;
+ }
+ // Keep the entire Home dashboard and its quick-action links present; only disable
+ // repeated entrance motion. No feature cards or metrics are removed.
+ function preserveHome(){
+   const home=$('homePage');if(!home)return;
+   home.classList.add('v85-home-stable');
+   const metrics=$('metrics');
+   if(metrics && !metrics.dataset.v85Guard){
+     metrics.dataset.v85Guard='1';
+     const observer=new MutationObserver(()=>{
+       // Repeated render calls may refresh values, but should not replay entry motion.
+       home.classList.add('v85-home-stable');
+     });
+     observer.observe(metrics,{attributes:true,childList:true,subtree:true});
+   }
+ }
+ // Ensure reminder and share actions use the same normalized bill preview/rate line.
+ const priorHTML=window.v64BillHTML;
+ if(typeof priorHTML==='function'&&!priorHTML.__v85RateSafe){
+   const safeHTML=function(source,mode){return priorHTML.call(this,normalizeBillForDisplay(source),mode)};
+   safeHTML.__v85RateSafe=true;window.v64BillHTML=safeHTML;
+ }
+ const priorReminder=window.v66BillReminder;
+ if(typeof priorReminder==='function'&&!priorReminder.__v85RateSafe){
+   const safeReminder=async function(cid,bid=''){
+     const source=bid?(window.state?.bills||[]).find(x=>String(x.id)===String(bid)):latestBillFor(cid);
+     if(!source){return priorReminder.call(this,cid,bid)}
+     // Temporarily normalize the source record for legacy reminder builders that clone
+     // the selected bill internally, then restore the user's stored record unchanged.
+     const snapshot={rate:source.rate,rateUnit:source.rateUnit,unit:source.unit,current:source.current,allTotal:source.allTotal,bigha:source.bigha};
+     const normalized=normalizeBillForDisplay(source);
+     Object.assign(source,{rate:normalized.rate,rateUnit:normalized.rateUnit,unit:normalized.unit,current:normalized.current,allTotal:normalized.allTotal,bigha:normalized.bigha});
+     try{return await priorReminder.call(this,cid,bid)}
+     finally{Object.assign(source,snapshot)}
+   };
+   safeReminder.__v85RateSafe=true;window.v66BillReminder=safeReminder;
+   window.v65BillReminder=function(cid,bid=''){return window.v66BillReminder(cid,bid)};
+   window.v64BillReminder=function(cid,bid=''){return window.v66BillReminder(cid,bid)};
+   window.shareCustomerBill=function(cid,bid=''){return window.v66BillReminder(cid,bid)};
+ }
+ // Older User Center buttons called several historical preview function names. Route
+ // all of those entry points to the same repaired reminder flow.
+ ['openBillPreviewV45','openBillPreviewV50','openBillPreviewV60','openBillReminderPreviewV60'].forEach(name=>{
+   if(typeof window[name]==='function'&&!window[name].__v85RateSafe){const fn=function(cid,bid=''){return window.v66BillReminder(cid,bid)};fn.__v85RateSafe=true;window[name]=fn;}
+ });
+ // Rebind visible User Center and menu actions after older wrappers have finished setting up.
+ function bindUserActions(){
+   const menu=$('v52Menu');if(menu&&!menu.dataset.v85ReminderBound){
+     menu.dataset.v85ReminderBound='1';
+     menu.addEventListener('click',e=>{const b=e.target.closest('#mBillReminder,#v52BillReminder');if(!b)return;const cid=window.activeCustomer||window.actionContext?.customerId||window.actionContext?.cid;if(cid){e.preventDefault();e.stopImmediatePropagation();window.v66BillReminder(cid)}} ,true);
+   }
+   document.querySelectorAll('[data-v73-detail-action="reminder"]').forEach(btn=>{
+     if(btn.dataset.v85Bound)return;btn.dataset.v85Bound='1';
+     btn.addEventListener('click',e=>{const cid=window.activeCustomer;if(cid){e.preventDefault();e.stopImmediatePropagation();window.v66BillReminder(cid)}},true);
+   });
+ }
+ function init(){preserveHome();bindUserActions();const chip=document.getElementById('buildChip');if(chip)chip.textContent='V85 · Complete User Experience';}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+ document.addEventListener('click',e=>{if(e.target.closest('.tabbar button,[data-page]'))setTimeout(preserveHome,0)});
+ setTimeout(()=>{const chip=document.getElementById('buildChip');if(chip)chip.textContent='V85 · Complete User Experience'},5200);
+ window.ashaAuditV85=()=>({build:'V85 Complete Dashboard + Rate-safe Reminder',homeMetrics:!!$('metrics')&&!!$('metrics').children.length,homeQuickActions:!!$('homePage .quick-actions')||!!$('homePage .quick-actions button'),userList:!!$('customerList'),billReminder:typeof window.v66BillReminder==='function',settings:!!$('settingsPage')});
+})();
