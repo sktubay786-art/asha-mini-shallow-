@@ -1,7 +1,7 @@
 const OWNER_UID="FZIhTAr0JEMoHCeQd3kr2t8cJKk2";
-const firebaseConfig=window.ASHA_FIREBASE_CONFIG||null;
+const firebaseConfig={apiKey:"AIzaSyCzC5aFnFbnsYBZ370MktK9XOrjwiLQk0E",authDomain:"asha-app-745be.firebaseapp.com",projectId:"asha-app-745be",storageBucket:"asha-app-745be.firebasestorage.app",messagingSenderId:"309162286021",appId:"1:309162286021:web:bc0d2a92a170c5f9c5c9ac",measurementId:"G-RRGVNEFGZQ"};
 let auth=null,db=null,DOC=null;
-try{if(firebaseConfig&&firebaseConfig.apiKey){firebase.initializeApp(firebaseConfig);auth=firebase.auth();db=firebase.firestore();DOC=db.collection("ashaMiniShallow").doc("ekramul-main");auth.setPersistence(firebase.auth.Auth.Persistence.SESSION)}else{console.error("Firebase config missing. Copy .env.example to .env and set Firebase values.")}}catch(e){console.warn(e)}
+try{firebase.initializeApp(firebaseConfig);auth=firebase.auth();db=firebase.firestore();DOC=db.collection("ashaMiniShallow").doc("ekramul-main");auth.setPersistence(firebase.auth.Auth.Persistence.SESSION)}catch(e){console.warn(e)}
 const KEY="asha_v29_fresh_ios_pro";
 const DEFAULT={settings:{company:"আশা মিনি শ্যালো",owner:"SK EKRAMUL Haque",contact:"9564061920",address:"Raghunathpur, Chaklachipur, Ghatal, Paschim Medinipur, 721232",upi:"8710065540@axl",payee:"SK ENAMUL HAQUE",country:"+91",accent:"#075c39",print:"thermal80",template:"premium"},customers:[],bills:[]};
 let state=loadState(),currentBill=null,activeCustomer=null,deferredPrompt=null,calcVal="";
