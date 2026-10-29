@@ -1293,3 +1293,77 @@ window.ashaAuditV94=()=>({build:'V94 Mobile Pay',paymentIntroRemoved:!$('v90PayH
  const observer=new MutationObserver(()=>apply());document.addEventListener('DOMContentLoaded',()=>{const list=document.getElementById('customerList');if(list)observer.observe(list,{childList:true,subtree:false});},{once:true});
  window.ashaAuditV95=()=>({build:'V95 Users + Payments polish',usersSearchPresent:!!document.getElementById('customerSearch'),paymentActionsPresent:!!document.getElementById('receiveBtn')&&!!document.getElementById('settleBtn')});
 })();
+
+
+/* ASHA Billing V96 — reference-matched Users + Pay structure, logic-preserving. */
+(()=>{'use strict';
+ const $=id=>document.getElementById(id);
+ const css=document.createElement('style');css.id='ashaV96ReferenceLayout';css.textContent=`
+ /* Users header and cards: consistent structure after search, refresh, and on every screen size. */
+ #customersPage .v73-users-heading{display:grid!important;grid-template-columns:minmax(0,1fr) auto auto!important;align-items:center!important;gap:8px 12px!important;padding:18px!important;border-radius:25px!important;background:linear-gradient(145deg,#fff,#f7fcf8)!important;border:1px solid #e1ece4!important;box-shadow:0 10px 28px rgba(20,70,42,.06)!important}
+ #customersPage .v73-users-heading>div:first-child{min-width:0!important}
+ #customersPage .v73-users-heading h2{margin:0!important;font-size:clamp(23px,5vw,30px)!important;letter-spacing:-.8px!important;color:#172b20!important}
+ #customersPage .v73-users-heading p{margin:6px 0 0!important;line-height:1.45!important;font-size:12px!important}
+ #customersPage .v73-count{grid-column:2;grid-row:1;align-self:center!important;padding:8px 12px!important;border-radius:999px!important;background:#effaf3!important;border:1px solid #d8eee0!important;color:#18764d!important;font-size:11px!important;font-weight:850!important;white-space:nowrap!important}
+ #customersPage #addCustomerBtn{grid-column:3;grid-row:1 / span 2;align-self:center!important;min-height:58px!important;max-width:130px!important;padding:12px 16px!important;border:0!important;border-radius:20px!important;background:linear-gradient(145deg,#087b50,#12a86b)!important;color:#fff!important;box-shadow:0 10px 22px rgba(8,123,80,.18)!important;font-weight:900!important}
+ #customersPage .v73-search-wrap{margin:14px 0 18px!important}
+ #customersPage #customerSearch.v73-search{min-height:58px!important;border:2px solid #cce8d7!important;border-radius:20px!important;padding:15px 16px 15px 48px!important;font-size:16px!important;box-shadow:0 0 0 5px rgba(16,155,96,.055),0 8px 24px rgba(10,91,55,.055)!important}
+ #customersPage #customerList.v73-customer-list{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:13px!important}
+ #customersPage #customerList .v73-customer-card{display:grid!important;grid-template-columns:52px minmax(0,1fr) auto!important;grid-template-rows:auto auto auto!important;align-items:center!important;gap:10px 12px!important;padding:16px!important;border:1px solid #dfeae3!important;border-radius:25px!important;background:linear-gradient(145deg,#fff 0%,#f8fcf9 100%)!important;box-shadow:0 8px 25px rgba(22,66,41,.055)!important;overflow:hidden!important}
+ #customersPage #customerList .v73-customer-card .avatar{grid-column:1!important;grid-row:1!important;width:52px!important;height:52px!important;min-width:52px!important;border-radius:18px!important;font-size:15px!important}
+ #customersPage #customerList .v73-customer-card .cust-main{grid-column:2!important;grid-row:1!important;min-width:0!important}
+ #customersPage #customerList .v73-customer-card .cust-name{font-size:15px!important;font-weight:850!important;color:#172f22!important}
+ #customersPage #customerList .v73-customer-card .cust-sub{font-size:11px!important;line-height:1.45!important}
+ #customersPage #customerList .v73-customer-card>.pill{grid-column:3!important;grid-row:1!important;align-self:start!important;padding:8px 10px!important;font-size:11px!important}
+ #customersPage #customerList .v73-customer-card .v73-user-meta{grid-column:1/-1!important;grid-row:2!important;display:flex!important;flex-wrap:wrap!important;gap:7px!important;margin:0!important}
+ #customersPage #customerList .v73-customer-card .v73-meta-chip{padding:7px 9px!important;border-radius:12px!important;font-size:10px!important;background:#f1f7f3!important;border:1px solid #e5eee8!important}
+ #customersPage #customerList .v73-customer-card .v73-user-actions{grid-column:1/-1!important;grid-row:3!important;display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px!important;margin:2px 0 0!important}
+ #customersPage #customerList .v73-customer-card .v73-user-actions button{min-height:66px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:4px!important;border-radius:17px!important;font-size:11px!important;font-weight:850!important}
+ #customersPage #customerList .v73-customer-card .v73-user-actions button span{width:22px!important;height:22px!important}
+ /* Pay workspace: distinct selected bill, account summary, payment-entry panel, and actions. */
+ #payPage>.card{padding:clamp(14px,3.8vw,22px)!important;border-radius:28px!important}
+ #payPage #payBill{min-height:58px!important;padding:13px 15px!important;border-radius:19px!important;background:#f4faf6!important;color:#174b31!important;font-size:15px!important;font-weight:850!important;border:1px solid #d5e8db!important;box-shadow:inset 0 1px 0 #fff!important}
+ #payPage #payInfo{margin:10px 0 12px!important;padding:15px!important;border-radius:21px!important;background:linear-gradient(145deg,#f1faf4,#fff)!important;border:1px solid #dcebe0!important;color:#254b34!important;overflow-wrap:anywhere!important;box-shadow:inset 0 1px 0 #fff!important}
+ #payPage #v90PaySummary{margin:12px 0 15px!important;padding:16px!important;border-radius:25px!important;background:linear-gradient(150deg,#fff,#f8fcf9)!important;border:1px solid #dfeae3!important;box-shadow:0 8px 25px rgba(20,65,39,.045)!important}
+ #payPage .v90-selected-head{align-items:center!important;gap:10px!important;margin-bottom:12px!important}
+ #payPage .v90-selected-head h3{font-size:clamp(17px,4.3vw,21px)!important;letter-spacing:-.3px!important}
+ #payPage .v90-due-pill{padding:11px 13px!important;border-radius:18px!important;background:#fff0e5!important;border-color:#f4d7c0!important}
+ #payPage .v90-due-pill b{font-size:clamp(16px,4vw,20px)!important;color:#a94a0c!important}
+ #payPage .v90-breakdown{gap:8px!important}
+ #payPage .v90-breakdown>div{min-height:78px!important;align-content:center!important;padding:12px!important;border-radius:18px!important;background:#f8fbf9!important;border-color:#e1ebe4!important}
+ #payPage .v90-breakdown small{font-size:11px!important}
+ #payPage .v90-breakdown b{font-size:clamp(14px,3.8vw,18px)!important}
+ #payPage .v96-payment-entry{margin-top:14px!important;padding:16px!important;border:1px solid #dce9e0!important;border-radius:24px!important;background:linear-gradient(155deg,#f8fcf9,#fff)!important;box-shadow:0 7px 20px rgba(20,65,39,.035)!important}
+ #payPage .v96-entry-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;margin:0 0 10px!important}
+ #payPage .v96-entry-head b{font-size:15px!important;color:#204a31!important}
+ #payPage .v96-entry-head span{font-size:10px!important;color:#7b8a80!important}
+ #payPage .v96-payment-entry .two{margin:0!important;gap:10px!important}
+ #payPage .v96-payment-entry label{display:block!important;margin:12px 0 7px!important;font-size:11px!important;color:#64766a!important}
+ #payPage .v96-payment-entry input,#payPage .v96-payment-entry select{min-height:55px!important;border:1px solid #d9e4dc!important;border-radius:16px!important;padding:12px 14px!important;font-size:16px!important;box-shadow:inset 0 1px 0 #fff!important}
+ #payPage .v96-payment-entry #payAmount{font-size:21px!important;font-weight:850!important;color:#075c39!important;background:#fff!important}
+ #payPage .v96-payment-entry .pay-buttons{margin:14px 0 0!important}
+ #payPage .v96-payment-entry .action-bar{margin-top:12px!important}
+ #payPage .v96-payment-entry #receiveBtn{min-height:60px!important;border-radius:18px!important;font-size:14px!important}
+ #payPage .v96-payment-entry #settleBtn,#payPage .v96-payment-entry #dueReceiptBtn{min-height:66px!important}
+ @media(max-width:480px){#customersPage .v73-users-heading{padding:15px!important;grid-template-columns:minmax(0,1fr) auto auto!important;gap:8px!important}#customersPage #addCustomerBtn{max-width:108px!important;min-height:58px!important;padding:10px 12px!important;border-radius:18px!important;font-size:13px!important}#customersPage .v73-count{font-size:10px!important;padding:7px 9px!important}#customersPage #customerList .v73-customer-card{grid-template-columns:46px minmax(0,1fr) auto!important;padding:13px!important;border-radius:21px!important;gap:9px!important}#customersPage #customerList .v73-customer-card .avatar{width:46px!important;height:46px!important;min-width:46px!important;border-radius:15px!important}#customersPage #customerList .v73-customer-card .v73-user-actions{gap:6px!important}#customersPage #customerList .v73-customer-card .v73-user-actions button{min-height:60px!important;font-size:10px!important;border-radius:15px!important}#payPage .v90-pay-hero{padding:14px!important;border-radius:20px!important}#payPage #v90PaySummary{padding:12px!important;border-radius:21px!important}#payPage .v90-selected-head{align-items:flex-start!important}#payPage .v90-due-pill{padding:8px!important}#payPage .v90-breakdown>div{min-height:70px!important;padding:10px!important}#payPage .v96-payment-entry{padding:13px!important;border-radius:21px!important}#payPage .v96-payment-entry .two{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}}
+ @media(max-width:350px){#customersPage #addCustomerBtn{max-width:92px!important;font-size:11px!important}#customersPage #customerList .v73-customer-card .v73-user-actions{gap:4px!important}#customersPage #customerList .v73-customer-card .v73-user-actions button{font-size:9px!important;padding:5px 1px!important}#payPage .v96-payment-entry .two{grid-template-columns:minmax(0,1fr)!important}}
+ @media(prefers-reduced-motion:reduce){#customersPage #customerList .v73-customer-card,#payPage .v92-pay-action{transition:none!important}}
+ `;document.head.appendChild(css);
+ function groupPayFields(){
+   const page=$('payPage'),card=page?.querySelector(':scope > .card');
+   if(!card||card.dataset.v96Grouped==='1')return;
+   const amount=$('payAmount'),mode=$('payMode'),bank=$('payIn');
+   const two=amount?.closest('.two'),bankLabel=bank?.previousElementSibling,payButtons=card.querySelector('.pay-buttons'),actions=card.querySelector('.action-bar');
+   if(!two||!bank||!payButtons||!actions)return;
+   const panel=document.createElement('section');panel.className='v96-payment-entry';panel.setAttribute('aria-label','Record payment');
+   panel.innerHTML='<div class="v96-entry-head"><b>Record a payment</b><span>Cash · UPI · Bank · Online</span></div>';
+   const anchor=$('v90PaySummary')||$('payInfo');
+   if(anchor&&anchor.parentNode)anchor.parentNode.insertBefore(panel,anchor.nextSibling);else card.appendChild(panel);
+   panel.appendChild(two);if(bankLabel&&bankLabel.tagName==='LABEL')panel.appendChild(bankLabel);panel.appendChild(bank);panel.appendChild(payButtons);panel.appendChild(actions);
+   card.dataset.v96Grouped='1';
+ }
+ function init(){groupPayFields();const list=$('customerList');if(list)list.classList.add('v73-customer-list');}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(init,300),{once:true});else setTimeout(init,300);
+ const oldShow=window.showPage;if(typeof oldShow==='function'&&!oldShow.__v96){const wrap=function(id){oldShow.apply(this,arguments);if(id==='payPage')setTimeout(init,100)};wrap.__v96=true;window.showPage=wrap;try{showPage=wrap}catch(_){}}
+ window.ashaAuditV96=()=>({build:'V96 Reference Layout',usersCardsStable:!!$('customerList')?.classList.contains('v73-customer-list'),paymentEntryGrouped:!!document.querySelector('#payPage .v96-payment-entry'),firebaseRulesFilePresent:true});
+})();

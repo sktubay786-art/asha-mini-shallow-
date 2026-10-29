@@ -1,7 +1,7 @@
 {
   "name": "ASHA Billing",
   "short_name": "ASHA Billing",
-  "start_url": "./index.html?v=95",
+  "start_url": "./index.html?v=96",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f5f7f6",
@@ -20,5 +20,5 @@
       "purpose": "any maskable"
     }
   ],
-  "version": "95"
+  "version": "96"
 }
