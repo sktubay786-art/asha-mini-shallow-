@@ -1,4 +1,4 @@
-const CACHE='asha-billing-v97-ui-refresh';
+const CACHE='asha-billing-v100-ui-refresh';
 const ASSETS=['./','./index.html?v=97','./style.css?v=97','./app.js?v=97','./upgrade.js?v=97','./manifest.json?v=97','./icon-192.png','./icon-512.png'];
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).catch(()=>{}))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim()});

@@ -1,6 +1,6 @@
 {
-  "name": "ASHA Billing",
-  "short_name": "ASHA Billing",
+  "name": "ASHA Billing V100",
+  "short_name": "ASHA Billing V100",
   "start_url": "./index.html?v=94",
   "scope": "./",
   "display": "standalone",
