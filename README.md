@@ -1,4 +1,4 @@
-# ASHA Billing — Fresh App 1.0
+# ASHA Billing — Fresh App 2.0
 
 A clean, standalone rebuild. It does not load any previous `app.js`, `upgrade.js`, or legacy UI code.
 

@@ -1,4 +1,4 @@
-// Intentionally no persistent cache: fresh network-loaded app files on every launch.
-self.addEventListener('install',e=>self.skipWaiting());
-self.addEventListener('activate',e=>e.waitUntil((async()=>{for(const k of await caches.keys())await caches.delete(k);await self.clients.claim()})()));
-self.addEventListener('fetch',e=>{});
+// ASHA Fresh 2.0: network-only worker; no app-shell or runtime caching.
+self.addEventListener('install', event => self.skipWaiting());
+self.addEventListener('activate', event => event.waitUntil((async () => { for (const key of await caches.keys()) await caches.delete(key); await self.clients.claim(); })()));
+self.addEventListener('fetch', () => {});
