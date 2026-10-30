@@ -1,21 +1,24 @@
 {
   "name": "ASHA Billing",
-  "short_name": "ASHA",
-  "start_url": "./",
+  "short_name": "ASHA Billing",
+  "start_url": "./index.html?v=94",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f2f7f3",
-  "theme_color": "#087a50",
+  "background_color": "#f5f7f6",
+  "theme_color": "#087b50",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "./icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "icon-512.png",
+      "src": "./icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
-  ]
+  ],
+  "version": "94"
 }
