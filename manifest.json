@@ -1,7 +1,7 @@
 {
-  "name": "ASHA Billing V100",
-  "short_name": "ASHA Billing V100",
-  "start_url": "./index.html?v=94",
+  "name": "ASHA Billing V101",
+  "short_name": "ASHA Billing V101",
+  "start_url": "./index.html?v=101",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f5f7f6",
@@ -20,5 +20,5 @@
       "purpose": "any maskable"
     }
   ],
-  "version": "94"
+  "version": "101"
 }
