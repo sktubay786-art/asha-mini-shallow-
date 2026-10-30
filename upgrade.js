@@ -1248,11 +1248,11 @@ window.ashaAuditV94=()=>({build:'V94 Mobile Pay',paymentIntroRemoved:!$('v90PayH
 })();
 /* V97 UI polish only: preserves existing data, Firebase and payment handlers. */
 (()=>{'use strict';
-const setBuild=()=>{document.documentElement.classList.add('asha-v97');const m=document.querySelector('meta[name="app-build"]');if(m)m.content='V97 Users + Pay + Settings UI';const c=document.querySelector('.hero-chips span:last-child');if(c)c.textContent='V97 · Refined UI';};
+const setBuild=()=>{document.documentElement.classList.add('asha-v97','asha-v103');const m=document.querySelector('meta[name="app-build"]');if(m)m.content='V103 Complete App Refresh';const c=document.querySelector('.hero-chips span:last-child');if(c)c.textContent='V103 · Complete App Refresh';};
 const decorate=()=>{setBuild();const add=document.getElementById('addCustomerBtn');if(add){add.innerHTML='<span aria-hidden="true">＋</span> Add User';add.setAttribute('aria-label','Add user');}const search=document.getElementById('customerSearch');if(search){search.placeholder='Search user, phone, village…';search.setAttribute('aria-label','Search users by name, phone or village');}const settings=document.querySelector('#settingsPage h2');if(settings)settings.textContent='Settings & Preferences';};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',decorate,{once:true});else decorate();
 const prior=window.showPage;if(typeof prior==='function'&&!prior.__v97){const wrapped=function(id){const out=prior.apply(this,arguments);if(['customersPage','payPage','settingsPage'].includes(id))setTimeout(decorate,50);return out;};wrapped.__v97=true;window.showPage=wrapped;try{showPage=wrapped}catch(_){}}
-window.ashaAuditV97=()=>({build:'V97 Users + Pay + Settings UI',userSearch:!!document.getElementById('customerSearch'),payDesk:!!document.getElementById('payBill'),settings:!!document.getElementById('settingsPage')});
+window.ashaAuditV97=()=>({build:'V103 Complete App Refresh',userSearch:!!document.getElementById('customerSearch'),payDesk:!!document.getElementById('payBill'),settings:!!document.getElementById('settingsPage')});
 })();
 
 
