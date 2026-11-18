@@ -1,14 +1,8 @@
 {
-  "name": "asha-billing-v95",
+  "name": "asha-billing-v104",
   "private": true,
-  "version": "95.0.0",
+  "version": "104.0.0",
   "type": "module",
-  "scripts": {
-    "dev": "node scripts/generate-config.cjs && vite --host 0.0.0.0",
-    "build": "node scripts/generate-config.cjs && vite build",
-    "preview": "vite preview --host 0.0.0.0"
-  },
-  "devDependencies": {
-    "vite": "^6.4.1"
-  }
+  "scripts": {"dev":"vite --host 0.0.0.0", "build":"vite build", "preview":"vite preview --host 0.0.0.0"},
+  "devDependencies": {"vite":"^6.4.1"}
 }

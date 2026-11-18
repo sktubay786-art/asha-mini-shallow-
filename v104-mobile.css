@@ -1,0 +1,7 @@
+/* V104 responsive stability layer */
+html,body{min-height:100%;max-width:100%;overflow-x:hidden}body{padding-bottom:env(safe-area-inset-bottom)}
+.app{min-height:100dvh;padding-bottom:calc(104px + env(safe-area-inset-bottom))}main,.page,.card{min-width:0}.page:not(.active){display:none!important}.page.active{display:grid!important}
+.tabbar.ios-tabbar-v72{bottom:calc(8px + env(safe-area-inset-bottom))!important;touch-action:pan-x;isolation:isolate}.tabbar button{cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}.tabbar button:focus-visible{outline:3px solid #12a87366;outline-offset:2px}
+#calcKeys button{touch-action:manipulation;user-select:none;-webkit-user-select:none}#calcKeys button.op{background:#176b4b}#calcKeys button.eq{background:#18a66f;color:#fff}#calcKeys button:active{transform:scale(.96)}
+@media(max-width:520px){.tabbar.ios-tabbar-v72{width:calc(100% - 12px)!important;padding:5px!important;gap:1px!important}.tabbar button{padding:7px 0!important}.tabbar button i{width:30px;height:29px}.tabbar button i svg{width:19px;height:19px}.tabbar button span{font-size:8px!important;white-space:nowrap}.action-bar>*{min-width:0;flex:1 1 auto}.two{grid-template-columns:repeat(2,minmax(0,1fr))}.bill-form,.preview-panel{width:100%;max-width:100%}}
+@media(max-width:350px){.tabbar button span{font-size:7px!important}.tabbar button i{width:26px;height:26px}}
