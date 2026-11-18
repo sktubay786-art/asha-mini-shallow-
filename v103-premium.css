@@ -15,3 +15,65 @@ input,select,textarea{border:1px solid #dce7e0!important;border-radius:15px!impo
 @media(min-width:760px){main{padding:22px}.metrics{grid-template-columns:repeat(4,minmax(0,1fr))}.quick-actions{grid-template-columns:repeat(5,minmax(0,1fr))}#billPage{grid-template-columns:minmax(340px,.9fr) minmax(0,1.1fr)}#settingsPage>.card{grid-template-columns:repeat(2,minmax(0,1fr));align-items:end}#settingsPage h2,#settingsPage .action-bar,#settingsPage #cloudStatus{grid-column:1/-1}#settingsPage label{align-self:end}}
 @media(max-width:420px){main{padding:11px}.card{padding:15px!important}.hero{padding:15px 14px 18px}.metrics{gap:8px}.metric{padding:12px}.quick-actions button{min-height:96px;padding:12px}.tabbar.ios-tabbar-v72{width:calc(100% - 12px)!important;bottom:max(6px,env(safe-area-inset-bottom))!important}.tabbar button span{font-size:8px}}
 @media(prefers-reduced-motion:no-preference){.btn,.quick-actions button,.tabbar button{transition:transform .16s ease,box-shadow .16s ease,background .16s ease}.btn:active,.quick-actions button:active{transform:scale(.985)}}
+
+
+/* ASHA Billing refined restoration — keep the familiar V103 visual language */
+:root{--asha-ios-font:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",sans-serif}
+body,button,input,select,textarea{font-family:var(--asha-ios-font)!important;-webkit-font-smoothing:antialiased}
+button{ -webkit-tap-highlight-color:transparent}
+.users-head-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;justify-content:flex-end}
+.users-count{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:0 12px;border-radius:999px;background:#eaf7ef;color:#087b50;font-size:12px;font-weight:800;border:1px solid #d5ecdd}
+#customerList .v102-card{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+#customerList .v102-card:active{transform:scale(.994)}
+.v102-meta .v102-chip{display:inline-flex;align-items:center;gap:6px}
+.v102-meta .v102-chip svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;flex:none}
+.v102-btn{gap:6px!important;font-family:var(--asha-ios-font)!important;transition:transform .16s ease,background .16s ease,box-shadow .16s ease}
+.v102-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.v102-btn:active,.chat-actions button:active,.bubble-actions button:active{transform:scale(.96)}
+.v102-btn small{font-size:10px;letter-spacing:-.1px}
+.tabbar button i svg,.quick-actions .action-icon svg{stroke-linecap:round;stroke-linejoin:round}
+#customerCount{white-space:nowrap}
+.chat-modal{border-radius:25px 25px 0 0!important;overflow:hidden}
+.chat-head{backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.chat-head button{border-radius:13px!important;min-width:38px;min-height:38px}
+.chat-body{padding:14px!important;background:linear-gradient(180deg,#f3f8f5,#f7faf8)!important}
+.profile-overview,.profile-entry{background:#fff;border:1px solid #e1ebe4;border-radius:19px;padding:14px;margin-bottom:11px;box-shadow:0 5px 18px #173e2808}
+.profile-overview-title,.profile-entry-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.profile-overview-title{font-size:13px;font-weight:750;color:#52695b}
+.profile-overview-title>b{font-size:13px}
+.profile-due-text{color:#b45b1b}.profile-paid-text{color:#087b50}
+.profile-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:13px 0}
+.profile-metrics>div{padding:10px 8px;border-radius:13px;background:#f4f8f5;min-width:0}
+.profile-metrics small,.profile-entry-head small,.profile-payment small{display:block;color:#7b8c81;font-size:10px;margin-bottom:5px}
+.profile-metrics b{display:block;color:#173b2b;font-size:13px;overflow-wrap:anywhere}
+.profile-contact{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.profile-contact span{display:inline-flex;align-items:center;gap:6px;background:#edf7f0;color:#456c55;border-radius:999px;padding:7px 10px;font-size:11px}
+.profile-contact svg,.profile-payment-icon svg,.profile-entry-actions svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.profile-note{font-size:12px;line-height:1.55;color:#53685b;margin:10px 0 0;overflow-wrap:anywhere}
+.profile-section-title{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:800;color:#234b35;padding:10px 3px 7px}
+.profile-section-title span{font-size:11px;color:#7a8b80;background:#eaf2ec;border-radius:20px;padding:4px 8px}
+.profile-entry-head b{font-size:13px;color:#1c4933}.profile-status{font-size:10px;font-weight:800;border-radius:30px;padding:6px 9px;white-space:nowrap}
+.profile-status.is-due{background:#fff1e8;color:#b45b1b}.profile-status.is-paid{background:#eaf7ef;color:#087b50}
+.profile-entry-stats{display:flex;gap:16px;flex-wrap:wrap;font-size:11px;color:#75877d;margin:10px 0}
+.profile-entry-stats b{color:#214a34}
+.profile-entry-actions{display:flex;gap:8px}
+.profile-entry-actions button{display:inline-flex;align-items:center;gap:6px;border:1px solid #dce9e0;background:#f7fbf8;color:#176343;border-radius:11px;padding:8px 11px;font-size:11px;font-weight:750}
+.profile-payment{display:flex;align-items:center;gap:10px;padding:11px 4px;border-bottom:1px solid #e6eee8}
+.profile-payment-icon{width:32px;height:32px;display:grid;place-items:center;border-radius:11px;background:#eaf7ef;color:#087b50;flex:none}
+.profile-payment>div{min-width:0;flex:1}.profile-payment>div b{font-size:13px;color:#214a34}
+.profile-payment-tag{font-size:10px;color:#6e8175;text-align:right}
+.profile-empty{background:#fff;border:1px dashed #d9e6dd;border-radius:15px;padding:16px;text-align:center;color:#819087;font-size:12px;margin-bottom:10px}
+#billPreviewWrap{display:flex;justify-content:center;align-items:flex-start;padding:clamp(8px,2vw,18px)!important}
+#billPreview{width:100%;max-width:560px;margin:0 auto}
+#billPreview .invoice{width:100%;max-width:560px;margin:0 auto;padding:clamp(16px,3vw,25px);border-radius:16px;box-sizing:border-box;background:#fff;color:#1d3829;box-shadow:0 8px 26px #173e2812}
+#billPreview .invoice h3{text-align:center;letter-spacing:1.2px;font-size:15px;margin:15px 0;color:#087b50}
+#billPreview .invoice .invoice-head{padding:16px 12px;border-radius:13px;background:linear-gradient(145deg,#eff9f2,#f8fcf9)}
+#billPreview .invoice .invoice-head h2{font-size:22px;letter-spacing:-.5px}
+#billPreview .invoice .report-row{padding:9px 3px;font-size:12px;line-height:1.45}
+#billPreview .invoice .invoice-pay{padding:13px;border:1px solid #e0ece4;background:#f7fbf8;border-radius:14px}
+#billPreview .invoice .qr{width:116px!important;height:116px!important;max-width:34vw;object-fit:contain;background:#fff;border-radius:8px;padding:4px}
+#billPreview .invoice-foot{text-align:center;padding-top:12px;color:#718477;font-size:11px}
+#billPage .preview-panel{min-width:0}
+@media(min-width:760px){#billPreview{max-width:590px}#billPreview .invoice{max-width:590px}}
+@media(max-width:520px){.users-head-actions{gap:6px}.users-count{font-size:10px;padding:0 9px}#customersPage .row-head{gap:10px}.v102-actions{grid-template-columns:repeat(4,minmax(0,1fr))}.profile-metrics{gap:5px}.profile-metrics>div{padding:9px 6px}.profile-metrics b{font-size:11px}#billPreview .invoice .qr{width:92px!important;height:92px!important}}
+@media(prefers-reduced-motion:reduce){#customerList .v102-card,.v102-btn{transition:none!important}}

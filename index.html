@@ -1,4 +1,4 @@
-<!doctype html><html lang="bn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#087b50"><title>ASHA Billing</title><link rel="manifest" href="./manifest.json"><link rel="stylesheet" href="./style.css"><link rel="stylesheet" href="./v103-premium.css"><link rel="stylesheet" href="./v104-ios.css"><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script></head><body>
+<!doctype html><html lang="bn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#087b50"><title>ASHA Billing</title><link rel="manifest" href="./manifest.json"><link rel="stylesheet" href="./style.css"><link rel="stylesheet" href="./v103-premium.css"><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script></head><body>
 
   <div id="login" class="login">
     <div class="login-card">
@@ -31,7 +31,7 @@
       </div>
       <div class="hero-chips">
         <span id="cloudChip">Cloud: checking</span>
-        <span id="buildChip">V104 · iOS Experience</span>
+        <span id="buildChip">V103 · Refined Update</span>
       </div>
     </header>
 
@@ -54,7 +54,7 @@
       <section id="customersPage" class="page">
         <div class="card row-head">
           <div><h2>Users</h2><p class="muted">Customer profiles · bills · payments</p></div>
-          <button class="btn primary" id="addCustomerBtn">+ Add</button>
+          <div class="users-head-actions"><span id="customerCount" class="users-count">0 Users</span><button class="btn primary" id="addCustomerBtn">＋ Add User</button></div>
         </div>
         <input id="customerSearch" class="search" placeholder="Search name, village, phone">
         <div id="customerList" class="customer-list"></div>
@@ -67,7 +67,7 @@
           <select id="billCustomer"></select>
           <div class="prev-due-top">
             <label>Previous Due</label>
-            <input id="previousDue" type="number" value="0" step="0.01" placeholder="Enter previous due">
+            <input id="previousDue" type="number" value="0" step="0.01" placeholder="আগের বাকি লিখুন">
           </div>
 
 
@@ -244,12 +244,12 @@
 
   <div id="chatModal" class="chat-modal hidden">
     <div class="chat-head">
-      <button id="chatBack" aria-label="Back"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
+      <button id="chatBack">‹</button>
       <div class="avatar" id="chatAvatar">?</div>
       <div class="chat-title"><b id="chatName">Customer</b><span id="chatSub">Phone</span></div>
-      <button id="chatShare" aria-label="Share"><svg viewBox="0 0 24 24"><path d="M12 16V3m-5 5 5-5 5 5M5 13v7h14v-7"/></svg></button>
-      <button id="chatCall" aria-label="Call"><svg viewBox="0 0 24 24"><path d="M7 3h3l2 5-2 2a15 15 0 0 0 4 4l2-2 5 2v3c0 1-1 2-2 2C10 19 5 14 5 5c0-1 1-2 2-2z"/></svg></button>
-      <button id="chatWhats" aria-label="Message"><svg viewBox="0 0 24 24"><path d="M20 11.5a8 8 0 0 1-11.8 7L4 20l1.5-4.2A8 8 0 1 1 20 11.5z"/><path d="M9 9c1 3 3 5 6 6"/></svg></button>
+      <button id="chatShare">⤴</button>
+      <button id="chatCall">✆</button>
+      <button id="chatWhats">W</button>
     </div>
     <div id="chatBody" class="chat-body"></div>
     <div id="manualChatBar" class="manual-chat-bar">
@@ -257,14 +257,14 @@
       <button id="manualChatSend">Send</button>
     </div>
     <div class="chat-actions">
-      <button id="chatBill"><svg viewBox="0 0 24 24"><path d="M7 3h8l4 4v14H7zM15 3v5h4M10 12h6M10 16h6"/></svg><span>Bill</span></button>
-      <button id="chatPay"><svg viewBox="0 0 24 24"><path d="M12 3v18M17 7c-.8-1.2-2.2-2-4.5-2-2.5 0-4 1.2-4 3s1.5 2.8 4 3.2 4.5 1.2 4.5 3.3-1.8 3.5-4.5 3.5c-2.2 0-4-.8-5-2.4"/></svg><span>Pay</span></button>
-      <button id="chatSettle"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg><span>Settle</span></button>
-      <button id="chatEntries"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></svg><span>Entries</span></button>
-      <button id="chatManual"><svg viewBox="0 0 24 24"><path d="M20 11.5a8 8 0 0 1-11.8 7L4 20l1.5-4.2A8 8 0 1 1 20 11.5z"/></svg><span>Chat</span></button>
-      <button id="chatLedger"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></svg><span>Ledger</span></button>
-      <button id="chatEdit"><svg viewBox="0 0 24 24"><path d="m4 16-.8 4.8L8 20l11-11-4-4L4 16Z"/></svg><span>Edit</span></button>
-      <button id="chatMore"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg><span>More</span></button>
+      <button id="chatBill">Bill</button>
+      <button id="chatPay">Pay</button>
+      <button id="chatSettle">Settle</button>
+      <button id="chatEntries">Entries</button>
+      <button id="chatManual">Chat</button>
+      <button id="chatLedger">Ledger</button>
+      <button id="chatEdit">Edit</button>
+      <button id="chatMore">⋯</button>
     </div>
   </div>
 

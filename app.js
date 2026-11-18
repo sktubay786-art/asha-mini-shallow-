@@ -15,23 +15,6 @@ function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt
 function digits(s=''){return String(s).replace(/\D/g,'')}
 function phone(s=''){let d=digits(s);return !d?'':d.length===10?(state.settings.country||'+91')+' '+d:d.length>10&&d.startsWith('91')?'+91 '+d.slice(-10):s}
 function initials(s='?'){return s.trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase()}
-
-const UI_ICONS={
- location:'<path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>',
- bills:'<path d="M7 3h8l4 4v14H7z"/><path d="M15 3v5h4M10 12h6M10 16h6"/>',
- edit:'<path d="m4 16-.8 4.8L8 20l11-11-4-4L4 16Z"/><path d="m13.5 6.5 4 4"/>',
- ledger:'<path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/>',
- receive:'<path d="M12 3v18M17 7c-.8-1.2-2.2-2-4.5-2-2.5 0-4 1.2-4 3s1.5 2.8 4 3.2 4.5 1.2 4.5 3.3-1.8 3.5-4.5 3.5c-2.2 0-4-.8-5-2.4"/>',
- settle:'<path d="m5 12 4 4L19 6"/>',
- reminder:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>',
- call:'<path d="M7 3h3l2 5-2 2a15 15 0 0 0 4 4l2-2 5 2v3c0 1-1 2-2 2C10 19 5 14 5 5c0-1 1-2 2-2z"/>',
- trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 14h10l1-14M9 7V4h6v3"/>',
- phone:'<path d="M7 3h3l2 5-2 2a15 15 0 0 0 4 4l2-2 5 2v3c0 1-1 2-2 2C10 19 5 14 5 5c0-1 1-2 2-2z"/>',
- user:'<circle cx="12" cy="8" r="3.5"/><path d="M4 21a8 8 0 0 1 16 0"/>',
- calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/>',
- wallet:'<path d="M4 6h15a2 2 0 0 1 2 2v11H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h13"/><path d="M16 13h5"/><circle cx="16" cy="13" r=".5"/>'
-};
-function uiIcon(name){return `<svg class="ios-icon" viewBox="0 0 24 24" aria-hidden="true">${UI_ICONS[name]||UI_ICONS.user}</svg>`}
 function toBigha(v,u){v=Number(v)||0;return u==='katha'?v/20:u==='decimal'?v/40:v}
 function paid(b){return (b.payments||[]).reduce((s,p)=>s+(Number(p.amount)||0),0)}
 function due(b){return Math.max(0,(Number(b.allTotal)||0)-paid(b))}
@@ -42,28 +25,46 @@ function showPage(page){document.querySelectorAll('.page').forEach(p=>p.classLis
 function theme(){document.documentElement.style.setProperty('--accent',state.settings.accent||'#075c39');setText('companyTitle',state.settings.company||'ASHA Billing');setText('companySub',[state.settings.contact,state.settings.address].filter(Boolean).join(' • '))}
 function options(){const c='<option value="__new">+ New customer manually</option>'+state.customers.map(x=>`<option value="${esc(x.id)}">${esc(x.name)} — ${esc(x.phone)}</option>`).join('');$('billCustomer').innerHTML=c;$('payBill').innerHTML=state.bills.map(b=>`<option value="${esc(b.id)}">${esc(b.billNo)} · ${esc(b.customerName)} · Due ${money(due(b))}</option>`).join('');$('setPrint').innerHTML=$('printMode').innerHTML;$('setTemplate').innerHTML=$('template').innerHTML;$('setPrint').value=state.settings.print;$('setTemplate').value=state.settings.template;const villages=[...new Set(state.customers.map(c=>c.village).filter(Boolean))];const v='<option value="all">All villages</option>'+villages.map(x=>`<option>${esc(x)}</option>`).join('');$('homeVillage').innerHTML=v;$('reportVillage').innerHTML=v;toggleManual();updatePayInfo()}
 function dashboard(){const m=$('homeMonth').value,v=$('homeVillage').value||'all';const bs=state.bills.filter(b=>(!m||b.date?.startsWith(m))&&(v==='all'||b.village===v));const total=bs.reduce((s,b)=>s+(+b.allTotal||0),0),col=bs.reduce((s,b)=>s+paid(b),0),d=state.customers.reduce((s,c)=>s+customerDue(c.id),0);$('metrics').innerHTML=[['Total Bill',money(total)],['Collected',money(col)],['Total Due',money(d)],['Customers',state.customers.length]].map(([a,b])=>`<div class="metric"><small>${a}</small><b>${b}</b></div>`).join('')}
+function uiIcon(name){
+ const paths={
+  bill:'<path d="M7 3.5h7l4 4V20H7z"/><path d="M14 3.5v4h4M10 12h5M10 15.5h5"/>',
+  edit:'<path d="m4 16.5-.8 3.3 3.3-.8L19 6.5 15.5 3z"/><path d="m13.8 4.7 3.5 3.5"/>',
+  ledger:'<path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+  pay:'<path d="M12 3v18M16.5 7c-.8-1.3-2.2-2-4.5-2-2.5 0-4 1.2-4 3s1.4 2.7 4 3.2 4.5 1.2 4.5 3.3-1.8 3.5-4.5 3.5c-2.1 0-3.9-.8-4.8-2.4"/>',
+  settle:'<path d="m5 12 4.2 4.2L19 6.5"/>',
+  remind:'<path d="M4 12a8 8 0 1 1 2.3 5.7"/><path d="M4 5v6h6"/>',
+  call:'<path d="M7 3.8 9.5 7l-1.3 2.1a14 14 0 0 0 6.7 6.7l2.1-1.3 3.2 2.5-.8 3c-.2.7-.9 1.1-1.6 1A17.5 17.5 0 0 1 3.8 6.2c-.1-.7.3-1.4 1-1.6z"/>',
+  delete:'<path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/>'
+ };
+ return `<svg viewBox="0 0 24 24" aria-hidden="true">${paths[name]||paths.ledger}</svg>`;
+}
 function customers(){
  const q=$('customerSearch').value.toLowerCase();
  const list=state.customers.filter(c=>[c.name,c.phone,c.village,c.address].join(' ').toLowerCase().includes(q));
+ setText('customerCount',`${list.length} ${list.length===1?'User':'Users'}`);
  $('customerList').innerHTML=list.length?list.map(c=>{
   const d=customerDue(c.id),bs=state.bills.filter(b=>b.customerId===c.id),count=bs.length;
   const latest=bs.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0];
-  return `<article class="v104-user-card" data-customer="${esc(c.id)}">
-   <div class="v104-user-head"><div class="v104-avatar">${esc(initials(c.name))}</div>
-    <div class="v104-user-main"><div class="v104-name">${esc(c.name)}</div><div class="v104-phone">${uiIcon('phone')} ${esc(c.phone||'Phone not added')}</div></div>
-    <span class="v104-due ${d?'':'is-paid'}">${d?'Due '+money(d):'Paid'}</span></div>
-   <div class="v104-user-meta"><span>${uiIcon('location')}${esc(c.village||'Village not set')}</span><span>${uiIcon('bills')}${count} Bills</span>${latest?`<span>${uiIcon('calendar')}${esc(latest.date||'')}</span>`:''}</div>
-   <div class="v104-user-balance"><div><small>Outstanding balance</small><b>${money(d)}</b></div><div><small>Total bills</small><b>${count}</b></div></div>
-   <div class="v104-actions">
-    <button class="v104-action is-primary" data-act="bill" data-id="${esc(c.id)}">${uiIcon('bills')}<small>New Bill</small></button>
-    <button class="v104-action" data-act="edit" data-id="${esc(c.id)}">${uiIcon('edit')}<small>Edit</small></button>
-    <button class="v104-action" data-act="ledger" data-id="${esc(c.id)}">${uiIcon('ledger')}<small>Profile</small></button>
-    <button class="v104-action" data-act="pay" data-id="${esc(c.id)}">${uiIcon('receive')}<small>Receive</small></button>
-    <button class="v104-action" data-act="settle" data-id="${esc(c.id)}">${uiIcon('settle')}<small>Settle</small></button>
-    <button class="v104-action" data-act="remind" data-id="${esc(c.id)}">${uiIcon('reminder')}<small>Reminder</small></button>
-    <button class="v104-action" data-act="call" data-id="${esc(c.id)}">${uiIcon('call')}<small>Call</small></button>
-    <button class="v104-action is-danger" data-act="delete" data-id="${esc(c.id)}">${uiIcon('trash')}<small>Delete</small></button>
-   </div></article>`;
+  return `<article class="v102-card" data-customer="${esc(c.id)}">
+   <div class="v102-top"><div class="v102-avatar">${esc(initials(c.name))}</div>
+    <div class="cust-main"><div class="v102-name">${esc(c.name)}</div><div class="v102-phone">${esc(c.phone||'No phone number')}</div></div>
+    <span class="v102-due ${d?'':'ok'}">${d?'Due '+money(d):'Paid'}</span>
+   </div>
+   <div class="v102-meta"><span class="v102-chip">${uiIcon('ledger')} ${esc(c.village||'Village not set')}</span>
+    <span class="v102-chip">${uiIcon('bill')} ${count} Bills</span>
+    ${latest?`<span class="v102-chip">Last bill · ${esc(latest.date||'')}</span>`:''}
+   </div>
+   <div class="v102-actions">
+    <button class="v102-btn primary" data-act="bill" data-id="${esc(c.id)}">${uiIcon('bill')}<small>New Bill</small></button>
+    <button class="v102-btn" data-act="edit" data-id="${esc(c.id)}">${uiIcon('edit')}<small>Edit</small></button>
+    <button class="v102-btn" data-act="ledger" data-id="${esc(c.id)}">${uiIcon('ledger')}<small>Ledger</small></button>
+    <button class="v102-btn" data-act="pay" data-id="${esc(c.id)}">${uiIcon('pay')}<small>Receive</small></button>
+    <button class="v102-btn" data-act="settle" data-id="${esc(c.id)}">${uiIcon('settle')}<small>Settle</small></button>
+    <button class="v102-btn" data-act="remind" data-id="${esc(c.id)}">${uiIcon('remind')}<small>Reminder</small></button>
+    <button class="v102-btn" data-act="call" data-id="${esc(c.id)}">${uiIcon('call')}<small>Call</small></button>
+    <button class="v102-btn danger" data-act="delete" data-id="${esc(c.id)}">${uiIcon('delete')}<small>Delete</small></button>
+   </div>
+  </article>`;
  }).join(''):'<div class="card muted">No customer yet</div>';
 }
 function renderAll(preview=false){theme();options();dashboard();customers();history();reports();landCalc();if(preview)previewBill()}
@@ -77,16 +78,9 @@ function invoice(b){
  const upi=state.settings.upi||'',payee=state.settings.payee||state.settings.company||'ASHA';
  const payAmount=dueAmt>0?dueAmt:Number(b.allTotal)||0;
  const upiLink=`upi://pay?pa=${encodeURIComponent(upi)}&pn=${encodeURIComponent(payee)}&am=${payAmount.toFixed(2)}&cu=INR&tn=${encodeURIComponent(b.billNo||'ASHA Bill')}`;
- const qr=`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(upiLink)}`;
- const rows=[['Season',b.season||'-'],['Land',`${b.landAmount||0} ${b.unit||''}`],['Converted',`${(Number(b.bigha)||0).toFixed(3)} বিঘা`],['Rate / Bigha',money(b.rate)],['Current Bill',money(b.current)],['Previous Due',money(b.previousDue)]];
- return `<div class="invoice v104-invoice ${esc(tpl)}">
-  <header class="v104-invoice-head"><div class="v104-brand-mark">${uiIcon('bills')}</div><div><h2>${esc(state.settings.company)}</h2><p>${esc(state.settings.owner)} · ${esc(state.settings.contact)}</p><p>${esc(state.settings.address)}</p></div><span class="v104-invoice-tag">INVOICE</span></header>
-  <div class="v104-invoice-customer"><div><small>BILL TO</small><b>${esc(b.customerName)}</b><span>${esc(b.phone||'Phone not added')}</span><span>${esc(b.village||'')}</span></div><div class="v104-invoice-number"><small>INVOICE NO.</small><b>${esc(b.billNo)}</b><small>${esc(b.date)}</small></div></div>
-  <div class="v104-invoice-lines">${rows.map(([a,v])=>`<div><span>${esc(a)}</span><b>${esc(v)}</b></div>`).join('')}</div>
-  <div class="v104-invoice-total"><div><span>Current bill</span><b>${money(b.current)}</b></div><div><span>Previous due</span><b>${money(b.previousDue)}</b></div><div class="grand"><span>Total amount</span><b>${money(b.allTotal)}</b></div><div><span>Paid / Adjusted</span><b>${money(paid(b))}</b></div><div class="balance"><span>Balance due</span><b>${money(dueAmt)}</b></div></div>
-  <div class="v104-invoice-pay"><div><small>PAYMENT DETAILS</small><b>UPI · ${esc(upi||'Not set')}</b><span>Payee: ${esc(payee)}</span><span>Scan to pay ${money(payAmount)}</span></div><img class="qr" src="${qr}" alt="UPI QR code"></div>
-  ${b.note?`<p class="v104-invoice-note">${esc(b.note)}</p>`:''}<footer class="v104-invoice-foot">Thank you for your business · ${esc(state.settings.company)}</footer>
- </div>`;
+ const qr=`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiLink)}`;
+ const rows=[['Bill No.',b.billNo],['Date',b.date],['Customer',b.customerName],['Phone',b.phone||'-'],['Village',b.village||'-'],['Address',b.address||'-'],['Season',b.season||'-'],['Land',`${b.landAmount||0} ${b.unit||''}`],['Converted',`${(Number(b.bigha)||0).toFixed(3)} বিঘা`],['Rate / Bigha',money(b.rate)],['Current Bill',money(b.current)],['Previous Due',money(b.previousDue)],['Total',money(b.allTotal)],['Paid / Adjusted',money(paid(b))],['Balance Due',money(dueAmt)]];
+ return `<div class="invoice ${esc(tpl)} premium"><div class="invoice-head"><h2>${esc(state.settings.company)}</h2><p>${esc(state.settings.owner)} · ${esc(state.settings.contact)}</p><p>${esc(state.settings.address)}</p></div><h3> BILL / INVOICE</h3>${rows.map(([a,v])=>`<div class="report-row"><span>${esc(a)}</span><b>${esc(v)}</b></div>`).join('')}<div class="report-row"><span>Status</span><b>${dueAmt>0?'DUE':'PAID'}</b></div><hr><div class="invoice-pay"><div><b>UPI: ${esc(upi||'Not set')}</b><p>Payee: ${esc(payee)}</p><p>Scan & Pay ${money(payAmount)}</p></div><img class="qr" src="${qr}" alt="UPI QR code"></div><p>${esc(b.note||'')}</p><div class="invoice-foot">Thank you · ${esc(state.settings.company)}</div></div>`
 }
 function renderPreview(b){$('billPreview').innerHTML=invoice(b)}
 function previewBill(){const b=formBill();if(b){currentBill=b;renderPreview(b)}}
@@ -115,28 +109,35 @@ function reminder(b){const msg=`ASHA Billing\nBill: ${b.billNo}\nCustomer: ${b.c
 function printBill(){if(!$('billPreview').innerHTML)return previewBill();window.print()}
 async function pdf(){if(!currentBill)currentBill=formBill();if(!currentBill)return alert('Preview a bill first');if(!window.html2pdf)return printBill();await window.html2pdf().set({margin:8,filename:`${currentBill.billNo}.pdf`,html2canvas:{scale:2},jsPDF:{unit:'mm',format:'a4'}}).from($('billPreview')).save()}
 function openChat(cid){
- activeCustomer=cid;const c=state.customers.find(x=>x.id===cid);if(!c)return;
+ activeCustomer=cid;
+ const c=state.customers.find(x=>x.id===cid); if(!c)return;
+ const bs=state.bills.filter(b=>b.customerId===cid).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+ const total=bs.reduce((s,b)=>s+(+b.allTotal||0),0);
+ const collected=bs.reduce((s,b)=>s+paid(b),0);
+ const dueNow=customerDue(cid);
  $('chatModal').classList.remove('hidden');
- const bs=state.bills.filter(b=>b.customerId===cid).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
- const total=bs.reduce((s,b)=>s+(+b.allTotal||0),0),received=bs.reduce((s,b)=>s+paid(b),0),outstanding=customerDue(cid);
  setText('chatAvatar',initials(c.name));setText('chatName',c.name);
  setText('chatSub',`${c.phone||'No phone'} · ${c.village||'Village not set'}`);
- $('chatBody').innerHTML=`<section class="v104-profile-hero">
-  <div class="v104-profile-identity"><div class="v104-profile-avatar">${esc(initials(c.name))}</div><div><h2>${esc(c.name)}</h2><p>${esc(c.phone||'Phone not added')}</p></div></div>
-  <div class="v104-profile-stats"><div><small>Total billed</small><b>${money(total)}</b></div><div><small>Received</small><b>${money(received)}</b></div><div><small>Outstanding</small><b>${money(outstanding)}</b></div></div>
- </section>
- <section class="v104-profile-info"><h3>Customer information</h3>
-  <div>${uiIcon('location')}<span><small>Village</small><b>${esc(c.village||'Not added')}</b></span></div>
-  <div>${uiIcon('user')}<span><small>Address</small><b>${esc(c.address||'Not added')}</b></span></div>
-  <div>${uiIcon('ledger')}<span><small>Customer note</small><b>${esc(c.note||'No notes')}</b></span></div>
-  <div>${uiIcon('calendar')}<span><small>Opening due</small><b>${money(c.openingDue||0)}</b></span></div>
- </section>
- <section class="v104-profile-section"><div class="v104-section-title"><h3>Bill history</h3><span>${bs.length} bills</span></div>
- ${bs.map(b=>`<article class="v104-history-item"><div class="v104-history-top"><b>${esc(b.billNo)}</b><small>${esc(b.date||'')}</small></div><div class="v104-history-values"><span>Total <b>${money(b.allTotal)}</b></span><span>Paid <b>${money(paid(b))}</b></span><span>Due <b>${money(due(b))}</b></span></div><div class="bubble-actions"><button data-viewbill="${esc(b.id)}">View bill</button><button data-paybill="${esc(b.id)}">Receive payment</button></div></article>`).join('')||'<p class="muted">No bills recorded for this user yet.</p>'}
- </section>
- <section class="v104-profile-section"><div class="v104-section-title"><h3>Payment activity</h3></div>
- ${bs.flatMap(b=>(b.payments||[]).map(p=>({...p,billNo:b.billNo}))).sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(p=>`<div class="v104-payment-item"><span class="v104-payment-icon">${uiIcon('wallet')}</span><div><b>${money(p.amount)}</b><small>${esc(p.date||'')} · ${esc(p.mode||'Payment')} · ${esc(p.billNo)}</small></div><strong>${esc(p.receivedIn||'Received')}</strong></div>`).join('')||'<p class="muted">No payment activity yet.</p>'}
- </section>`;
+ const billRows=bs.map(b=>`<section class="profile-entry">
+  <div class="profile-entry-head"><div><b>${esc(b.billNo)}</b><small>${esc(b.date||'')}</small></div><span class="profile-status ${due(b)>0?'is-due':'is-paid'}">${due(b)>0?'Due '+money(due(b)):'Paid'}</span></div>
+  <div class="profile-entry-stats"><span>Total <b>${money(b.allTotal)}</b></span><span>Received <b>${money(paid(b))}</b></span></div>
+  <div class="profile-entry-actions"><button data-viewbill="${esc(b.id)}">${uiIcon('bill')} View Bill</button><button data-paybill="${esc(b.id)}">${uiIcon('pay')} Receive</button></div>
+ </section>`).join('');
+ const payments=bs.flatMap(b=>(b.payments||[]).map(p=>({...p,billNo:b.billNo}))).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+ const paymentRows=payments.map(p=>`<div class="profile-payment"><span class="profile-payment-icon">${uiIcon('pay')}</span><div><b>${money(p.amount)}</b><small>${esc(p.date||'')} · ${esc(p.mode||'Payment')} · ${esc(p.billNo||'')}</small></div><span class="profile-payment-tag">${esc(p.note||'Received')}</span></div>`).join('');
+ $('chatBody').innerHTML=`
+  <div class="profile-overview">
+   <div class="profile-overview-title"><span>Customer overview</span><b class="${dueNow?'profile-due-text':'profile-paid-text'}">${dueNow?'Due '+money(dueNow):'Fully paid'}</b></div>
+   <div class="profile-metrics"><div><small>Total bills</small><b>${bs.length}</b></div><div><small>Billed amount</small><b>${money(total)}</b></div><div><small>Received</small><b>${money(collected)}</b></div></div>
+   <div class="profile-contact"><span>${uiIcon('call')} ${esc(c.phone||'Phone not added')}</span><span>${uiIcon('ledger')} ${esc(c.village||'Village not added')}</span></div>
+   ${c.address?`<p class="profile-note"><b>Address</b><br>${esc(c.address)}</p>`:''}
+   ${c.note?`<p class="profile-note"><b>Customer note</b><br>${esc(c.note)}</p>`:''}
+   ${(+c.openingDue||0)>0?`<p class="profile-note"><b>Opening due</b> ${money(c.openingDue)}</p>`:''}
+  </div>
+  <div class="profile-section-title">Bill history <span>${bs.length}</span></div>
+  ${billRows||'<div class="profile-empty">No bills created for this customer yet.</div>'}
+  <div class="profile-section-title">Payment history <span>${payments.length}</span></div>
+  ${paymentRows||'<div class="profile-empty">No payments recorded yet.</div>'}`;
 }
 function directPay(cid,settle=false){const amount=+(prompt(settle?'Settle amount':'Receive amount',String(customerDue(cid)))||0);if(amount<=0)return;let left=amount;for(const b of state.bills.filter(x=>x.customerId===cid)){if(left<=0)break;const part=Math.min(left,due(b));if(part){b.payments=b.payments||[];b.payments.push({id:id(),date:today(),amount:part,mode:settle?'Settlement':'Cash',receivedIn:settle?'Settled':'Cash',note:settle?'Settled from customer ledger':'Direct payment'});left-=part}}if(left>0){const c=state.customers.find(x=>x.id===cid);if(c)c.openingDue=Math.max(0,(+c.openingDue||0)-left)}persist();openChat(cid)}
 function bind(){document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));$('loginBtn').onclick=login;$('logoutBtn').onclick=logout;$('addCustomerBtn').onclick=()=>openCustomer();$('saveCustomerBtn').onclick=saveCustomer;$('closeCustomerBtn').onclick=closeCustomer;$('customerSearch').oninput=customers;$('customerList').onclick=e=>{const a=e.target.closest('[data-act]');if(a){e.stopPropagation();const c=state.customers.find(x=>x.id===a.dataset.id);if(!c)return;const act=a.dataset.act;if(act==='bill'){$('billCustomer').value=c.id;showPage('billPage');toggleManual();previewBill()}else if(act==='edit')openCustomer(c.id);else if(act==='ledger')openChat(c.id);else if(act==='pay')directPay(c.id,false);else if(act==='settle')directPay(c.id,true);else if(act==='remind'){const b=state.bills.filter(x=>x.customerId===c.id).sort((x,y)=>(y.date||'').localeCompare(x.date||''))[0];if(b)reminder(b);else alert('No bill found')}else if(act==='call'){if(c.phone)location.href='tel:'+digits(c.phone);else alert('No phone number')}else if(act==='delete'){if(confirm('Delete this customer and all linked bills?')){state.customers=state.customers.filter(x=>x.id!==c.id);state.bills=state.bills.filter(x=>x.customerId!==c.id);persist()}}return}const row=e.target.closest('[data-customer]');if(row)openChat(row.dataset.customer)};['billCustomer','season','landUnit','land','rate','paidNow','billPayMode','receivedIn','billNote','template','printMode','manualName','manualPhone','manualVillage','manualAddress','previousDue'].forEach(x=>$(x).addEventListener('input',previewBill));$('billCustomer').onchange=()=>{toggleManual();const c=state.customers.find(x=>x.id===$('billCustomer').value);$('previousDue').value=c?customerDue(c.id):0;previewBill()};$('saveBillBtn').onclick=saveBill;$('previewBtn').onclick=previewBill;$('printBtn').onclick=printBill;$('pdfBtn').onclick=pdf;$('shareBtn').onclick=()=>currentBill?reminder(currentBill):alert('Save or preview a bill first');$('waTextBtn').onclick=()=>currentBill?reminder(currentBill):alert('Save or preview a bill first');$('payBill').onchange=updatePayInfo;$('fillDueBtn').onclick=fillDue;$('cashBtn').onclick=()=>quickMode('Cash');$('onlineBtn').onclick=()=>quickMode('UPI');$('receiveBtn').onclick=()=>savePayment(false);$('settleBtn').onclick=()=>savePayment(true);$('dueReceiptBtn').onclick=dueReceipt;['homeVillage','homeMonth','reportVillage','reportMonth'].forEach(x=>$(x).addEventListener('change',renderAll));$('csvBtn').onclick=csv;$('backupBtn').onclick=backup;$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=importData;['calcLand','calcUnit','calcRate'].forEach(x=>$(x).addEventListener('input',landCalc));$('saveSettingsBtn').onclick=settingsSave;$('cloudPullBtn').onclick=pullCloud;$('cloudPushBtn').onclick=()=>pushCloud(true);$('cloudDoctorBtn').onclick=()=>setText('cloudStatus',auth?.currentUser?'Signed in · '+auth.currentUser.uid:'Not signed in');$('chatBack').onclick=()=>$('chatModal').classList.add('hidden');$('chatCall').onclick=()=>{const c=state.customers.find(x=>x.id===activeCustomer);if(c?.phone)location.href='tel:'+digits(c.phone)};$('chatWhats').onclick=()=>{const c=state.customers.find(x=>x.id===activeCustomer);if(c?.phone)window.open('https://wa.me/'+digits(c.phone),'_blank','noopener')};$('chatBill').onclick=()=>{const c=state.customers.find(x=>x.id===activeCustomer);$('chatModal').classList.add('hidden');showPage('billPage');$('billCustomer').value=c?.id||'__new';toggleManual();previewBill()};$('chatPay').onclick=()=>directPay(activeCustomer);$('chatSettle').onclick=()=>directPay(activeCustomer,true);$('chatEdit').onclick=()=>openCustomer(activeCustomer);$('historyList').onclick=e=>{const v=e.target.closest('[data-viewbill]'),p=e.target.closest('[data-paybill]'),r=e.target.closest('[data-remind]');if(v)billActions(state.bills.find(b=>b.id===v.dataset.viewbill));if(p){showPage('payPage');$('payBill').value=p.dataset.paybill;updatePayInfo()}if(r){const b=state.bills.find(x=>x.id===r.dataset.remind);if(b)reminder(b)}};$('chatBody').onclick=e=>{const v=e.target.closest('[data-viewbill]'),p=e.target.closest('[data-paybill]');if(v)billActions(state.bills.find(b=>b.id===v.dataset.viewbill));if(p){showPage('payPage');$('payBill').value=p.dataset.paybill;updatePayInfo()}};$('installBtn').onclick=()=>deferredInstall?deferredInstall.prompt():alert('Browser menu → Add to Home screen');window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e})}
