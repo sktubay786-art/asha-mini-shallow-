@@ -1,33 +1,21 @@
-# ASHA Billing — Fresh Edition
+# ASHA Billing — Fresh rebuild
 
-A clean rebuild with a new responsive interface and a single application code path.
-
-## Firebase compatibility
-
-This app connects to the existing Firebase project `asha-app-745be` and reads/writes the existing Firestore document `ashaMiniShallow/ekramul-main`. It expects the existing data envelope `{ data: { settings, customers, bills } }` and retains the existing customer, invoice and payment field names.
-
-The Firebase Web API key is a public client identifier, not a server secret. Keep Firestore rules owner-restricted and configure API key restrictions in Google Cloud. Never add service-account credentials to this project.
+A clean ES-module application using the existing ASHA Billing visual assets and the same Firebase project / Firestore document identity.
 
 ## Run locally
 
-```bash
-npm install
-npm run dev
-```
+1. Install Node.js 20 or newer.
+2. Run `npm install`.
+3. Run `npm run dev`.
 
-## Build
+## Data safety
 
-```bash
-npm run build
-```
-
-## Deploy
-
-Deploy the built `dist` directory to Firebase Hosting or another static host. If using Firebase Hosting, set `public` to `dist` in `firebase.json` after building.
+- Firebase project: `asha-app-745be`
+- Firestore path: `ashaMiniShallow/ekramul-main`
+- Existing local-storage key is retained for local data continuity.
+- This project does not run any cloud deletion, collection migration, or document reset.
+- Firebase web API configuration is public client configuration; authorization must be enforced by Firebase Authentication and Firestore Security Rules.
 
 ## Notes
 
-- Existing Firebase Authentication owner UID is retained.
-- Existing Firestore document path is retained; this app does not create a new database or collection.
-- The UI is a fresh implementation, not a patch layered over previous app generations.
-- Test login, cloud read/write, customer CRUD, invoice creation and payment entry in your Firebase project before using it for live accounts.
+The original styles and visual assets are retained as design references. Application logic has been replaced with a new, consolidated module. Verify the owner login and a cloud backup before using it for live billing. The production build should be run with `npm install && npm run build` in an environment with package-registry access.
