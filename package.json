@@ -1,7 +1,7 @@
 {
-  "name": "asha-billing-v104",
+  "name": "asha-billing-fresh",
   "private": true,
-  "version": "104.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {"dev":"vite --host 0.0.0.0", "build":"vite build", "preview":"vite preview --host 0.0.0.0"},
   "devDependencies": {"vite":"^6.4.1"}
