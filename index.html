@@ -42,6 +42,9 @@
           <div class="filter-row dashboard-filters"><label class="sr-only" for="homeVillage">Filter village</label><select id="homeVillage" aria-label="Filter by village"></select><label class="sr-only" for="homeMonth">Filter month</label><input id="homeMonth" type="month" aria-label="Filter by month"></div>
         </div>
         <div class="metrics" id="metrics"></div>
+        <section class="dash-extra card"><div class="dash-section-head"><div><span class="eyebrow">COLLECTION OVERVIEW</span><h3>Settlement & Collection</h3></div></div><div id="settlementMetrics" class="settlement-metrics"></div></section>
+        <section class="dash-extra card"><div class="dash-section-head"><div><span class="eyebrow">VILLAGE ANALYTICS</span><h3>Village-wise Due</h3><p class="muted">প্রতিটি গ্রামের মোট বাকি ও customer count</p></div></div><div id="villageDueList" class="village-due-list"></div></section>
+        <section class="dash-extra card"><div class="dash-section-head"><div><span class="eyebrow">BUSINESS SNAPSHOT</span><h3>Today & Follow-up</h3></div></div><div id="businessSnapshot" class="business-snapshot"></div></section>
         <div class="quick-actions">
           <button data-page="billPage"><span class="action-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.75h7l4 4v12.5H7z"/><path d="M14 3.75v4h4M9.5 12h6M9.5 15.5h6"/></svg></span><b>New Bill</b><small>Create invoice</small></button>
           <button data-page="customersPage"><span class="action-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 19v-1.3a5.5 5.5 0 0 1 11 0V19zM16 5.5a3 3 0 0 1 0 5.8M17 14a4.5 4.5 0 0 1 3.5 4.4V19h-4"/></svg></span><b>Customers</b><small>Profiles & ledger</small></button>
@@ -57,6 +60,8 @@
           <button class="btn primary" id="addCustomerBtn">+ Add</button>
         </div>
         <input id="customerSearch" class="search" placeholder="Search name, village, phone">
+        <div id="userSummary" class="user-summary"></div>
+        <div class="user-toolbar"><span>Customer directory</span><select id="userSort" aria-label="Sort users"><option value="due">Highest due</option><option value="name">Name A–Z</option><option value="recent">Recently added</option></select></div>
         <div id="customerList" class="customer-list"></div>
       </section>
 
