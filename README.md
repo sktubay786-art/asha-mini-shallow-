@@ -1,31 +1,33 @@
-# ASHA Billing — Fresh App 2.0
+# ASHA Billing — Fresh Edition
 
-A clean, standalone rebuild. It does not load any previous `app.js`, `upgrade.js`, or legacy UI code.
+A clean rebuild with a new responsive interface and a single application code path.
 
-## Included
-- Email/password Firebase Authentication (requires your own config)
-- Local demo mode
-- Customer create/edit/search/delete and customer centre
-- New bills with quantity, unit, rate, total and optional initial payment
-- Receive payment and separate settlement/adjustment entries
-- Customer ledger, bill history, WhatsApp bill reminder, phone call
-- Dashboard totals, CSV export, JSON backup/restore, settings and calculator
-- Fresh cache policy: unregisters old service workers and deletes Cache Storage on app startup; the new service worker does not cache app files.
+## Firebase compatibility
 
-## Setup
-1. Upload all files in this folder to the GitHub repository root.
-2. Copy `firebase-config.example.js` to `firebase-config.js` and fill in your Firebase **web app** config.
-3. Enable Email/Password in Firebase Authentication.
-4. Create Firestore and publish `firestore.rules`.
-5. Enable GitHub Pages over HTTPS.
+This app connects to the existing Firebase project `asha-app-745be` and reads/writes the existing Firestore document `ashaMiniShallow/ekramul-main`. It expects the existing data envelope `{ data: { settings, customers, bills } }` and retains the existing customer, invoice and payment field names.
 
-Without Firebase config, choose **Continue with local demo**. Demo data stays in this browser only.
+The Firebase Web API key is a public client identifier, not a server secret. Keep Firestore rules owner-restricted and configure API key restrictions in Google Cloud. Never add service-account credentials to this project.
 
-## Security
-- Firestore document path: `ashaUsers/{uid}`.
-- Rules allow each signed-in user to access only their own document.
-- Firebase browser API keys are identifiers, not server secrets. Restrict the key in Google Cloud; never include service-account keys in this project.
-- Do not use demo mode for important production records. Export regular backups.
+## Run locally
 
-## Important
-This is a fresh baseline implementation. Test all workflows with sample data before production use. WhatsApp reminder opens a prefilled WhatsApp chat; it does not send automatically. Deleting a customer deletes that customer's bills from the app data.
+```bash
+npm install
+npm run dev
+```
+
+## Build
+
+```bash
+npm run build
+```
+
+## Deploy
+
+Deploy the built `dist` directory to Firebase Hosting or another static host. If using Firebase Hosting, set `public` to `dist` in `firebase.json` after building.
+
+## Notes
+
+- Existing Firebase Authentication owner UID is retained.
+- Existing Firestore document path is retained; this app does not create a new database or collection.
+- The UI is a fresh implementation, not a patch layered over previous app generations.
+- Test login, cloud read/write, customer CRUD, invoice creation and payment entry in your Firebase project before using it for live accounts.

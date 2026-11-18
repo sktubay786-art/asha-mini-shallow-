@@ -1,10 +1,9 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /ashaMiniShallow/{docId} {
+    match /ashaMiniShallow/ekramul-main {
       allow read, write: if request.auth != null
-        && request.auth.uid == "FZIhTAr0JEMoHCeQd3kr2t8cJKk2"
-        && docId == "ekramul-main";
+        && request.auth.uid == "FZIhTAr0JEMoHCeQd3kr2t8cJKk2";
     }
   }
 }
