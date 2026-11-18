@@ -1,7 +1,7 @@
 {
-  "name": "ASHA Billing",
+  "name": "ASHA Billing \u2014 iOS Experience",
   "short_name": "ASHA Billing",
-  "start_url": "./index.html?v=94",
+  "start_url": "./index.html?v=104",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f5f7f6",
@@ -20,5 +20,5 @@
       "purpose": "any maskable"
     }
   ],
-  "version": "94"
+  "version": "104"
 }
